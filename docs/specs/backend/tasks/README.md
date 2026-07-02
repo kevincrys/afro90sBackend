@@ -20,6 +20,7 @@ Organizado em **4 fases** alinhadas com [`infra/tasks/`](../../infra/tasks/READM
 | # | Arquivo | O que entrega |
 |---|---------|---------------|
 | 00 | [00-setup-repo.md](00-setup-repo.md) | Estrutura `afro90sBackend`, Vitest, ESLint, CI |
+| 00 | [00-deploy-api.md](00-deploy-api.md) | Deploy S3 + `update-function-code` |
 | 01 | [01-convencoes-globais.md](01-convencoes-globais.md) | Response helpers, CORS, `X-Request-Id` |
 | 02 | [02-modelos-de-dados.md](02-modelos-de-dados.md) | Schemas Zod: Product, Order, Customer |
 | 03 | [03-erros-http.md](03-erros-http.md) | `ApiError`, mapeamento code → status |

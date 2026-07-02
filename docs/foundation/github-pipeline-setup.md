@@ -1,104 +1,84 @@
 # Configuração de Pipelines — afro90sBackend
 
-Guia para configurar **GitHub Actions**, **Environments** e **branch protection** neste repositório.
+Guia para configurar **GitHub Actions**, **Environments**, **OIDC AWS** e **branch protection** neste repositório.
 
-> Setup AWS compartilhado (OIDC provider, conta, região): ver guia completo no [afro90sInfra](https://github.com/kevincrys/afro90sInfra/blob/main/docs/foundation/github-pipeline-setup.md).
+> OIDC provider, bucket de artefatos e Lambda: [afro90sInfra — github-pipeline-setup.md](https://github.com/kevincrys/afro90sInfra/blob/main/docs/foundation/github-pipeline-setup.md) · [ADR-007](https://github.com/kevincrys/afro90sInfra/blob/main/docs/foundation/adr/007-backend-lambda-s3-deploy.md)
 
 ## Repositório
 
 | Campo | Valor |
 |-------|-------|
 | GitHub | `kevincrys/afro90sBackend` |
-| Pipeline | CI only (sem deploy AWS direto) |
-| Deploy Lambda | Via CDK no **afro90sInfra** |
+| CI | `ci.yml` — sem AWS |
+| Deploy | `deploy-dev.yml` / `deploy-prod.yml` — S3 + Lambda |
+| Auth AWS | OIDC — sem access keys |
 
 ## Branches
 
-| Branch | Uso |
-|--------|-----|
-| `main` | Production — merge via PR + CI verde |
-| `dev` | Integração — CI em todo push |
+| Branch | Deploy |
+|--------|--------|
+| `dev` | Automático → Lambda **dev** |
+| `main` | Automático → Lambda **production** (approval) |
 
-```bash
-git checkout -b dev && git push -u origin dev
-```
+## Workflows
 
-## Workflow
+| Arquivo | Trigger | Environment |
+|---------|---------|-------------|
+| `ci.yml` | PR + push | — |
+| `deploy-dev.yml` | Push `dev` | `dev` |
+| `deploy-prod.yml` | Push `main` | `production` |
 
-### `.github/workflows/ci.yml`
+Spec: [00-deploy-api.md](../specs/backend/tasks/00-deploy-api.md)
 
-| Campo | Valor |
-|-------|-------|
-| Trigger | `pull_request` + `push` (todas branches) |
-| Node | 20 |
-| Steps | `npm ci` → `npm run build` → `npm run test:coverage` → `npm run lint` |
-| Falha | Cobertura < 80% ou erros de lint/typecheck |
+### Deploy (resumo)
 
-Spec de implementação: [backend/tasks/00-setup-repo.md](../specs/backend/tasks/00-setup-repo.md)
+1. `npm run test:coverage`
+2. `npm run bundle && npm run package:lambda`
+3. `aws s3 cp lambda.zip s3://$ARTIFACT_BUCKET/api/$SHA.zip`
+4. `aws s3 cp lambda.zip s3://$ARTIFACT_BUCKET/api/latest.zip`
+5. `aws lambda update-function-code --s3-bucket ... --s3-key api/latest.zip`
 
-### OIDC AWS (opcional na v1)
+## AWS — Role IAM
 
-O CI do backend **não precisa de AWS** na fase inicial (testes com mocks). Se testes de integração exigirem AWS:
-
-| Role IAM | Trigger |
-|----------|---------|
-| `afro90s-github-backend-pr` | `repo:kevincrys/afro90sBackend:pull_request` |
-| `afro90s-github-backend-dev` | `repo:kevincrys/afro90sBackend:ref:refs/heads/dev` |
+| Role | Trigger | Policy |
+|------|---------|--------|
+| `afro90s-github-backend-dev` | push `dev` | `s3:PutObject` em `.../api/*` + `lambda:UpdateFunctionCode` |
+| `afro90s-github-backend-prod` | push `main` | Idem prod |
 
 ## GitHub Environments
 
-| Environment | Quando usar | Variables |
-|-------------|-------------|-----------|
-| `dev` | Jobs futuros com AWS (integração) | `AWS_ROLE_ARN`, `AWS_REGION` |
-| `production` | Idem para main | `AWS_ROLE_ARN`, `AWS_REGION` |
+### `dev`
 
-Na v1, o workflow `ci.yml` **não** precisa de `environment:`.
+| Variable | Exemplo |
+|----------|---------|
+| `AWS_ROLE_ARN` | `arn:aws:iam::083171867610:role/afro90s-github-backend-dev` |
+| `AWS_REGION` | `us-east-1` |
+| `ARTIFACT_BUCKET` | `afro90s-dev-s3-lambda-artifacts` |
+| `LAMBDA_FUNCTION_NAME` | `afro90s-dev-lambda-api` |
 
-**Repository variables** recomendadas:
+### `production`
 
-| Nome | Valor |
-|------|-------|
-| `NODE_VERSION` | `20` |
+Mesmas variables com valores prod + **required reviewers**.
 
 ## Branch protection — `main`
 
-**Settings → Branches → Add rule** (ou Rulesets):
-
-| Opção | Valor |
-|-------|-------|
-| Require pull request | ✅ · 1 approval |
-| Require status checks | ✅ · check name: `ci` (ou nome do job) |
-| Require up to date | ✅ |
-| Block force push | ✅ |
-
-## Rulesets (alternativa)
-
-**Settings → Rules → New ruleset** targeting `main`:
-
 - Require PR + 1 approval
 - Require status check `ci`
-- Block force pushes
+- Block force push
 
-## Relação com deploy
+## Pré-requisitos
 
-```
-afro90sBackend: PR → CI passa → merge
-       ↓
-afro90sInfra: CDK referencia/bundle deste repo → cdk deploy → Lambda atualizada
-```
-
-Garanta que merges em `dev`/`main` do backend precedam ou acompanhem deploy infra quando houver mudança de código.
+- [ ] Infra task 10 deployada (Lambda + bucket artefatos)
+- [ ] Roles IAM backend criadas (infra task 00)
+- [ ] Variables preenchidas nos environments
 
 ## Checklist
 
-- [ ] Branch `dev` criada
-- [ ] `.github/workflows/ci.yml` commitado
-- [ ] Branch protection em `main` com required check `ci`
-- [ ] PR de teste passa build + test + lint
-- [ ] (Opcional) Roles IAM se CI precisar AWS
+- [ ] `ci.yml` + `deploy-dev.yml` + `deploy-prod.yml` commitados
+- [ ] Merge em `dev` atualiza Lambda
+- [ ] Nenhum `AWS_ACCESS_KEY_ID` no repo
 
 ## Referências
 
 - [Pipeline overview](../specs/pipelines/overview.md)
-- [Task 00 — setup](../specs/backend/tasks/00-setup-repo.md)
-- [Guia completo (infra)](https://github.com/kevincrys/afro90sInfra/blob/main/docs/foundation/github-pipeline-setup.md)
+- [Task 00-deploy-api](../specs/backend/tasks/00-deploy-api.md)

@@ -18,7 +18,8 @@ Guia de implementação do backend Afro90s no repositório **afro90sBackend**.
 | Storage imagens | S3 |
 | E-mail | SES |
 | Validação | Zod |
-| Bundling | esbuild |
+| Bundling | esbuild (`npm run bundle`) |
+| Deploy | S3 artifact + `update-function-code` ([ADR-007](docs/foundation/adr/007-backend-lambda-s3-deploy.md)) |
 
 ## Estrutura sugerida do repositório
 

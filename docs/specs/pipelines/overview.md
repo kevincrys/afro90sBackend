@@ -1,51 +1,56 @@
 # Pipelines — afro90sBackend
 
-**Status:** Rascunho  
-**Última atualização:** 2025-06-23
+**Status:** Aprovado  
+**Última atualização:** 2025-06-23  
+**ADR:** [007-backend-lambda-s3-deploy](https://github.com/kevincrys/afro90sInfra/blob/main/docs/foundation/adr/007-backend-lambda-s3-deploy.md)
 
 ## Escopo deste repositório
 
-Pipeline de **integração contínua** — validação de código em todo PR e push. **Deploy** da Lambda é responsabilidade do **afro90sInfra** (CDK).
+- **CI** — validação em todo PR/push
+- **CD** — deploy do **código Lambda** via S3 + `update-function-code`
 
-## Workflow planejado
+Config da Lambda (env vars, IAM, timeout) continua no **afro90sInfra** (CDK).
+
+## Workflows
 
 | Workflow | Arquivo | Trigger | Ação |
 |----------|---------|---------|------|
-| CI | `ci.yml` | PR + push (all branches) | build → test:coverage → lint |
+| CI | `ci.yml` | PR + push | build → test:coverage → lint |
+| Deploy dev | `deploy-dev.yml` | Push `dev` | bundle → S3 → update-function-code |
+| Deploy prod | `deploy-prod.yml` | Push `main` | Idem + environment `production` |
 
-## Requisitos de CI
-
-| Check | Critério |
-|-------|----------|
-| TypeScript | `npm run build` sem erros |
-| Testes | `npm run test:coverage` — cobertura ≥ 80% |
-| Lint | `npm run lint` sem erros |
-
-## Configuração GitHub
-
-Guia: [github-pipeline-setup.md](../../foundation/github-pipeline-setup.md)
-
-- **Environments:** opcionais na v1 (CI sem AWS)
-- **Branch protection:** `main` exige PR + status check `ci`
-- **Secrets:** nenhum necessário na v1
-
-## Task de implementação
-
-| Task | Descrição | Status |
-|------|-----------|--------|
-| [00-setup-repo](../backend/tasks/00-setup-repo.md) | Estrutura + `ci.yml` | pendente |
-
-## Fluxo com afro90sInfra
+## Fluxo de deploy
 
 ```
-1. Dev abre PR no afro90sBackend → CI passa → merge
-2. afro90sInfra CDK bundle/deploy inclui código atualizado
-3. Lambda em dev/prod reflete nova versão
+merge dev/main
+    → npm run bundle (esbuild)
+    → lambda.zip
+    → s3://ARTIFACT_BUCKET/api/{sha}.zip
+    → s3://ARTIFACT_BUCKET/api/latest.zip
+    → aws lambda update-function-code
+    → Lambda executa código novo
 ```
 
-## Critérios de aceite (fase 0)
+## Variables (por environment)
 
-- [ ] `ci.yml` roda em todo PR
-- [ ] Merge bloqueado se CI falhar
-- [ ] Cobertura mínima 80% enforced no workflow
-- [ ] Nenhum secret no repositório
+| Variable | Origem |
+|----------|--------|
+| `AWS_ROLE_ARN` | IAM role OIDC backend |
+| `AWS_REGION` | `us-east-1` |
+| `ARTIFACT_BUCKET` | Output CDK `LambdaArtifactsBucketName` |
+| `LAMBDA_FUNCTION_NAME` | Output CDK `LambdaFunctionName` |
+
+## Tasks de implementação
+
+| Task | Descrição |
+|------|-----------|
+| [00-setup-repo.md](../backend/tasks/00-setup-repo.md) | Estrutura + CI |
+| [00-deploy-api.md](../backend/tasks/00-deploy-api.md) | Bundle + deploy workflows |
+
+## Critérios de aceite
+
+- [ ] PR dispara CI; merge bloqueado se falhar
+- [ ] Push em `dev` atualiza Lambda dev
+- [ ] Push em `main` atualiza Lambda prod (com approval)
+- [ ] Rollback possível via zip `{sha}` no S3
+- [ ] Nenhum secret AWS no repositório

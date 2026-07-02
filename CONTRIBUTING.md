@@ -1,39 +1,20 @@
 # Como Contribuir — afro90sBackend
 
-## Fluxo de trabalho
+## Fluxo
 
-1. Crie uma branch a partir de `main` ou `dev`: `feat/descricao-curta` ou `fix/descricao-curta`.
-2. Se alterar contrato HTTP, atualize [docs/specs/backend/api-routes.md](docs/specs/backend/api-routes.md) e sincronize com [afro90sInfra](https://github.com/kevincrys/afro90sInfra).
-3. Implemente seguindo a task em [docs/specs/backend/tasks/](docs/specs/backend/tasks/).
-4. Garanta `npm run build`, `npm test` e `npm run lint` passando localmente.
-5. Abra PR — CI deve passar (coverage ≥ 80%).
-
-## Commits
-
-```
-feat: add GET /products with cursor pagination
-fix: validate order payload with Zod
-test: cover product service edge cases
-docs: update api-routes for admin POST
-```
-
-## Documentação
-
-| Mudança | Onde documentar |
-|---------|-----------------|
-| Nova/alterada rota API | `docs/specs/backend/api-routes.md` (+ afro90sInfra) |
-| Novo modelo/campo | `docs/specs/backend/data-models.md` |
-| Nova task ou fase | `docs/specs/backend/tasks/` |
-| Pipeline CI | `docs/specs/pipelines/overview.md` |
-
-## Revisão de PR
-
-- [ ] CI verde (build, test, lint)
-- [ ] Cobertura ≥ 80%
-- [ ] Contrato API atualizado se aplicável
-- [ ] Nenhum secret commitado
-- [ ] Link para task/spec relacionada
+1. Branch `feat/` ou `fix/` a partir de `main` ou `dev`
+2. PR com CI verde (coverage ≥ 80%)
+3. Merge em `dev` → **deploy automático** da Lambda dev
+4. Merge em `main` → deploy production (approval)
 
 ## Deploy
 
-Merge neste repo **não** faz deploy automático. Após merge, o pipeline do **afro90sInfra** deve incluir o código atualizado no próximo `cdk deploy`.
+Este repo **publica o código Lambda**. Não é necessário merge na infra para cada mudança de handler — apenas na primeira vez (recursos) ou quando env vars/IAM mudarem.
+
+Ver [00-deploy-api.md](docs/specs/backend/tasks/00-deploy-api.md).
+
+## PR checklist
+
+- [ ] CI verde
+- [ ] Contrato API atualizado se aplicável
+- [ ] Nenhum secret commitado

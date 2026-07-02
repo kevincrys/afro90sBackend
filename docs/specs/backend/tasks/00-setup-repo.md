@@ -1,12 +1,12 @@
-# Task 00 — Setup do repositório afro90sBackend
+# Task 00 — Setup do repositório afro90s-api
 
 **Fase:** 0 — Fundação  
 **Status:** pendente  
-**Repo:** `afro90sBackend` (`kevincrys/afro90sBackend`)
+**Repo:** `afro90s-api` (repositório separado)
 
 ## Objetivo
 
-Criar e configurar o repositório `afro90sBackend` com toda a infraestrutura de código antes de implementar qualquer handler.
+Criar e configurar o repositório `afro90s-api` com toda a infraestrutura de código antes de implementar qualquer handler.
 
 ## Configurações já definidas
 
@@ -14,7 +14,9 @@ Criar e configurar o repositório `afro90sBackend` com toda a infraestrutura de 
 |---------|-------|
 | Runtime | Node.js 20 + TypeScript strict |
 | Framework HTTP | Middy (middleware para Lambda) |
-| Bundling | esbuild via CDK `NodejsFunction` |
+| Bundling | esbuild no **afro90sBackend** (`npm run bundle`) |
+| Deploy código | S3 + `update-function-code` ([ADR-007](../../../foundation/adr/007-backend-lambda-s3-deploy.md)) |
+| Deploy config | CDK no afro90sInfra (env vars, IAM, timeout) |
 | Testes | Vitest + cobertura mínima 80% |
 | Linting | ESLint + Prettier |
 | Lambda | Monolítico com router interno |
@@ -24,7 +26,7 @@ Criar e configurar o repositório `afro90sBackend` com toda a infraestrutura de 
 ### Estrutura de pastas
 
 ```
-afro90sBackend/
+afro90s-api/
 ├── src/
 │   ├── handler.ts          # entry point Lambda
 │   ├── router.ts           # roteador interno
@@ -61,7 +63,9 @@ afro90sBackend/
 
 ### `package.json` scripts
 
-- [ ] `"build": "tsc --noEmit"` — type check (bundling é via esbuild no CDK)
+- [ ] `"build": "tsc --noEmit"` — type check
+- [ ] `"bundle": "node scripts/bundle.mjs"` — esbuild → `dist/` (deploy)
+- [ ] `"package:lambda": "cd dist && zip -r ../lambda.zip ."`
 - [ ] `"test": "vitest run"`
 - [ ] `"test:watch": "vitest"`
 - [ ] `"test:coverage": "vitest run --coverage"`
@@ -99,12 +103,14 @@ AWS_REGION=us-east-1
 - [ ] `eslint.config.js` com `@typescript-eslint/recommended`
 - [ ] `.prettierrc`: `{ "singleQuote": true, "semi": true, "printWidth": 100 }`
 
-### GitHub Actions — CI do repositório `afro90sBackend`
+### GitHub Actions — CI
 
 - [ ] `.github/workflows/ci.yml`:
   - Trigger: `push` e `pull_request` em qualquer branch
-  - Steps: `npm ci` → `npm run build` → `npm run test:coverage`
+  - Steps: `npm ci` → `npm run build` → `npm run test:coverage` → `npm run lint`
   - Falha se cobertura < 80%
+
+Deploy (S3 + Lambda): ver [00-deploy-api.md](00-deploy-api.md).
 
 ## Pré-requisitos
 
