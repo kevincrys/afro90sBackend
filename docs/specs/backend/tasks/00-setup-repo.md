@@ -1,12 +1,12 @@
-# Task 00 — Setup do repositório afro90s-api
+# Task 00 — Setup do repositório afro90sBackend
 
 **Fase:** 0 — Fundação  
 **Status:** pendente  
-**Repo:** `afro90s-api` (repositório separado)
+**Repo:** `afro90sBackend` (`kevincrys/afro90sBackend`)
 
 ## Objetivo
 
-Criar e configurar o repositório `afro90s-api` com toda a infraestrutura de código antes de implementar qualquer handler.
+Criar e configurar o repositório `afro90sBackend` com toda a infraestrutura de código antes de implementar qualquer handler.
 
 ## Configurações já definidas
 
@@ -24,7 +24,7 @@ Criar e configurar o repositório `afro90s-api` com toda a infraestrutura de có
 ### Estrutura de pastas
 
 ```
-afro90s-api/
+afro90sBackend/
 ├── src/
 │   ├── handler.ts          # entry point Lambda
 │   ├── router.ts           # roteador interno
@@ -99,7 +99,7 @@ AWS_REGION=us-east-1
 - [ ] `eslint.config.js` com `@typescript-eslint/recommended`
 - [ ] `.prettierrc`: `{ "singleQuote": true, "semi": true, "printWidth": 100 }`
 
-### GitHub Actions — CI do repositório `afro90s-api`
+### GitHub Actions — CI do repositório `afro90sBackend`
 
 - [ ] `.github/workflows/ci.yml`:
   - Trigger: `push` e `pull_request` em qualquer branch

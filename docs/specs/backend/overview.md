@@ -5,7 +5,7 @@
 
 ## Objetivo
 
-Guia de implementação do backend Afro90s no repositório futuro `afro90s-api`.
+Guia de implementação do backend Afro90s no repositório **afro90sBackend**.
 
 ## Stack
 
@@ -23,7 +23,7 @@ Guia de implementação do backend Afro90s no repositório futuro `afro90s-api`.
 ## Estrutura sugerida do repositório
 
 ```
-afro90s-api/
+afro90sBackend/
 ├── src/
 │   ├── handlers/
 │   │   ├── products-public.ts

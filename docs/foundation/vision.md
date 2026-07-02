@@ -1,62 +1,55 @@
-# Visão e Escopo — afro90sInfra
+# Visão e Escopo — afro90sBackend
 
 ## Objetivo
 
-Provisionar, configurar e operar a infraestrutura necessária para o projeto **Afro90s**, de forma reprodutível, segura e documentada.
-
-Este repositório é a fonte da verdade para:
-
-- Definição de ambientes (`dev`, `production`)
-- Recursos de cloud e rede (AWS via CDK)
-- Políticas de acesso (IAM, secrets)
-- Pipelines de deploy de infraestrutura
-- **Specs centralizadas** de backend e frontend (contratos para repos de aplicação)
+Implementar a **API REST serverless** do Afro90s: handlers Lambda, serviços de negócio, acesso a DynamoDB/S3/SES e testes automatizados.
 
 ## Escopo
 
-- Infraestrutura como código (AWS CDK em TypeScript)
-- Configuração de ambientes e recursos compartilhados
-- Documentação técnica (specs, ADRs, arquitetura)
-- Automação de provisionamento e deploy
-- Especificações de API, modelos de dados e requisitos de frontend
+- Código-fonte da Lambda (Node.js 20 + TypeScript)
+- Rotas públicas (`/products`, `/orders`) e admin (`/admin/*`)
+- Modelos, validação Zod, tratamento de erros HTTP
+- Testes unitários e de integração (Vitest)
+- Pipeline CI (build, test, lint) neste repositório
+- Specs locais de backend (cópia/ref. da documentação central)
 
 ## Fora de escopo
 
-- Código-fonte das aplicações (implementação Lambda e React vive em `afro90s-api` e `afro90s-web`)
-- Lógica de negócio executável
-- Conteúdo editorial ou assets de mídia finais
-- Gerenciamento de dependências de aplicação (npm dos repos de app)
+- Provisionamento AWS (CDK, IAM, API Gateway config) → **afro90sInfra**
+- Interface web → **afro90sFrontend**
+- Decisões arquiteturais globais e ADRs → **afro90sInfra** (alterações de contrato exigem PR lá também)
+- Deploy direto da Lambda (feito pelo CDK no afro90sInfra)
 
-Repositórios de aplicação consomem **outputs** e seguem **specs** definidas aqui.
+## Contratos
+
+| Documento | Uso |
+|-----------|-----|
+| [api-routes.md](../specs/backend/api-routes.md) | Contrato HTTP — não implementar rotas fora da spec |
+| [data-models.md](../specs/backend/data-models.md) | Schemas DynamoDB |
+| [overview.md](../specs/backend/overview.md) | Stack e estrutura |
+
+Mudanças de contrato: atualizar spec neste repo **e** no [afro90sInfra](https://github.com/kevincrys/afro90sInfra).
 
 ## Princípios
 
-1. **Reprodutibilidade** — ambientes criados a partir de código versionado, não configuração manual ad hoc.
-2. **Segurança por padrão** — least privilege, secrets fora do repositório, recursos com tags e auditoria.
-3. **Documentação viva** — specs e ADRs acompanham mudanças estruturais.
-4. **Simplicidade** — preferir soluções diretas; complexidade só quando justificada em ADR.
+1. **Contrato first** — endpoint novo ou alterado começa na spec `api-routes.md`.
+2. **Testes obrigatórios** — cobertura mínima 80%; CI bloqueia merge se falhar.
+3. **Sem secrets no Git** — variáveis injetadas pelo CDK no deploy.
+4. **Diff mínimo** — uma concern por PR.
 
-## Stakeholders
+## Roadmap
 
-| Papel | Responsabilidade |
-|-------|------------------|
-| Maintainer de infra | Evolução do repo, review de PRs, ADRs |
-| Desenvolvedores | Consumir outputs e specs; implementar em repos de app |
-| Agentes de IA | Seguir AGENTS.md, specs e rules ao implementar |
+- [ ] Task 00 — setup do repo (estrutura, ESLint, Vitest, CI)
+- [ ] Fase 1 — rotas públicas (products, orders)
+- [ ] Fase 2 — auth Cognito + rotas admin
+- [ ] Fase 3 — upload de imagens, CRUD admin completo
+- [ ] Fase 4 — SES, testes de cobertura, aceite final
 
-## Roadmap inicial
-
-- [x] Definir cloud provider e stack IaC (ADRs 002–004)
-- [x] Specs de backend, frontend e infra
-- [ ] Implementar stacks CDK em `infra/`
-- [ ] Pipeline CI/CD (validate + diff + deploy dev; production manual)
-- [ ] Provisionar ambiente `dev`
-- [ ] Integração com repositórios `afro90s-api` e `afro90s-web`
+Tasks: [docs/specs/backend/tasks/](../specs/backend/tasks/)
 
 ## Referências
 
-- [Visão do produto Afro90s](project-overview.md)
-- [Arquitetura](architecture.md)
-- [Glossário](glossary.md)
-- [ADRs](adr/)
-- [Specs](../specs/)
+- [Arquitetura global](architecture.md) (cópia local)
+- [Visão do produto](project-overview.md)
+- [Pipeline CI](../specs/pipelines/overview.md)
+- [Setup GitHub](github-pipeline-setup.md)

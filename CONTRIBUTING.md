@@ -1,42 +1,39 @@
-# Como Contribuir
+# Como Contribuir — afro90sBackend
 
 ## Fluxo de trabalho
 
-1. Crie uma branch a partir de `main`: `feat/descricao-curta` ou `fix/descricao-curta`.
-2. Se a mudança for estrutural, abra ou atualize um ADR em `docs/foundation/adr/`.
-3. Se introduzir nova capacidade de infra, documente em `docs/specs/`.
-4. Abra um Pull Request com descrição clara do **por quê** e do **o quê**.
-5. Aguarde review antes de merge em `main`.
+1. Crie uma branch a partir de `main` ou `dev`: `feat/descricao-curta` ou `fix/descricao-curta`.
+2. Se alterar contrato HTTP, atualize [docs/specs/backend/api-routes.md](docs/specs/backend/api-routes.md) e sincronize com [afro90sInfra](https://github.com/kevincrys/afro90sInfra).
+3. Implemente seguindo a task em [docs/specs/backend/tasks/](docs/specs/backend/tasks/).
+4. Garanta `npm run build`, `npm test` e `npm run lint` passando localmente.
+5. Abra PR — CI deve passar (coverage ≥ 80%).
 
 ## Commits
 
-Use mensagens concisas no imperativo, focadas no propósito:
-
 ```
-add módulo de rede para ambiente dev
-fix policy IAM com permissão excessiva
-docs: atualizar spec de ambientes
+feat: add GET /products with cursor pagination
+fix: validate order payload with Zod
+test: cover product service edge cases
+docs: update api-routes for admin POST
 ```
-
-Prefixos opcionais: `feat`, `fix`, `docs`, `refactor`, `chore`.
 
 ## Documentação
 
 | Mudança | Onde documentar |
 |---------|-----------------|
-| Decisão arquitetural | `docs/foundation/adr/NNN-titulo.md` |
-| Novo requisito de infra | `docs/specs/infra/` ou subpasta correspondente |
-| Termo novo do domínio | `docs/foundation/glossary.md` |
-| Mudança de escopo | `docs/foundation/vision.md` |
+| Nova/alterada rota API | `docs/specs/backend/api-routes.md` (+ afro90sInfra) |
+| Novo modelo/campo | `docs/specs/backend/data-models.md` |
+| Nova task ou fase | `docs/specs/backend/tasks/` |
+| Pipeline CI | `docs/specs/pipelines/overview.md` |
 
-## ADRs
+## Revisão de PR
 
-Numere sequencialmente: `001-`, `002-`, etc. Use o template em `docs/foundation/adr/001-repo-structure.md` como referência de formato.
+- [ ] CI verde (build, test, lint)
+- [ ] Cobertura ≥ 80%
+- [ ] Contrato API atualizado se aplicável
+- [ ] Nenhum secret commitado
+- [ ] Link para task/spec relacionada
 
-## Revisão
+## Deploy
 
-PRs devem incluir:
-
-- Link para spec ou ADR relacionado (quando aplicável)
-- Plano de teste ou validação (ex.: `terraform plan`, checklist manual)
-- Confirmação de que nenhum secret foi incluído
+Merge neste repo **não** faz deploy automático. Após merge, o pipeline do **afro90sInfra** deve incluir o código atualizado no próximo `cdk deploy`.

@@ -1,6 +1,6 @@
 # Tasks — Backend Afro90s (entregas faseadas)
 
-Backlog de implementação da API no repositório **`afro90s-api`** (repo separado).
+Backlog de implementação da API no repositório **`afro90sBackend`** (`kevincrys/afro90sBackend`).
 Organizado em **4 fases** alinhadas com [`infra/tasks/`](../../infra/tasks/README.md).
 
 ## Legenda de status
@@ -19,7 +19,7 @@ Organizado em **4 fases** alinhadas com [`infra/tasks/`](../../infra/tasks/READM
 
 | # | Arquivo | O que entrega |
 |---|---------|---------------|
-| 00 | [00-setup-repo.md](00-setup-repo.md) | Estrutura `afro90s-api`, Vitest, ESLint, CI |
+| 00 | [00-setup-repo.md](00-setup-repo.md) | Estrutura `afro90sBackend`, Vitest, ESLint, CI |
 | 01 | [01-convencoes-globais.md](01-convencoes-globais.md) | Response helpers, CORS, `X-Request-Id` |
 | 02 | [02-modelos-de-dados.md](02-modelos-de-dados.md) | Schemas Zod: Product, Order, Customer |
 | 03 | [03-erros-http.md](03-erros-http.md) | `ApiError`, mapeamento code → status |

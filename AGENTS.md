@@ -1,59 +1,51 @@
-# Guia para Agentes de IA
+# Guia para Agentes de IA — afro90sBackend
 
-Este arquivo orienta assistentes de IA (Cursor, Copilot, etc.) ao trabalhar neste repositório.
+Este repositório contém a **implementação da API Lambda** do Afro90s.
 
 ## Antes de implementar
 
-1. Leia [docs/foundation/project-overview.md](docs/foundation/project-overview.md) para entender o produto Afro90s.
-2. Leia [docs/foundation/vision.md](docs/foundation/vision.md) para o escopo deste repo.
-3. Consulte [docs/foundation/architecture.md](docs/foundation/architecture.md) para alinhar com a arquitetura.
-4. Verifique a spec da **esfera** relevante (tabela abaixo).
-5. Para qualquer endpoint ou contrato HTTP, leia **[docs/specs/backend/api-routes.md](docs/specs/backend/api-routes.md)**.
-6. Siga as regras em [.cursor/rules/](.cursor/rules/).
+1. Leia [docs/foundation/vision.md](docs/foundation/vision.md) — escopo deste repo.
+2. Leia **[docs/specs/backend/api-routes.md](docs/specs/backend/api-routes.md)** — contrato HTTP obrigatório.
+3. Consulte [docs/specs/backend/overview.md](docs/specs/backend/overview.md) e [data-models.md](docs/specs/backend/data-models.md).
+4. Verifique a task correspondente em [docs/specs/backend/tasks/](docs/specs/backend/tasks/).
+5. Siga as regras em [.cursor/rules/](.cursor/rules/).
 
 ## Onde encontrar o quê
 
 | Tipo | Local |
 |------|-------|
-| Visão do produto | `docs/foundation/project-overview.md` |
-| Fundamentação (por quê) | `docs/foundation/` |
-| Especificações (o quê) | `docs/specs/` |
-| **API — rotas, headers, payloads** | `docs/specs/backend/api-routes.md` |
-| Decisões arquiteturais | `docs/foundation/adr/` |
-| Regras de código/convenções | `.cursor/rules/` |
-| Glossário do domínio | `docs/foundation/glossary.md` |
+| Escopo deste repo | `docs/foundation/vision.md` |
+| **Contrato API** | `docs/specs/backend/api-routes.md` |
+| Modelos DynamoDB | `docs/specs/backend/data-models.md` |
+| Tasks de implementação | `docs/specs/backend/tasks/` |
+| Pipeline CI | `docs/specs/pipelines/overview.md` |
+| Setup GitHub | `docs/foundation/github-pipeline-setup.md` |
+| Regras Cursor | `.cursor/rules/` |
 
-## Specs por esfera
+## Documentação central
 
-| Esfera | Entry point | Documentos principais |
-|--------|-------------|----------------------|
-| **CDK / Infra** | `docs/specs/infra/overview.md` | `cdk.md`, `resources.md`, `outputs.md` |
-| **Backend** | `docs/specs/backend/overview.md` | `data-models.md`, **`api-routes.md`** |
-| **Frontend** | `docs/specs/frontend/overview.md` | `ui-ux.md`, `integration.md` |
+ADRs, arquitetura global e specs canônicas: [afro90sInfra](https://github.com/kevincrys/afro90sInfra/tree/main/docs). Alterações de contrato API devem ser refletidas nos dois repos.
 
-## Princípios
-
-- **Spec first**: não implemente infra sem spec ou ADR correspondente quando a decisão for estrutural.
-- **Mínimo escopo**: altere apenas o necessário para a tarefa.
-- **Convenções existentes**: siga padrões já estabelecidos no repo antes de introduzir novos.
-- **Documentar decisões**: mudanças arquiteturais exigem novo ADR em `docs/foundation/adr/`.
-
-## Stack
+## Stack deste repo
 
 | Componente | Decisão |
 |------------|---------|
-| Cloud | AWS |
-| IaC | AWS CDK (TypeScript) |
-| Frontend | React 18 + Vite → S3 + CloudFront |
-| Backend | Lambda Node.js 20 + API Gateway |
-| Banco | DynamoDB |
-| Auth admin | Cognito (sem login de cliente na v1) |
+| Runtime | Lambda Node.js 20 |
+| Linguagem | TypeScript strict |
+| HTTP | Middy + router interno |
+| Validação | Zod |
+| Testes | Vitest (80% coverage) |
+| Deploy | CDK no afro90sInfra — **não** implementar deploy aqui |
 
-Consulte `docs/specs/infra/overview.md` e ADRs 002–006 antes de assumir outras tecnologias.
+## Princípios
+
+- **Contrato first** — não implementar endpoints fora de `api-routes.md`.
+- **Diff mínimo** — altere só o necessário.
+- **Testes** — toda rota/serviço novo com testes; CI exige 80% coverage.
 
 ## O que não fazer
 
-- Não commitar secrets, `.env` ou credenciais.
-- Não alterar documentação de fundamentação sem solicitação explícita.
-- Não criar recursos de infra fora do escopo da spec/ADR em vigor.
-- Não implementar endpoints que divergem de `api-routes.md` sem atualizar a spec primeiro.
+- Não commitar secrets ou `.env`.
+- Não provisionar recursos AWS (CDK fica no afro90sInfra).
+- Não alterar frontend ou specs de infra sem escopo explícito.
+- Não criar workflows de deploy Lambda neste repo.
