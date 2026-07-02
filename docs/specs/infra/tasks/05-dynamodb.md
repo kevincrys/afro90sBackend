@@ -66,7 +66,7 @@ Implementar `DatabaseStack`: tabelas `products` e `orders` com GSIs dentro do fr
 
 ## Pré-requisitos
 
-- Tasks 01, 02, 03 concluídas
+- [Task 04](04-cicd.md) concluída (CI/CD pronto para deploy)
 
 ## Critérios de conclusão
 

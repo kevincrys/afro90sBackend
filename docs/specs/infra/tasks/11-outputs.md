@@ -66,7 +66,7 @@ echo "Outputs salvos em infra/outputs-${ENV}.json"
 
 ## Pré-requisitos
 
-- Tasks 05–10 concluídas (para ter os outputs definidos)
+- [Task 10](10-api-publica.md) concluída
 
 ## Critérios de conclusão
 

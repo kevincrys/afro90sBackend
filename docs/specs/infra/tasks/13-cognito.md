@@ -69,7 +69,7 @@ Implementar `AuthStack` com o User Pool Cognito e configurar o authorizer JWT no
 
 ## Pré-requisitos
 
-- Tasks 01–12 concluídas (fase 1 entregue)
+- [Task 12](12-aceite-fase1.md) concluída (fase 1 entregue)
 
 ## Critérios de conclusão
 

@@ -1,8 +1,8 @@
-# Task 07 — Frontend hosting (S3 + CloudFront)
+# Task 06 — Frontend hosting (S3 + CloudFront)
 
 **Fase:** 1 — Site público  
 **Status:** pendente  
-**Arquivos alvo:** [`resources.md`](../resources.md), [`cdk.md`](../cdk.md)
+**Arquivos alvo:** [`resources.md](../resources.md), [`cdk.md`](../cdk.md)
 
 ## Objetivo
 
@@ -43,6 +43,8 @@ Implementar `FrontendStack`: bucket S3 privado + distribuição CloudFront com O
 - [ ] Alias de domínio: campo `domainNames` preenchido com `config.domainName` se definido (placeholder para quando o domínio for comprado)
 - [ ] Security headers via `ResponseHeadersPolicy`: HSTS, X-Content-Type-Options
 
+> Behavior `/assets/*` para imagens de produtos é adicionado na [task 07](07-assets-storage.md).
+
 ### Exports via SSM
 
 - [ ] `/afro90s/{env}/cloudfront-web-url` — URL da distribuição (sem barra final)
@@ -53,8 +55,7 @@ Implementar `FrontendStack`: bucket S3 privado + distribuição CloudFront com O
 
 ## Pré-requisitos
 
-- Tasks 01, 02, 03 concluídas
-- Task 06 (StorageStack) deployada no mesmo ciclo para adicionar behavior `/assets/*`
+- [Task 05](05-dynamodb.md) concluída
 
 ## Critérios de conclusão
 

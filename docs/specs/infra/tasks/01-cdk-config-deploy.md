@@ -1,4 +1,4 @@
-# Task 02 — Configuração por ambiente
+# Task 01 — Configuração por ambiente
 
 **Status:** pendente  
 **Arquivos alvo:** [`cdk.md`](../cdk.md)
@@ -61,8 +61,7 @@ export function getConfig(env: string) {
 
 ### Uso em `bin/app.ts`
 
-- [ ] Importar `getConfig` e passar para cada stack via construtor
-- [ ] Passar `env: { account, region }` no `StackProps` de cada stack
+- [ ] Integração com stacks na [task 02](02-cdk-stacks.md) (`getConfig` + `StackProps`)
 
 ### Scripts npm validados
 
@@ -74,12 +73,12 @@ export function getConfig(env: string) {
 
 ## Pré-requisitos
 
-- Task 00 concluída (estrutura do repo criada)
+- [Task 00](00-environments.md) concluída (estrutura do repo criada)
 
 ## Critérios de conclusão
 
 - [ ] `getConfig('dev')` e `getConfig('prod')` retornam configs sem erro
-- [ ] Todos os stacks recebem config via props (sem hardcode de conta/região)
+- [ ] Todos os stacks recebem config via props na task 02 (sem hardcode de conta/região)
 - [ ] `npm run build` sem erros TypeScript
 - [ ] `cdk.md` atualizado com tabela de parâmetros por env
 - [ ] Atualizar **Status** para `concluída`

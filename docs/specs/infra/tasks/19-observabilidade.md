@@ -47,7 +47,7 @@ Configurar log groups com retenção e dashboard CloudWatch dentro do free tier.
 
 ## Pré-requisitos
 
-- Task 10 (Lambda criada — para referenciar o log group)
+- [Task 18](18-ses.md) concluída
 
 ## Critérios de conclusão
 

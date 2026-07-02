@@ -34,8 +34,7 @@ Criar a role IAM da Lambda admin com permissões de CRUD em DynamoDB e escrita n
 
 ## Pré-requisitos
 
-- Task 05 (DynamoDB — ARNs das tabelas)
-- Task 06 (Storage — ARN do bucket)
+- [Task 14](14-aceite-fase2.md) concluída (fase 2 entregue)
 
 ## Critérios de conclusão
 

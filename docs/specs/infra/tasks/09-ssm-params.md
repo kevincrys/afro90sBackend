@@ -59,7 +59,7 @@ Criados nas respectivas stacks:
 
 ## Pré-requisitos
 
-- Task 05 (DynamoDB), 06 (Storage), 07 (Frontend) — para ter os valores a exportar
+- [Task 08](08-iam-publica.md) concluída
 
 ## Critérios de conclusão
 

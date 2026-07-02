@@ -21,12 +21,12 @@ Configurar identidade SES, template de e-mail e conectar o envio ao `POST /order
 
 ## O que implementar
 
-### SES — identidade (setup manual pré-deploy — dev)
+### SES — identidade (setup manual — fase 4)
 
-> Feito no console SES `us-east-1`. Já deve ter sido verificado na task 00.
+> Verificação de remetente e destino no console SES (`us-east-1`). **Não** fazer na task 00 — somente antes do deploy desta task.
 
-- [ ] Confirmar que e-mail remetente está verificado em SES sandbox
-- [ ] Confirmar que e-mail destino (admin) está verificado em SES sandbox
+- [ ] Verificar e-mail remetente em SES sandbox
+- [ ] Verificar e-mail destino (admin) em SES sandbox
 - [ ] Em prod: quando domínio for comprado, criar `CfnEmailIdentity` para o domínio
 
 ### SES — template CDK
@@ -74,7 +74,7 @@ new CfnTemplate(this, 'OrderTemplate', {
 
 ## Pré-requisitos
 
-- Tasks 00–17 concluídas (fases 1, 2 e 3 entregues)
+- [Task 17](17-aceite-fase3.md) concluída (fase 3 entregue)
 - E-mail remetente verificado no SES sandbox
 
 ## Critérios de conclusão

@@ -22,7 +22,7 @@ Validar que o login de admin via Cognito está funcional. As rotas `/admin/*` ai
 
 ## Pré-requisitos
 
-- Task 13 concluída
+- [Task 13](13-cognito.md) concluída
 
 ## Critérios de conclusão
 

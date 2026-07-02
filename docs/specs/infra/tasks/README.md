@@ -13,6 +13,12 @@ Conta AWS: `083171867610` | Região: `us-east-1` | Ambientes: `dev` e `prod`
 | `em andamento` | Em implementação |
 | `concluída` | Critérios de conclusão verificados |
 
+## Ordem de execução
+
+**O número da task é a ordem de execução.** Execute sequencialmente: `00 → 01 → 02 → … → 20`.
+
+Cada task depende apenas da anterior (`task N` requer `task N-1` concluída), salvo indicação explícita em contrário no próprio arquivo.
+
 ---
 
 ## Fase 0 — Fundação
@@ -21,11 +27,11 @@ Conta AWS: `083171867610` | Região: `us-east-1` | Ambientes: `dev` e `prod`
 
 | # | Arquivo | O que entrega |
 |---|---------|---------------|
-| 00 | [00-environments.md](00-environments.md) | Setup repo CDK, IAM user, OIDC, bootstrap, GitHub |
-| 01 | [01-cdk-stacks.md](01-cdk-stacks.md) | 5 stacks scaffold em `lib/stacks/` + `bin/app.ts` |
-| 02 | [02-cdk-config-deploy.md](02-cdk-config-deploy.md) | `lib/config/{dev,prod}.ts` e scripts npm |
+| 00 | [00-environments.md](00-environments.md) | Setup repo CDK, OIDC, GitHub (sem CLI local) |
+| 01 | [01-cdk-config-deploy.md](01-cdk-config-deploy.md) | `lib/config/{dev,prod}.ts` e scripts npm |
+| 02 | [02-cdk-stacks.md](02-cdk-stacks.md) | 5 stacks scaffold em `lib/stacks/` + `bin/app.ts` |
 | 03 | [03-tags-naming.md](03-tags-naming.md) | Aspect de tags globais e convenção de naming |
-| 04 | [04-cicd.md](04-cicd.md) | 3 workflows GitHub Actions (validate, deploy-dev, deploy-prod) |
+| 04 | [04-cicd.md](04-cicd.md) | 3 workflows GitHub Actions + CDK bootstrap na pipeline |
 
 ---
 
@@ -37,8 +43,8 @@ Conta AWS: `083171867610` | Região: `us-east-1` | Ambientes: `dev` e `prod`
 | # | Arquivo | O que entrega |
 |---|---------|---------------|
 | 05 | [05-dynamodb.md](05-dynamodb.md) | Tabelas `products` e `orders` + GSIs (free tier) |
-| 06 | [06-assets-storage.md](06-assets-storage.md) | S3 assets + behavior `/assets/*` no CloudFront |
-| 07 | [07-frontend-hosting.md](07-frontend-hosting.md) | S3 web + CloudFront OAC (SPA React) |
+| 06 | [06-frontend-hosting.md](06-frontend-hosting.md) | S3 web + CloudFront OAC (SPA React) |
+| 07 | [07-assets-storage.md](07-assets-storage.md) | S3 assets + behavior `/assets/*` no CloudFront |
 | 08 | [08-iam-publica.md](08-iam-publica.md) | Role Lambda pública (sem SES) |
 | 09 | [09-ssm-params.md](09-ssm-params.md) | SSM Parameters fase 1 + `.env.example` |
 | 10 | [10-api-publica.md](10-api-publica.md) | HTTP API + Lambda + 3 rotas públicas |
@@ -91,32 +97,18 @@ Conta AWS: `083171867610` | Região: `us-east-1` | Ambientes: `dev` e `prod`
 
 ---
 
-## Dependências entre tasks
+## Cadeia de dependências
 
 | Task | Depende de |
 |------|------------|
-| 01, 02 | 00 |
-| 03 | 01 |
-| 04 | 00, 02 |
-| 05, 06, 07 | 01, 02, 03 |
-| 06 | 07 (behavior no CF) |
-| 08 | 05 |
-| 09 | 05, 06, 07, 10 |
-| 10 | 05, 06, 07, 08, 09 |
-| 11 | 05–10 |
-| 12 | 00–11 |
-| 13 | 12 (fase 1 entregue) |
-| 14 | 13 |
-| 15 | 05, 06 |
-| 16 | 13, 15 |
-| 17 | 15, 16 |
-| 18 | 00–17 |
-| 19 | 10 |
-| 20 | 00–19 |
+| 00 | — |
+| 01–20 | task anterior (`N-1`) |
 
 ## Referências
 
 - [Specs CDK](../cdk.md)
 - [Recursos AWS](../resources.md)
 - [Outputs](../outputs.md)
+- [Pipelines infra](../../pipelines/overview.md)
+- [Setup GitHub](../../../foundation/github-pipeline-setup.md)
 - [API routes](../../backend/api-routes.md)

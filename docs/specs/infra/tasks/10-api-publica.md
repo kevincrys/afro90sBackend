@@ -19,7 +19,8 @@ Implementar o HTTP API Gateway com a Lambda de router e as **3 rotas públicas**
 | Lambda | 1 função com router interno |
 | Timeout | 29s |
 | Memory | 256 MB |
-| Bundling | esbuild via `NodejsFunction` |
+| Código Lambda | Placeholder via CDK; **código real** deployado pelo **afro90sBackend** ([ADR-007](../../../foundation/adr/007-backend-lambda-s3-deploy.md)) |
+| Artefatos | Bucket `afro90s-{env}-s3-lambda-artifacts` |
 | Payload format | 2.0 |
 | Throttling | `burstLimit: 50`, `rateLimit: 100` |
 | CORS | Origem = `CloudFrontWebUrl` |
@@ -40,12 +41,32 @@ Implementar o HTTP API Gateway com a Lambda de router e as **3 rotas públicas**
   ```
 - [ ] Throttling default: `throttlingBurstLimit: 50`, `throttlingRateLimit: 100`
 
+### S3 — bucket artefatos Lambda
+
+- [ ] Nome: `afro90s-{env}-s3-lambda-artifacts`
+- [ ] `blockPublicAccess: BlockPublicAccess.BLOCK_ALL`
+- [ ] `encryption: BucketEncryption.S3_MANAGED`
+- [ ] `versioning: true` (rollback de pacotes)
+- [ ] Lifecycle (opcional v1): expirar objetos `api/*.zip` com mais de 90 dias
+- [ ] Prefixo: `api/{sha}.zip`, `api/latest.zip`
+- [ ] Output `LambdaArtifactsBucketName` + SSM `/afro90s/{env}/lambda-artifacts-bucket`
+
 ### Lambda — função única
 
 - [ ] Nome: `afro90s-{env}-lambda-api`
 - [ ] `runtime: Runtime.NODEJS_20_X`
+- [ ] `handler: 'handler.handler'`
 - [ ] `memorySize: 256`, `timeout: Duration.seconds(29)`
-- [ ] `bundling: { minify: true }` via `NodejsFunction`
+- [ ] **Código inicial (placeholder)** — não usar `NodejsFunction` com source do backend:
+  ```typescript
+  code: lambda.Code.fromInline(`
+    exports.handler = async () => ({
+      statusCode: 503,
+      body: JSON.stringify({ code: 'NOT_DEPLOYED', message: 'Awaiting deploy from afro90sBackend' }),
+    });
+  `),
+  ```
+- [ ] Após primeiro deploy do backend, código é gerenciado via `update-function-code` — CDK deploys subsequentes **não** devem sobrescrever o zip (usar `lambda.Code.fromBucket` com ignore changes ou documentar que redeploy infra skip code)
 - [ ] LogGroup com retenção 14 dias (task 19)
 - [ ] Role: `afro90s-{env}-role-lambda-public` (task 08)
 - [ ] Variáveis de ambiente:
@@ -62,11 +83,15 @@ Implementar o HTTP API Gateway com a Lambda de router e as **3 rotas públicas**
 ### Outputs
 
 - [ ] `CfnOutput` `ApiBaseUrl` = URL base sem stage e sem barra final
+- [ ] `CfnOutput` `LambdaFunctionName` = nome da função API
+- [ ] `CfnOutput` `LambdaArtifactsBucketName`
 - [ ] SSM: `/afro90s/{env}/api-base-url`
+- [ ] SSM: `/afro90s/{env}/lambda-function-name`
+- [ ] SSM: `/afro90s/{env}/lambda-artifacts-bucket`
 
 ## Pré-requisitos
 
-- Task 05 (DynamoDB), 06 (Assets), 07 (Frontend), 08 (IAM pública), 09 (SSM) concluídas
+- [Task 09](09-ssm-params.md) concluída
 
 ## Critérios de conclusão
 

@@ -38,7 +38,7 @@ Validar que o painel admin está funcional: CRUD de produtos, gestão de pedidos
 
 ## Pré-requisitos
 
-- Tasks 15 e 16 concluídas
+- [Task 16](16-api-admin.md) concluída
 
 ## Critérios de conclusão
 

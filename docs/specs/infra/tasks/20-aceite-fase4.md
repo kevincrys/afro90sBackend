@@ -76,7 +76,7 @@ echo "=== Smoke test completo OK ==="
 
 ## Pré-requisitos
 
-- Tasks 00–19 todas concluídas
+- [Task 19](19-observabilidade.md) concluída
 
 ## Critérios de conclusão
 

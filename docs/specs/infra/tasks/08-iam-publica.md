@@ -34,7 +34,7 @@ Criar a role IAM da Lambda pública (`GET /products`, `GET /products/{id}`, `POS
 
 ## Pré-requisitos
 
-- Task 05 (DynamoDB — ARNs disponíveis)
+- [Task 07](07-assets-storage.md) concluída
 
 ## Critérios de conclusão
 

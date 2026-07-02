@@ -1,4 +1,4 @@
-# Task 06 — Assets storage (imagens de produtos)
+# Task 07 — Assets storage (imagens de produtos)
 
 **Fase:** 1 — Site público  
 **Status:** pendente  
@@ -6,7 +6,7 @@
 
 ## Objetivo
 
-Implementar `StorageStack`: bucket S3 privado de imagens com entrega via behavior `/assets/*` na distribuição CloudFront da task 07.
+Implementar `StorageStack`: bucket S3 privado de imagens com entrega via behavior `/assets/*` na distribuição CloudFront da [task 06](06-frontend-hosting.md).
 
 ## Configurações já definidas
 
@@ -32,14 +32,14 @@ Implementar `StorageStack`: bucket S3 privado de imagens com entrega via behavio
 
 ### CloudFront — behavior `/assets/*`
 
-- [ ] Adicionar origin do bucket assets na distribuição criada na task 07
+- [ ] Adicionar origin do bucket assets na distribuição criada na [task 06](06-frontend-hosting.md)
   - `S3BucketOrigin.withOriginAccessControl()` para bucket assets
 - [ ] `additionalBehaviors['assets/*']`:
   - `allowedMethods: AllowedMethods.ALLOW_GET_HEAD`
   - `cachePolicy: CachePolicy.CACHING_OPTIMIZED`
   - `viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS`
 
-> A distribuição CloudFront pertence ao `FrontendStack` (task 07). O `StorageStack` exporta o bucket via SSM para que o `FrontendStack` adicione o behavior.
+> A distribuição CloudFront pertence ao `FrontendStack` (task 06). O `StorageStack` exporta o bucket via SSM para que o `FrontendStack` adicione o behavior.
 
 ### Exports via SSM
 
@@ -53,8 +53,7 @@ Implementar `StorageStack`: bucket S3 privado de imagens com entrega via behavio
 
 ## Pré-requisitos
 
-- Task 05 (DynamoDB — stacks inicializadas)
-- Task 07 (Frontend hosting) deve ser deployada junto ou depois (behavior no mesmo CF)
+- [Task 06](06-frontend-hosting.md) concluída (CloudFront web deployado)
 
 ## Critérios de conclusão
 

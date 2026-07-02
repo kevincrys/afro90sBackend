@@ -64,7 +64,7 @@ echo "=== Fase 1 OK ==="
 
 ## Pré-requisitos
 
-- Tasks 00–11 concluídas
+- [Task 11](11-outputs.md) concluída
 
 ## Critérios de conclusão
 

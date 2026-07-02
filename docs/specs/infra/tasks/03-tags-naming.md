@@ -75,7 +75,7 @@ Padrão: `afro90s-{env}-{tipo}-{nome}`
 
 ## Pré-requisitos
 
-- Task 01 concluída (stacks criadas)
+- [Task 02](02-cdk-stacks.md) concluída (stacks criadas)
 
 ## Critérios de conclusão
 

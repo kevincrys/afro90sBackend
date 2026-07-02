@@ -56,7 +56,7 @@ Opção B — Lambda separada (recomendado para isolamento de IAM):
 
 ## Pré-requisitos
 
-- Tasks 13 (Cognito + authorizer), 15 (IAM admin) concluídas
+- [Task 15](15-iam-admin.md) concluída
 
 ## Critérios de conclusão
 

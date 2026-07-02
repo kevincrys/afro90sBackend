@@ -59,7 +59,7 @@ Configurar pipeline GitHub Actions para build e deploy da SPA no S3/CloudFront d
 ## Pré-requisitos
 
 - Task 00 concluída
-- Infra task 04 (CI/CD) e task 07 (frontend hosting) deployadas
+- Infra task 04 (CI/CD) e task 06 (frontend hosting) deployadas
 
 ## Critérios de conclusão
 
