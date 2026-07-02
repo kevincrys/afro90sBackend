@@ -1,0 +1,66 @@
+---
+description: Minimizar custos AWS em toda decisão de infraestrutura
+alwaysApply: true
+---
+
+# Minimização de Custos AWS
+
+## Princípio
+
+Toda decisão de infraestrutura deve considerar custo como critério primário,
+especialmente em ambientes serverless e de baixo tráfego (v1).
+
+## Padrões obrigatórios
+
+### Compute
+- **Lambda**: sempre preferir em vez de containers/EC2 para workloads esporádicos
+- **Memory Lambda**: começar com o mínimo funcional (128–256 MB); só aumentar com evidência
+- **Timeout Lambda**: configurar o menor valor possível por rota
+- **Provisioned Concurrency**: ❌ não usar na v1
+
+### DynamoDB
+- **Billing**: on-demand (`PAY_PER_REQUEST`) — já decidido no projeto
+- **PITR**: habilitar só em `prod` (custo adicional em `dev`)
+- **Streams**: só se houver caso de uso real
+- **GSIs**: criar apenas os índices usados; cada GSI replica dados e cobra
+
+### S3
+- **Lifecycle rules**: configurar expiração para objetos temporários
+- **Versioning**: só em `prod`; em `dev` pode ser desativado
+- **Intelligent-Tiering**: não usar na v1 (overhead de custo mínimo de monitoramento)
+
+### CloudFront
+- **Price Class**: usar `PriceClass_100` (EUA + Europa) ou `PriceClass_200` em vez de All
+  — Brasil está em `PriceClass_200`; `All` só se necessário
+- **Cache**: maximizar TTL de assets estáticos (JS/CSS/imagens) para reduzir origins requests
+
+### API Gateway
+- **HTTP API** (já decidido) — custo ~70% menor que REST API
+- **Throttling**: definir limites para evitar custos acidentais por abuso
+
+### Cognito
+- **MAU gratuito**: 50.000 usuários/mês no plano gratuito — suficiente para v1
+- Não habilitar features avançadas pagas (Advanced Security, etc.)
+
+### SES
+- Sandbox em `dev` (gratuito para testes)
+- Monitorar bounce/complaint para não pagar por reenvios indevidos
+
+### SSM Parameter Store
+- Usar **Standard** (gratuito até 10.000 parâmetros) — não Advanced
+
+## Ao propor ou revisar infra
+
+1. Estimar custo do recurso antes de propor
+2. Preferir tier gratuito ou serverless sempre que possível
+3. Sinalizar explicitamente quando uma decisão tem impacto de custo relevante:
+   `⚠️ Custo estimado: ~$X/mês`
+4. Em `dev`: aceitar menor durabilidade/disponibilidade para economizar
+5. Em `prod`: balancear custo vs confiabilidade, mas sem excessos
+
+## O que não fazer
+
+- ❌ Criar recursos sempre-ativos (ECS, EC2, RDS) sem justificativa e ADR
+- ❌ Habilitar PITR, versioning ou streams em `dev`
+- ❌ Usar `PriceClass_All` no CloudFront sem necessidade
+- ❌ Criar mais GSIs do que o necessário para as queries reais

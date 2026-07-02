@@ -1,0 +1,38 @@
+---
+description: Priorizar decisões e preferências do usuário acima de convenções genéricas
+alwaysApply: true
+---
+
+# Decisões do Usuário têm Prioridade
+
+## Princípio
+
+Quando o usuário expressou uma decisão — nas specs, nos chats, nas tasks ou diretamente —
+essa decisão **prevalece** sobre recomendações genéricas, convenções de mercado ou preferências do agente.
+
+## Como aplicar
+
+- **Specs e tasks como fonte de verdade**: Decisões registradas em `docs/specs/` e `docs/foundation/`
+  refletem escolhas já tomadas. Não questione sem motivo concreto.
+- **Pergunte antes de desviar**: Se uma sugestão diferir do que o usuário decidiu, avise explicitamente
+  e aguarde confirmação antes de implementar.
+- **Não sobrescreva silenciosamente**: Nunca troque uma abordagem decidida pelo usuário por outra
+  sem explicar o motivo e obter aprovação.
+
+## Exemplos de decisões já tomadas neste projeto
+
+| Decisão | Fonte |
+|---------|-------|
+| Mesma conta AWS para `dev` e `prod` | task 00 |
+| Região `us-east-1` | task 00 |
+| OIDC para CI (sem access keys) | task 10 e 13 |
+| Stacks separadas por recurso | task 01 |
+| SSM Parameter Store (não Secrets Manager) para e-mails do sistema | task 12 |
+| `selfSignUpEnabled: false` no Cognito | task 08 |
+| SRP no Cognito frontend | task 08 |
+
+## O que não fazer
+
+- ❌ Sugerir alternativas sem antes implementar o que foi decidido
+- ❌ Ignorar anotações nas tasks (`docs/specs/infra/tasks/`, etc.)
+- ❌ Alterar decisões de foundation sem solicitação explícita

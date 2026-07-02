@@ -1,0 +1,37 @@
+---
+description: Nunca commitar sem revisão explícita do usuário
+alwaysApply: true
+---
+
+# Git — Commit apenas com aprovação explícita
+
+## Regra principal
+
+**Nunca crie um commit, faça push ou altere o histórico git sem instrução explícita do usuário.**
+
+Isso inclui:
+- `git commit`
+- `git push`
+- `git merge` / `git rebase`
+- `git commit --amend`
+- `git stash pop` com efeitos colaterais
+
+## Antes de qualquer commit
+
+1. Mostre ao usuário um resumo claro do que será commitado (arquivos + mensagem proposta)
+2. Aguarde confirmação explícita ("pode commitar", "sim", "faz o commit")
+3. Somente então execute o commit
+
+## Mensagem de commit
+
+- Formato: `tipo: descrição curta no imperativo` (ex.: `feat: adicionar stack DynamoDB`)
+- Tipos: `feat`, `fix`, `docs`, `chore`, `refactor`, `test`
+- Máximo 72 caracteres na linha principal
+- Nunca usar `--no-verify`
+
+## O que não fazer
+
+- ❌ Commitar no meio de uma implementação sem perguntar
+- ❌ Fazer push automático após commit
+- ❌ Criar commits de "WIP" sem avisar
+- ❌ Alterar commits já existentes sem confirmação

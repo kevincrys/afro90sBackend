@@ -1,0 +1,923 @@
+# API Routes — Catálogo completo
+
+**Status:** Aprovado  
+**Última atualização:** 2025-06-23
+
+> Documento editável — fonte da verdade para métodos, headers, payloads e respostas de cada rota.
+
+## Índice
+
+1. [Convenções globais](#convenções-globais)
+   - [Paginação (cursor opaco)](#paginação-cursor-opaco)
+2. [Rotas públicas](#rotas-públicas)
+3. [Rotas admin](#rotas-admin)
+4. [Upload de imagens (produtos)](#upload-de-imagens-produtos)
+5. [Códigos HTTP e erros](#códigos-http-e-erros)
+6. [Resumo rápido](#resumo-rápido)
+
+**Total: 11 rotas** (3 públicas + 8 admin)
+
+---
+
+## Convenções globais
+
+### Base URL
+
+```
+https://{api-id}.execute-api.{region}.amazonaws.com/{stage}
+```
+
+Exemplo: `https://abc123.execute-api.sa-east-1.amazonaws.com/dev`
+
+### Headers comuns (todas as rotas)
+
+| Header | Obrigatório | Valor | Notas |
+|--------|-------------|-------|-------|
+| `Accept` | Recomendado | `application/json` | |
+| `Content-Type` | Em requests com body | Ver rota | `application/json` ou `multipart/form-data` |
+| `X-Request-Id` | Opcional | UUID | Rastreio; API pode ecoar na resposta |
+
+### Headers de resposta comuns
+
+| Header | Valor |
+|--------|-------|
+| `Content-Type` | `application/json; charset=utf-8` |
+| `X-Request-Id` | ID da requisição (se enviado ou gerado) |
+
+### Paginação (cursor opaco)
+
+Listagens (`GET /products`, `GET /admin/products`, `GET /admin/orders`) usam **paginação por cursor opaco** — não offset (`page=2`) e não “último id” exposto ao cliente.
+
+#### O que é o cursor
+
+| Propriedade | Descrição |
+|-------------|-----------|
+| **Opaco** | O cliente **não interpreta, não decodifica e não monta** o valor — apenas repassa `nextCursor` na próxima requisição |
+| **Não é JWT** | Não tem assinatura nem claims de autenticação. Strings que começam com `eyJ` são comuns porque o payload interno é JSON em Base64 (`{"` → `eyJ`) |
+| **Descartável** | Válido apenas para a **mesma rota** e os **mesmos filtros** da requisição que o gerou |
+| **Opcional na 1ª página** | Omitir `cursor` na primeira chamada; enviar `nextCursor` da resposta anterior para continuar |
+
+#### Formato da resposta
+
+```json
+{
+  "items": [ "..."] ,
+  "nextCursor": "eyJpZCI6IjU1MGU4NDAwLWUyOWItNDFkNC1hNzE2LTQ0NjY1NTQ0MDAwMCJ9",
+  "hasMore": true
+}
+```
+
+| Campo | Tipo | Descrição |
+|-------|------|-----------|
+| `items` | array | Página atual (pode ter menos que `limit` itens) |
+| `nextCursor` | string \| omitido | Presente quando existem mais itens; ausente ou `null` na última página |
+| `hasMore` | boolean | `true` se há próxima página; `false` na última |
+
+Regra: se `hasMore` é `false`, ignorar `nextCursor`. Se `hasMore` é `true`, `nextCursor` deve estar presente.
+
+#### Query params de paginação
+
+| Param | Tipo | Default | Max | Descrição |
+|-------|------|---------|-----|-----------|
+| `limit` | integer | `20` | `100` | Máximo de itens por página |
+| `cursor` | string | — | — | Valor de `nextCursor` da resposta anterior (URL-encode se necessário) |
+
+**Ao paginar**, repetir os mesmos filtros da primeira requisição (`name`, `category`, `status`, etc.) **e** enviar `cursor`. Exemplo:
+
+```http
+# Página 1
+GET /products?limit=20&name=óculos
+
+# Página 2 — mesmos filtros + cursor
+GET /products?limit=20&name=óculos&cursor=eyJpZCI6Li4ufQ==
+```
+
+Alterar filtros com um `cursor` antigo → `400 INVALID_CURSOR` ou resultado inconsistente (comportamento indefinido; API deve rejeitar).
+
+#### Como o backend gera o cursor (implementação)
+
+O cursor encapsula a posição da leitura no **DynamoDB** (`LastEvaluatedKey` da `Query`/`Scan`), não o id do último item exibido.
+
+Fluxo interno:
+
+```
+1. Query DynamoDB com Limit = limit (+ filtros da rota)
+2. Se LastEvaluatedKey existe → há mais páginas
+3. Montar payload interno (JSON) com:
+   - chaves do índice usado (PK/SK ou GSI)
+   - hash dos filtros da query (name, category, status…) para invalidar cursor trocado
+4. Codificar: Base64URL( JSON.stringify(payload) ) → nextCursor
+5. Na próxima request: decodificar cursor → ExclusiveStartKey + validar filtros
+```
+
+**Payload interno (exemplos — não exposto na API):**
+
+Listagem de produtos **sem** `name` (tabela principal, PK `id`):
+
+```json
+{
+  "v": 1,
+  "index": "primary",
+  "key": { "id": "550e8400-e29b-41d4-a716-446655440000" },
+  "filters": { "category": "oculos" }
+}
+```
+
+Listagem de produtos **com** `name` (GSI `gsi-name`, PK `nameLower`, SK `id`):
+
+```json
+{
+  "v": 1,
+  "index": "gsi-name",
+  "key": { "nameLower": "oculos vintage", "id": "550e8400-e29b-41d4-a716-446655440000" },
+  "filters": { "name": "óculos" }
+}
+```
+
+Listagem de pedidos com `status` (GSI `gsi-status-createdAt`):
+
+```json
+{
+  "v": 1,
+  "index": "gsi-status-createdAt",
+  "key": { "status": "SOLICITADO", "createdAt": "2025-06-23T14:30:00.000Z" },
+  "filters": { "status": "SOLICITADO" }
+}
+```
+
+> Por isso um único `after={id}` não basta: a continuação depende do **índice** e da **chave composta** usados na query, não só do último `id` visível no JSON.
+
+#### Uso no frontend
+
+```typescript
+// Página 1
+const page1 = await fetch('/products?limit=20&name=óculos');
+const data1 = await page1.json();
+// data1.items, data1.hasMore, data1.nextCursor
+
+// Página 2 — repassar cursor sem alterar
+if (data1.hasMore && data1.nextCursor) {
+  const url = `/products?limit=20&name=óculos&cursor=${encodeURIComponent(data1.nextCursor)}`;
+  const page2 = await fetch(url);
+}
+```
+
+Padrão de UI recomendado: **“Carregar mais”** ou scroll infinito — não “página 5” (DynamoDB não suporta offset eficiente).
+
+#### Erros de paginação
+
+| Status | `code` | Quando |
+|--------|--------|--------|
+| `400` | `INVALID_CURSOR` | Cursor malformado, expirado (se houver TTL futuro) ou incompatível com filtros atuais |
+| `400` | `INVALID_QUERY` | `limit` fora do intervalo permitido |
+
+### Formato de erro
+
+```json
+{
+  "code": "VALIDATION_ERROR",
+  "message": "Descrição legível",
+  "details": {}
+}
+```
+
+---
+
+## Rotas públicas
+
+Autenticação: **nenhuma**.
+
+---
+
+### `GET /products`
+
+Lista produtos com paginação e busca opcional por nome.
+
+| | |
+|---|---|
+| **Método** | `GET` |
+| **Path** | `/products` |
+| **Auth** | Não |
+
+#### Request headers
+
+| Header | Obrigatório | Valor |
+|--------|-------------|-------|
+| `Accept` | Recomendado | `application/json` |
+
+#### Query parameters
+
+| Param | Tipo | Obrigatório | Default | Descrição |
+|-------|------|-------------|---------|-----------|
+| `limit` | integer | Não | `20` | Itens por página (max 100) |
+| `cursor` | string | Não | — | Cursor de paginação |
+| `name` | string | Não | — | Busca parcial por nome (case-insensitive) |
+| `category` | string | Não | — | Filtro: `oculos`, `acessorios`, `maquiagem` |
+
+#### Response `200 OK`
+
+```json
+{
+  "items": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "name": "Óculos Vintage Gold",
+      "price": 89.9,
+      "quantity": 12,
+      "photos": [
+        "https://cdn.afro90s.com.br/products/550e8400/abc.jpg"
+      ],
+      "category": "oculos",
+      "createdAt": "2025-06-23T12:00:00.000Z",
+      "updatedAt": "2025-06-23T12:00:00.000Z"
+    }
+  ],
+  "nextCursor": "eyJuYW1lIjo...",
+  "hasMore": true
+}
+```
+
+#### Erros
+
+| Status | `code` | Quando |
+|--------|--------|--------|
+| `400` | `INVALID_QUERY` | `limit` inválido ou `category` desconhecida |
+
+---
+
+### `GET /products/{id}`
+
+Retorna um produto por ID.
+
+| | |
+|---|---|
+| **Método** | `GET` |
+| **Path** | `/products/{id}` |
+| **Auth** | Não |
+
+#### Path parameters
+
+| Param | Tipo | Descrição |
+|-------|------|-----------|
+| `id` | string (UUID) | ID do produto |
+
+#### Request headers
+
+| Header | Obrigatório | Valor |
+|--------|-------------|-------|
+| `Accept` | Recomendado | `application/json` |
+
+#### Response `200 OK`
+
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "name": "Óculos Vintage Gold",
+  "price": 89.9,
+  "quantity": 12,
+  "photos": ["https://cdn.afro90s.com.br/products/550e8400/abc.jpg"],
+  "category": "oculos",
+  "createdAt": "2025-06-23T12:00:00.000Z",
+  "updatedAt": "2025-06-23T12:00:00.000Z"
+}
+```
+
+#### Erros
+
+| Status | `code` | Quando |
+|--------|--------|--------|
+| `404` | `NOT_FOUND` | Produto não existe |
+
+---
+
+### `POST /orders`
+
+Cria pedido com status inicial `SOLICITADO`. Valida estoque (sem decrementar na v1). Dispara e-mail SES.
+
+| | |
+|---|---|
+| **Método** | `POST` |
+| **Path** | `/orders` |
+| **Auth** | Não |
+
+#### Request headers
+
+| Header | Obrigatório | Valor |
+|--------|-------------|-------|
+| `Content-Type` | Sim | `application/json` |
+| `Accept` | Recomendado | `application/json` |
+
+#### Request body
+
+```json
+{
+  "items": [
+    {
+      "productId": "550e8400-e29b-41d4-a716-446655440000",
+      "quantity": 2
+    }
+  ],
+  "customer": {
+    "name": "Maria Silva",
+    "address": "Rua Exemplo, 123 - Centro",
+    "postalCode": "01310-100",
+    "tel": "11999998888"
+  }
+}
+```
+
+| Campo | Tipo | Obrigatório | Regras |
+|-------|------|-------------|--------|
+| `items` | array | Sim | Min 1 item |
+| `items[].productId` | string (UUID) | Sim | Produto deve existir |
+| `items[].quantity` | integer | Sim | >= 1 |
+| `customer.name` | string | Sim | Min 2 caracteres |
+| `customer.address` | string | Sim | Min 5 caracteres |
+| `customer.postalCode` | string | Sim | CEP |
+| `customer.tel` | string | Sim | Telefone com DDD |
+
+#### Response `201 Created`
+
+```json
+{
+  "id": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+  "status": "SOLICITADO",
+  "items": [
+    {
+      "productId": "550e8400-e29b-41d4-a716-446655440000",
+      "quantity": 2,
+      "unitPrice": 89.9
+    }
+  ],
+  "fullPrice": 179.8,
+  "customer": {
+    "name": "Maria Silva",
+    "address": "Rua Exemplo, 123 - Centro",
+    "postalCode": "01310-100",
+    "tel": "11999998888"
+  },
+  "createdAt": "2025-06-23T14:30:00.000Z",
+  "updatedAt": "2025-06-23T14:30:00.000Z"
+}
+```
+
+#### Erros
+
+| Status | `code` | Quando |
+|--------|--------|--------|
+| `400` | `VALIDATION_ERROR` | Body inválido |
+| `400` | `PRODUCT_NOT_FOUND` | `productId` inexistente |
+| `409` | `INSUFFICIENT_STOCK` | Quantidade > estoque disponível |
+
+#### Efeitos colaterais
+
+- Persiste registro em DynamoDB (`orders`)
+- Envia e-mail ao admin via SES
+
+---
+
+## Rotas admin
+
+Autenticação: **Cognito JWT obrigatório**.
+
+#### Request headers (todas as rotas admin)
+
+| Header | Obrigatório | Valor |
+|--------|-------------|-------|
+| `Authorization` | Sim | `Bearer <access_token>` |
+| `Accept` | Recomendado | `application/json` |
+
+---
+
+### `GET /admin/products`
+
+Lista todos os produtos (paginada).
+
+| | |
+|---|---|
+| **Método** | `GET` |
+| **Path** | `/admin/products` |
+| **Auth** | Cognito JWT |
+
+#### Query parameters
+
+| Param | Tipo | Obrigatório | Default | Descrição |
+|-------|------|-------------|---------|-----------|
+| `limit` | integer | Não | `20` | Max 100 |
+| `cursor` | string | Não | — | Paginação |
+| `name` | string | Não | — | Busca por nome |
+| `category` | string | Não | — | Filtro de categoria |
+
+#### Response `200 OK`
+
+Mesmo formato de `GET /products` (`PaginatedResponse<Product>`).
+
+#### Erros
+
+| Status | `code` | Quando |
+|--------|--------|--------|
+| `401` | `UNAUTHORIZED` | Token ausente ou expirado |
+| `403` | `FORBIDDEN` | Token válido sem permissão admin |
+
+---
+
+### `POST /admin/products`
+
+Cria novo produto. **Suporta imagens via URL (string), base64 ou stream (multipart → S3).**
+
+| | |
+|---|---|
+| **Método** | `POST` |
+| **Path** | `/admin/products` |
+| **Auth** | Cognito JWT |
+
+#### Modo A — JSON (`application/json`)
+
+**Request headers**
+
+| Header | Valor |
+|--------|-------|
+| `Content-Type` | `application/json` |
+
+**Request body**
+
+```json
+{
+  "name": "Óculos Vintage Gold",
+  "price": 89.9,
+  "quantity": 12,
+  "category": "oculos",
+  "photos": [
+    {
+      "type": "url",
+      "value": "https://exemplo.com/imagem-existente.jpg"
+    },
+    {
+      "type": "base64",
+      "value": "/9j/4AAQSkZJRgABAQ...",
+      "filename": "oculos-frente.jpg",
+      "contentType": "image/jpeg"
+    }
+  ]
+}
+```
+
+| Campo | Tipo | Obrigatório | Regras |
+|-------|------|-------------|--------|
+| `name` | string | Sim | |
+| `price` | number | Sim | > 0 |
+| `quantity` | integer | Sim | >= 0 |
+| `category` | Category | Sim | enum |
+| `photos` | PhotoInput[] | Não | Default `[]`; ver [upload de imagens](#upload-de-imagens-produtos) |
+
+#### Modo B — Multipart (`multipart/form-data`)
+
+**Request headers**
+
+| Header | Valor |
+|--------|-------|
+| `Content-Type` | `multipart/form-data` |
+
+**Form fields**
+
+| Campo | Tipo | Obrigatório | Descrição |
+|-------|------|-------------|-----------|
+| `name` | string | Sim | |
+| `price` | string/number | Sim | |
+| `quantity` | string/number | Sim | |
+| `category` | string | Sim | |
+| `photos` | string (JSON) | Não | Array JSON de `PhotoInput`; entradas `stream` referenciam campos de arquivo abaixo |
+| `photo_0` | file (binary) | Condicional | Arquivo de imagem |
+| `photo_1` | file (binary) | Condicional | Arquivo adicional |
+| `photo_N` | file (binary) | Condicional | Até 10 arquivos |
+
+Exemplo do campo `photos` em multipart:
+
+```json
+[
+  { "type": "url", "value": "https://cdn.exemplo.com/ja-existente.jpg" },
+  { "type": "stream", "fieldName": "photo_0" },
+  { "type": "stream", "fieldName": "photo_1" }
+]
+```
+
+#### Response `201 Created`
+
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "name": "Óculos Vintage Gold",
+  "price": 89.9,
+  "quantity": 12,
+  "photos": [
+    "https://exemplo.com/imagem-existente.jpg",
+    "https://cdn.afro90s.com.br/products/550e8400/uuid-1.jpg",
+    "https://cdn.afro90s.com.br/products/550e8400/uuid-2.jpg"
+  ],
+  "category": "oculos",
+  "createdAt": "2025-06-23T15:00:00.000Z",
+  "updatedAt": "2025-06-23T15:00:00.000Z"
+}
+```
+
+> A resposta sempre retorna `photos` como **array de strings (URLs finais)** — nunca base64.
+
+#### Erros
+
+| Status | `code` | Quando |
+|--------|--------|--------|
+| `400` | `VALIDATION_ERROR` | Campos inválidos |
+| `400` | `INVALID_IMAGE` | MIME não suportado ou arquivo corrompido |
+| `413` | `PAYLOAD_TOO_LARGE` | Imagem > 5 MB ou total > 10 MB |
+| `401` / `403` | | Auth |
+
+---
+
+### `GET /admin/products/{id}`
+
+Retorna produto por ID.
+
+| | |
+|---|---|
+| **Método** | `GET` |
+| **Path** | `/admin/products/{id}` |
+| **Auth** | Cognito JWT |
+
+#### Path parameters
+
+| Param | Tipo | Descrição |
+|-------|------|-----------|
+| `id` | string (UUID) | ID do produto |
+
+#### Response `200 OK`
+
+Objeto `Product` completo (igual `GET /products/{id}`).
+
+#### Erros
+
+| Status | `code` | Quando |
+|--------|--------|--------|
+| `404` | `NOT_FOUND` | Produto não existe |
+| `401` / `403` | | Auth |
+
+---
+
+### `PUT /admin/products/{id}`
+
+Atualiza produto. Mesma lógica de imagens do `POST` (url, base64, stream).
+
+| | |
+|---|---|
+| **Método** | `PUT` |
+| **Path** | `/admin/products/{id}` |
+| **Auth** | Cognito JWT |
+
+#### Path parameters
+
+| Param | Tipo | Descrição |
+|-------|------|-----------|
+| `id` | string (UUID) | ID do produto |
+
+#### Request headers
+
+| Header | Valor |
+|--------|-------|
+| `Content-Type` | `application/json` **ou** `multipart/form-data` |
+
+#### Request body (JSON)
+
+```json
+{
+  "name": "Óculos Vintage Gold (edição)",
+  "price": 79.9,
+  "quantity": 10,
+  "category": "oculos",
+  "photos": [
+    { "type": "url", "value": "https://cdn.afro90s.com.br/products/550e8400/existing.jpg" },
+    { "type": "base64", "value": "...", "filename": "nova-foto.jpg" }
+  ]
+}
+```
+
+> `photos` substitui a lista inteira. URLs não reenviadas são removidas (e arquivos S3 órfãos podem ser deletados — implementação futura).
+
+#### Response `200 OK`
+
+Objeto `Product` atualizado.
+
+#### Erros
+
+| Status | `code` | Quando |
+|--------|--------|--------|
+| `404` | `NOT_FOUND` | Produto não existe |
+| `400` | `VALIDATION_ERROR` | Body inválido |
+| `400` | `INVALID_IMAGE` | Imagem inválida |
+| `401` / `403` | | Auth |
+
+---
+
+### `DELETE /admin/products/{id}`
+
+Remove produto.
+
+| | |
+|---|---|
+| **Método** | `DELETE` |
+| **Path** | `/admin/products/{id}` |
+| **Auth** | Cognito JWT |
+
+#### Path parameters
+
+| Param | Tipo | Descrição |
+|-------|------|-----------|
+| `id` | string (UUID) | ID do produto |
+
+#### Request headers
+
+| Header | Obrigatório | Valor |
+|--------|-------------|-------|
+| `Authorization` | Sim | `Bearer <token>` |
+
+#### Response `204 No Content`
+
+Sem body.
+
+#### Erros
+
+| Status | `code` | Quando |
+|--------|--------|--------|
+| `404` | `NOT_FOUND` | Produto não existe |
+| `401` / `403` | | Auth |
+
+---
+
+### `PATCH /admin/products/{id}/stock`
+
+Ajusta estoque por delta (positivo aumenta, negativo reduz).
+
+| | |
+|---|---|
+| **Método** | `PATCH` |
+| **Path** | `/admin/products/{id}/stock` |
+| **Auth** | Cognito JWT |
+
+#### Request headers
+
+| Header | Valor |
+|--------|-------|
+| `Content-Type` | `application/json` |
+
+#### Request body
+
+```json
+{
+  "delta": -2
+}
+```
+
+| Campo | Tipo | Obrigatório | Regras |
+|-------|------|-------------|--------|
+| `delta` | integer | Sim | != 0; negativo reduz estoque |
+
+#### Response `200 OK`
+
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "quantity": 10
+}
+```
+
+#### Erros
+
+| Status | `code` | Quando |
+|--------|--------|--------|
+| `404` | `NOT_FOUND` | Produto não existe |
+| `409` | `INSUFFICIENT_STOCK` | Resultado < 0 |
+| `400` | `VALIDATION_ERROR` | `delta` = 0 ou ausente |
+| `401` / `403` | | Auth |
+
+---
+
+### `GET /admin/orders`
+
+Lista pedidos com filtros.
+
+| | |
+|---|---|
+| **Método** | `GET` |
+| **Path** | `/admin/orders` |
+| **Auth** | Cognito JWT |
+
+#### Query parameters
+
+| Param | Tipo | Obrigatório | Default | Descrição |
+|-------|------|-------------|---------|-----------|
+| `limit` | integer | Não | `20` | Max 100 |
+| `cursor` | string | Não | — | Paginação |
+| `status` | OrderStatus | Não | — | Filtrar por status |
+
+#### Response `200 OK`
+
+```json
+{
+  "items": [
+    {
+      "id": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+      "status": "SOLICITADO",
+      "items": [
+        { "productId": "550e8400-e29b-41d4-a716-446655440000", "quantity": 2, "unitPrice": 89.9 }
+      ],
+      "fullPrice": 179.8,
+      "customer": {
+        "name": "Maria Silva",
+        "address": "Rua Exemplo, 123",
+        "postalCode": "01310-100",
+        "tel": "11999998888"
+      },
+      "createdAt": "2025-06-23T14:30:00.000Z",
+      "updatedAt": "2025-06-23T14:30:00.000Z"
+    }
+  ],
+  "nextCursor": null,
+  "hasMore": false
+}
+```
+
+#### Erros
+
+| Status | `code` | Quando |
+|--------|--------|--------|
+| `400` | `INVALID_QUERY` | `status` inválido |
+| `401` / `403` | | Auth |
+
+---
+
+### `GET /admin/orders/{id}`
+
+Retorna pedido por ID.
+
+| | |
+|---|---|
+| **Método** | `GET` |
+| **Path** | `/admin/orders/{id}` |
+| **Auth** | Cognito JWT |
+
+#### Path parameters
+
+| Param | Tipo | Descrição |
+|-------|------|-----------|
+| `id` | string (UUID) | ID do pedido |
+
+#### Response `200 OK`
+
+Objeto `Order` completo.
+
+#### Erros
+
+| Status | `code` | Quando |
+|--------|--------|--------|
+| `404` | `NOT_FOUND` | Pedido não existe |
+| `401` / `403` | | Auth |
+
+---
+
+### `PATCH /admin/orders/{id}/status`
+
+Atualiza status do pedido.
+
+| | |
+|---|---|
+| **Método** | `PATCH` |
+| **Path** | `/admin/orders/{id}/status` |
+| **Auth** | Cognito JWT |
+
+#### Request headers
+
+| Header | Valor |
+|--------|-------|
+| `Content-Type` | `application/json` |
+
+#### Request body
+
+```json
+{
+  "status": "EM_ATENDIMENTO"
+}
+```
+
+| Campo | Tipo | Obrigatório | Regras |
+|-------|------|-------------|--------|
+| `status` | OrderStatus | Sim | Transição válida (ver data-models.md) |
+
+#### Response `200 OK`
+
+Objeto `Order` com status atualizado.
+
+#### Erros
+
+| Status | `code` | Quando |
+|--------|--------|--------|
+| `404` | `NOT_FOUND` | Pedido não existe |
+| `400` | `INVALID_STATUS_TRANSITION` | Transição não permitida |
+| `400` | `VALIDATION_ERROR` | Status desconhecido |
+| `401` / `403` | | Auth |
+
+---
+
+## Upload de imagens (produtos)
+
+Aplicável a `POST /admin/products` e `PUT /admin/products/{id}`.
+
+### Três formas de entrada (`PhotoInput`)
+
+| `type` | Entrada | Processamento backend |
+|--------|---------|----------------------|
+| `url` | string URL | Usa URL diretamente em `photos[]` |
+| `base64` | string base64 ou data URI | Decodifica → valida MIME → `PutObject` S3 → URL CDN |
+| `stream` | arquivo multipart | Lê stream do campo → `PutObject` S3 → URL CDN |
+
+### Fluxo base64 / stream
+
+```
+Cliente                    API Lambda                    S3 / CDN
+   │── PhotoInput ──────────►│                              │
+   │   (base64|stream)       │── PutObject ────────────────►│
+   │                         │◄── key ──────────────────────│
+   │                         │── monta URL pública          │
+   │◄── Product.photos[] ────│   (ASSETS_CDN_URL + key)     │
+```
+
+### Limites (editáveis)
+
+| Regra | Valor |
+|-------|-------|
+| Max tamanho por imagem | 5 MB |
+| Max fotos por produto | 10 |
+| MIME types | `image/jpeg`, `image/png`, `image/webp` |
+| Max payload API Gateway | 10 MB |
+
+### Chave S3 sugerida
+
+```
+products/{productId}/{uuid}.{ext}
+```
+
+---
+
+## Códigos HTTP e erros
+
+| Status | Uso |
+|--------|-----|
+| `200` | Sucesso com body |
+| `201` | Recurso criado |
+| `204` | Sucesso sem body |
+| `400` | Validação / query inválida |
+| `401` | Token ausente ou expirado |
+| `403` | Sem permissão admin |
+| `404` | Recurso não encontrado |
+| `409` | Conflito (estoque, transição status) |
+| `413` | Payload muito grande |
+| `500` | Erro interno |
+
+### Códigos de erro (`code`)
+
+| `code` | Descrição |
+|--------|-----------|
+| `VALIDATION_ERROR` | Body ou parâmetros inválidos |
+| `NOT_FOUND` | Recurso não existe |
+| `UNAUTHORIZED` | Auth ausente/inválida |
+| `FORBIDDEN` | Sem permissão |
+| `INSUFFICIENT_STOCK` | Estoque insuficiente |
+| `INVALID_QUERY` | Query params inválidos |
+| `INVALID_CURSOR` | Cursor de paginação inválido ou incompatível com filtros |
+| `INVALID_IMAGE` | Imagem inválida ou MIME não suportado |
+| `PAYLOAD_TOO_LARGE` | Arquivo excede limite |
+| `INVALID_STATUS_TRANSITION` | Mudança de status não permitida |
+| `PRODUCT_NOT_FOUND` | productId inexistente no pedido |
+| `INTERNAL_ERROR` | Erro não tratado |
+
+---
+
+## Resumo rápido
+
+| Método | Rota | Auth | Content-Type |
+|--------|------|------|--------------|
+| `GET` | `/products` | — | — |
+| `GET` | `/products/{id}` | — | — |
+| `POST` | `/orders` | — | `application/json` |
+| `GET` | `/admin/products` | JWT | — |
+| `POST` | `/admin/products` | JWT | `application/json` ou `multipart/form-data` |
+| `GET` | `/admin/products/{id}` | JWT | — |
+| `PUT` | `/admin/products/{id}` | JWT | `application/json` ou `multipart/form-data` |
+| `DELETE` | `/admin/products/{id}` | JWT | — |
+| `PATCH` | `/admin/products/{id}/stock` | JWT | `application/json` |
+| `GET` | `/admin/orders` | JWT | — |
+| `GET` | `/admin/orders/{id}` | JWT | — |
+| `PATCH` | `/admin/orders/{id}/status` | JWT | `application/json` |
+
+## Referências
+
+- [Modelos de dados](data-models.md)
+- [Backend overview](overview.md)
+- [Recursos AWS](../infra/resources.md)

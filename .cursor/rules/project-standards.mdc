@@ -1,0 +1,30 @@
+---
+description: Padrões gerais do repositório afro90sInfra
+alwaysApply: true
+---
+
+# Padrões do Projeto — afro90sInfra
+
+## Documentação
+
+- Fundamentação: `docs/foundation/` (visão, arquitetura, ADRs)
+- Specs: `docs/specs/` — consultar antes de implementar infra nova
+- Decisões estruturais exigem ADR em `docs/foundation/adr/`
+
+## Código e IaC
+
+- Nunca commitar secrets, `.env`, chaves ou credenciais
+- Preferir diff mínimo e focado na tarefa
+- Seguir convenções existentes antes de introduzir padrões novos
+- Tags obrigatórias em recursos cloud: `project=afro90s`, `env`, `managed-by=afro90sInfra`
+
+## Naming
+
+- Recursos: `afro90s-{env}-{tipo}-{nome}` (ex.: `afro90s-dev-vpc-main`)
+- Branches: `feat/`, `fix/`, `docs/` + descrição curta
+- ADRs: `NNN-titulo-kebab-case.md`
+
+## Agentes de IA
+
+- Ler `AGENTS.md` e spec relacionada antes de implementar
+- Não alterar docs de foundation sem solicitação explícita
