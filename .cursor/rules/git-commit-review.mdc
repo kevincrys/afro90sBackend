@@ -1,37 +1,14 @@
 ---
-description: Nunca commitar sem revisão explícita do usuário
+description: Nunca commitar ou fazer push sem o usuário pedir explicitamente
 alwaysApply: true
 ---
 
-# Git — Commit apenas com aprovação explícita
+# Git — commit e push só quando solicitado
 
-## Regra principal
+**Não execute `git commit`, `git push` nem altere histórico git até o usuário pedir explicitamente.**
 
-**Nunca crie um commit, faça push ou altere o histórico git sem instrução explícita do usuário.**
+Após implementar ou corrigir algo: resumir mudanças, propor mensagem de commit e **aguardar** confirmação. Push só se pedido.
 
-Isso inclui:
-- `git commit`
-- `git push`
-- `git merge` / `git rebase`
-- `git commit --amend`
-- `git stash pop` com efeitos colaterais
+Proibido sem pedido: commits automáticos após fix/task, push após commit, amend/rebase não solicitados.
 
-## Antes de qualquer commit
-
-1. Mostre ao usuário um resumo claro do que será commitado (arquivos + mensagem proposta)
-2. Aguarde confirmação explícita ("pode commitar", "sim", "faz o commit")
-3. Somente então execute o commit
-
-## Mensagem de commit
-
-- Formato: `tipo: descrição curta no imperativo` (ex.: `feat: adicionar stack DynamoDB`)
-- Tipos: `feat`, `fix`, `docs`, `chore`, `refactor`, `test`
-- Máximo 72 caracteres na linha principal
-- Nunca usar `--no-verify`
-
-## O que não fazer
-
-- ❌ Commitar no meio de uma implementação sem perguntar
-- ❌ Fazer push automático após commit
-- ❌ Criar commits de "WIP" sem avisar
-- ❌ Alterar commits já existentes sem confirmação
+Mensagens: `tipo: descrição` (`feat`, `fix`, `docs`, …). Nunca `--no-verify`.
