@@ -75,7 +75,7 @@ afro90s-api/
 
 - [ ] `"strict": true`
 - [ ] `"target": "ES2022"`
-- [ ] `"module": "CommonJS"` (Lambda Node 20)
+- [ ] `"module": "CommonJS"` (Lambda Node 24)
 - [ ] `"outDir": "dist"`
 - [ ] Excluir `node_modules`, `dist`
 

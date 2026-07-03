@@ -26,7 +26,7 @@ Configurar pipeline GitHub Actions para build e deploy da SPA no S3/CloudFront d
 - [ ] Trigger: `push` em branch `dev`
 - [ ] Steps:
   1. Checkout
-  2. Node 20 + `npm ci`
+  2. Node 24 + `npm ci`
   3. Injetar `VITE_*` do artifact `outputs-dev.json` da infra (ou GitHub vars)
   4. `npm run build`
   5. `aws s3 sync dist/ s3://afro90s-dev-s3-web --delete`

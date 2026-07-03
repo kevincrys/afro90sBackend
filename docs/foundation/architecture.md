@@ -13,7 +13,7 @@
        ▼
 ┌─────────────┐     invoke     ┌──────────────┐     read/write   ┌────────────┐
 │ API Gateway │ ──────────────►│   Lambda     │ ────────────────►│ DynamoDB   │
-│  HTTP API   │                │  (Node 20)   │                  │ products   │
+│  HTTP API   │                │  (Node 24)   │                  │ products   │
 └─────────────┘                └──────┬───────┘                  │ orders     │
        │                              │                          └────────────┘
        │ Cognito JWT                  ├──► SES (e-mail pedido)

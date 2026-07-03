@@ -37,7 +37,7 @@ Configurar pipelines de **deploy do código Lambda** neste repositório: bundle 
 - [ ] Permissions: `id-token: write`, `contents: read`
 - [ ] Steps (por fluxo alterado ou matrix nos 4 fluxos):
   1. Checkout
-  2. Node 20 + `npm ci`
+  2. Node 24 + `npm ci`
   3. `npm run test:coverage`
   4. Bundle + zip por fluxo
   5. `configure-aws-credentials` com `${{ vars.AWS_ROLE_ARN }}`

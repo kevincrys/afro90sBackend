@@ -17,7 +17,7 @@
     "lint": "eslint \"resources/**/src/**/*.ts\" \"libs/**/src/**/*.ts\""
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=24"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

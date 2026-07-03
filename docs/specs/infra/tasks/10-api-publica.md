@@ -62,7 +62,7 @@ Implementar o HTTP API Gateway com **4 Lambdas** (uma por fluxo) e as **3 rotas 
 
 Para cada função:
 
-- [x] `runtime: Runtime.NODEJS_20_X`
+- [x] `runtime: Runtime.NODEJS_24_X`
 - [x] `handler: 'handler.handler'`
 - [x] `memorySize: 256`, `timeout: Duration.seconds(29)`
 - [x] **Código inicial (placeholder)** — não usar `NodejsFunction` com source do backend

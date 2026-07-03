@@ -22,7 +22,7 @@ for (const flow of flows) {
     outfile: outFile,
     bundle: true,
     platform: 'node',
-    target: 'node20',
+    target: 'node24',
     format: 'cjs',
     minify: true,
     sourcemap: true,
