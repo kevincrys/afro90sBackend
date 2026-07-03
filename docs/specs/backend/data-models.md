@@ -150,6 +150,16 @@ interface Order {
 }
 ```
 
+### Valores monetários (`price`, `unitPrice`, `fullPrice`)
+
+- Moeda BRL com **2 casas decimais** (`multipleOf(0.01)` no Zod).
+- `unitPrice`: snapshot de `Product.price` no momento do pedido.
+- `fullPrice`: calculado no servidor em `order.validation.ts` — **soma em centavos inteiros** para evitar imprecisão de ponto flutuante:
+  1. `priceToCents(unitPrice)` → `Math.round(price * 100)`
+  2. Por linha: `centavos × quantity`
+  3. Soma dos centavos das linhas → `centsToMoney` (`/ 100`)
+- Não usar `Number.EPSILON` nem `toFixed()` para aritmética de totais; a soma inteira em centavos é a abordagem adotada.
+
 Retenção: ao transicionar para `CONCLUIDO` ou `CANCELADO`, o backend define `expiresAt = floor(now/1000) + 180 * 86400`. Pedidos ativos não recebem `expiresAt`.
 
 ## Tipos auxiliares de resposta

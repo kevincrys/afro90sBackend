@@ -416,6 +416,8 @@ Cria pedido com status inicial `SOLICITADO`. Valida estoque (sem decrementar na 
 | `customer.postalCode` | string | Sim | CEP |
 | `customer.tel` | string | Sim | Telefone com DDD |
 
+> **`fullPrice`:** calculado no servidor somando cada linha em centavos inteiros (`Math.round(unitPrice × 100) × quantity`), depois convertido para BRL (`/ 100`), evitando drift de ponto flutuante.
+
 #### Response `201 Created`
 
 ```json

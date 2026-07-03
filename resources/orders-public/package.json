@@ -8,6 +8,8 @@
     "bundle": "node ../../scripts/bundle.mjs orders-public"
   },
   "dependencies": {
-    "@afro90s/http": "*"
+    "@afro90s/http": "*",
+    "@afro90s/models": "*",
+    "@afro90s/repositories": "*"
   }
 }

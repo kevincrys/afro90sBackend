@@ -1,5 +1,6 @@
 export type ApiErrorCode =
   | 'VALIDATION_ERROR'
+  | 'INVALID_OPTION'
   | 'NOT_FOUND'
   | 'INSUFFICIENT_STOCK'
   | 'INVALID_CURSOR'
@@ -18,6 +19,7 @@ export interface ApiErrorBody {
 
 export const API_ERROR_STATUS: Record<ApiErrorCode, number> = {
   VALIDATION_ERROR: 400,
+  INVALID_OPTION: 400,
   INVALID_CURSOR: 400,
   INVALID_QUERY: 400,
   UNAUTHORIZED: 401,

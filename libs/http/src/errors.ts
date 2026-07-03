@@ -42,6 +42,13 @@ export function throwInsufficientStock(message = 'Estoque insuficiente.'): never
   throw new ApiError('INSUFFICIENT_STOCK', message);
 }
 
+export function throwInvalidOption(
+  details: Record<string, string>,
+  message = 'Opção do produto inválida.',
+): never {
+  throw new ApiError('INVALID_OPTION', message, details);
+}
+
 export function throwInvalidQuery(message = 'Parâmetro de consulta inválido.'): never {
   throw new ApiError('INVALID_QUERY', message);
 }

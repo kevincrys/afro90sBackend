@@ -19,7 +19,7 @@ Implementar schemas Zod e tipos TypeScript para `Product`, `Order`, `Customer` e
 | `quantity` | 0–99999; default 0 na criação |
 | `category` | Enum lowercase; sem acentos (`oculos`, `acessorios`, `maquiagem`) |
 | `nameLower` | `normalizeNameLower(name)` — lowercase + remove acentos |
-| `fullPrice` | Calculado no servidor: `sum(item.quantity × item.unitPrice)` |
+| `fullPrice` | Calculado no servidor: soma em **centavos inteiros** (`priceToCents(unitPrice) × quantity` por linha, depois `/ 100`) |
 | `unitPrice` | Snapshot de `Product.price` no momento do pedido |
 | `customer.name` | 2–200 caracteres |
 | `customer.postalCode` | Só dígitos (8 chars) |

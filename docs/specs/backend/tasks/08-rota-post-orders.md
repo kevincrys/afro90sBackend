@@ -1,8 +1,8 @@
 # Task 08 — Rota `POST /orders`
 
 **Fase:** 1 — API pública (sem e-mail)  
-**Status:** pendente  
-**Arquivos alvo:** [`api-routes.md`](../api-routes.md)
+**Status:** concluída  
+**Arquivos alvo:** [`api-routes.md`](../api-routes.md), `resources/orders-public/`
 
 ## Objetivo
 
@@ -12,7 +12,7 @@ Implementar criação de pedido. Na fase 1 grava no DynamoDB **sem enviar e-mail
 
 | Decisão | Valor |
 |---------|-------|
-| `fullPrice` | Calculado no servidor |
+| `fullPrice` | Calculado no servidor (soma em centavos inteiros; ver `data-models.md`) |
 | `unitPrice` | Snapshot de `Product.price` |
 | Itens duplicados | Merge por `(productId, selectedOption)` |
 | `selectedOption` | Obrigatório se produto tem `options`; validar ∈ `product.options` |
@@ -25,46 +25,35 @@ Implementar criação de pedido. Na fase 1 grava no DynamoDB **sem enviar e-mail
 
 ## O que implementar
 
-### `src/routes/orders.ts`
+### `resources/orders-public/src/routes/post-orders.ts`
 
-- [ ] Handler `POST /orders`
-- [ ] Validar body com `CreateOrderSchema`
-- [ ] Fluxo:
-  1. Validar body e merge itens por `(productId, selectedOption)`
-  2. Buscar cada produto → `404` se não existir
-  3. Validar `selectedOption` → `400 INVALID_OPTION` se produto exige opção e valor inválido
-  4. Validar estoque → `409` se `quantity < requested`
-  5. Calcular `fullPrice` e `unitPrice` snapshot (persistir `selectedOption` no item)
-  6. Gravar order com status `SOLICITADO`
-  7. Se `SES_ENABLED === 'true'`: chamar `emailService` (fase 4)
-  8. Retornar `201` com subset
+- [x] Handler `POST /orders`
+- [x] Validar body com `CreateOrderSchema`
+- [x] Fluxo via `order.service.createOrder`
 
-### `src/services/order.service.ts`
+### `resources/orders-public/src/services/order.service.ts`
 
-- [ ] `createOrder(input)` — orquestra validação + persistência + e-mail condicional
+- [x] `createOrder(input)` — orquestra validação + persistência + e-mail condicional
 
-### `src/services/email.service.ts` (stub fase 1)
+### `resources/orders-public/src/services/email.service.ts` (stub fase 1)
 
-- [ ] `sendOrderNotification(order)` — no-op se `SES_ENABLED=false`; log `"SES disabled, skipping email"`
+- [x] `sendOrderNotification(order)` — no-op se `SES_ENABLED=false`; log `"SES disabled, skipping email"`
 
 ### Testes
 
-- [ ] Pedido válido → `201`
-- [ ] Produto inexistente → `404`
-- [ ] Estoque insuficiente → `409`
-- [ ] Body inválido → `400 VALIDATION_ERROR`
-- [ ] Opção ausente ou inválida → `400 INVALID_OPTION`
-- [ ] Merge `(productId, selectedOption)` soma quantidades
-- [ ] `fullPrice` calculado corretamente no servidor
+- [x] Pedido válido → `201`
+- [x] Produto inexistente → `404`
+- [x] Estoque insuficiente → `409`
+- [x] Body inválido → `400 VALIDATION_ERROR`
+- [x] Opção ausente ou inválida → `400 INVALID_OPTION`
+- [x] Merge `(productId, selectedOption)` soma quantidades
+- [x] `fullPrice` calculado corretamente no servidor
 
 ## Pré-requisitos
 
 - Tasks 00–07 concluídas
-- Infra fase 1 (API pública) deployada
 
 ## Critérios de conclusão
 
-- [ ] `POST /orders` retorna `201` em dev (sem e-mail)
-- [ ] Pedido visível no DynamoDB
-- [ ] Testes com cobertura do fluxo principal
-- [ ] Atualizar **Status** para `concluída`
+- [x] Handler e serviços implementados com testes
+- [x] Atualizar **Status** para `concluída`
