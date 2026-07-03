@@ -9,6 +9,8 @@ Definir os tipos de dados persistidos e expostos pela API. Referência para impl
 
 ## Enums
 
+Implementação Zod em `libs/models` (`@afro90s/models`).
+
 ### Category
 
 ```typescript
@@ -34,6 +36,7 @@ type OrderStatus =
 interface Product {
   id: string;              // UUID v4
   name: string;
+  nameLower: string;       // interno (GSI gsi-name); não exposto em GET público
   description: string;     // texto livre; editável só no admin; max 2000 caracteres
   price: number;           // BRL decimal, ex.: 49.90
   quantity: number;        // inteiro >= 0
@@ -51,7 +54,8 @@ interface Product {
 |-------|-------|
 | `description` | String; **0–2000** caracteres; default `""` na criação; **somente admin** altera (`POST/PUT /admin/products*`) |
 | `options` | Array opcional de strings; **máx. 5** itens; cada item **1–40** caracteres, trim; **sem duplicatas** (case-insensitive); ordem preservada |
-| Leitura pública | `GET /products*` retorna `description` e `options` (somente leitura) |
+| `nameLower` | Gerado no servidor: `normalizeNameLower(name)` — lowercase + remoção de acentos (`NFD`) |
+| Leitura pública | `GET /products*` retorna `description` e `options` (somente leitura); **não** retorna `nameLower` |
 
 ## PhotoInput (entrada no CRUD admin — não persistido como objeto)
 
@@ -125,8 +129,8 @@ Persistido no pedido como snapshot (mesmo que o catálogo mude depois).
 interface Customer {
   name: string;
   address: string;
-  postalCode: string;        // CEP — formato livre ou 00000-000
-  tel: string;               // telefone com DDD
+  postalCode: string;        // 8 dígitos (CEP sem hífen)
+  tel: string;               // 10–11 dígitos com DDD
 }
 ```
 
@@ -184,6 +188,17 @@ interface ApiError {
 | `ENVIADO` | `CONCLUIDO`, `CANCELADO` |
 | `CONCLUIDO` | — (terminal) |
 | `CANCELADO` | — (terminal) |
+
+## Schemas Zod (`@afro90s/models`)
+
+| Schema | Uso |
+|--------|-----|
+| `ProductSchema` / `CreateProductSchema` / `UpdateProductSchema` | Persistência e CRUD admin |
+| `OrderSchema` / `CreateOrderSchema` | Pedido persistido e `POST /orders` |
+| `CustomerSchema` | Cliente no pedido |
+| `isValidOrderStatusTransition(from, to)` | `PATCH /admin/orders/{id}/status` |
+
+Validação de `selectedOption` contra `product.options` ocorre em runtime na rota `POST /orders` (task 08), não no Zod isolado.
 
 ## Referências
 

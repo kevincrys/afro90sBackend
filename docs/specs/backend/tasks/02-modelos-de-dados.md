@@ -1,8 +1,8 @@
 # Task 02 — Modelos de dados (Product, Order, Customer)
 
 **Fase:** 0 — Fundação  
-**Status:** pendente  
-**Arquivos alvo:** [`data-models.md`](../data-models.md)
+**Status:** concluída  
+**Arquivos alvo:** [`data-models.md`](../data-models.md), `libs/models/`
 
 ## Objetivo
 
@@ -17,8 +17,8 @@ Implementar schemas Zod e tipos TypeScript para `Product`, `Order`, `Customer` e
 | `description` | 0–2000 caracteres; default `""`; admin only |
 | `options` | 0–5 strings; cada 1–40 chars; sem duplicatas (case-insensitive) |
 | `quantity` | 0–99999; default 0 na criação |
-| `category` | Enum lowercase; sem acentos |
-| `nameLower` | `name.toLowerCase()` normalizado (remove acentos) |
+| `category` | Enum lowercase; sem acentos (`oculos`, `acessorios`, `maquiagem`) |
+| `nameLower` | `normalizeNameLower(name)` — lowercase + remove acentos |
 | `fullPrice` | Calculado no servidor: `sum(item.quantity × item.unitPrice)` |
 | `unitPrice` | Snapshot de `Product.price` no momento do pedido |
 | `customer.name` | 2–200 caracteres |
@@ -33,80 +33,19 @@ Implementar schemas Zod e tipos TypeScript para `Product`, `Order`, `Customer` e
 
 ## O que implementar
 
-### `src/models/product.ts`
+### `libs/models/src/product.ts`
 
-```typescript
-export const CategoryEnum = z.enum(['camiseta','bone','acessorio','disco','outro']);
-export type Category = z.infer<typeof CategoryEnum>;
+- [x] `CategoryEnum`, `ProductSchema`, `CreateProductSchema`, `UpdateProductSchema`
+- [x] Refinar `options`: rejeitar duplicatas case-insensitive no create/update
+- [x] `normalizeNameLower(name)` em `libs/models/src/normalize.ts`
 
-export const ProductSchema = z.object({
-  id: z.string().uuid(),
-  name: z.string().min(2).max(120),
-  nameLower: z.string(),
-  description: z.string().max(2000),
-  price: z.number().positive().multipleOf(0.01),
-  quantity: z.number().int().min(0).max(99999),
-  photos: z.array(z.string().url()),
-  category: CategoryEnum,
-  options: z.array(z.string().trim().min(1).max(40)).max(5).optional(),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
-});
-export type Product = z.infer<typeof ProductSchema>;
+### `libs/models/src/order.ts`
 
-export const CreateProductSchema = ProductSchema.omit({ id:true, nameLower:true, createdAt:true, updatedAt:true })
-  .extend({ description: z.string().max(2000).default('') });
-export const UpdateProductSchema = CreateProductSchema.partial();
-```
+- [x] `OrderStatusEnum`, `OrderItemSchema`, `CustomerSchema`, `OrderSchema`, `CreateOrderSchema`
+- [x] `isValidOrderStatusTransition()` — transições conforme `data-models.md`
+- [x] Validação de `selectedOption` contra `product.options` em runtime (task 08), não só no Zod
 
-- [ ] Refinar `options`: rejeitar duplicatas case-insensitive no create/update
-
-- [ ] Implementar função `normalizeNameLower(name: string): string` (lowercase + remove acentos com `normalize('NFD')`)
-
-### `src/models/order.ts`
-
-```typescript
-export const OrderStatusEnum = z.enum(['SOLICITADO','CONFIRMADO','ENVIADO','ENTREGUE','CANCELADO']);
-
-export const OrderItemSchema = z.object({
-  productId: z.string().uuid(),
-  quantity: z.number().int().min(1).max(99),
-  unitPrice: z.number().positive(),
-  selectedOption: z.string().trim().min(1).max(40).optional(),
-});
-
-export const CustomerSchema = z.object({
-  name: z.string().min(2).max(200),
-  address: z.string().min(2).max(200),
-  postalCode: z.string().regex(/^\d{8}$/),
-  tel: z.string().regex(/^\d{10,11}$/),
-});
-
-export const OrderSchema = z.object({
-  id: z.string().uuid(),
-  status: OrderStatusEnum,
-  items: z.array(OrderItemSchema).min(1).max(99),
-  fullPrice: z.number().positive(),
-  customer: CustomerSchema,
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
-});
-
-export const CreateOrderSchema = z.object({
-  customer: CustomerSchema,
-  items: z.array(z.object({
-    productId: z.string().uuid(),
-    quantity: z.number().int().min(1).max(99),
-    selectedOption: z.string().trim().min(1).max(40).optional(),
-  })).min(1).max(99),
-});
-```
-
-- [ ] Validar `selectedOption` contra `product.options` em runtime (task 08), não só no Zod
-
-- [ ] Transições de status válidas: `SOLICITADO→CONFIRMADO→ENVIADO→ENTREGUE` / qualquer→`CANCELADO`
-
-### `src/models/errors.ts`
+### `libs/models/src/errors.ts`
 
 - [ ] Ver task 03
 
@@ -116,8 +55,8 @@ export const CreateOrderSchema = z.object({
 
 ## Critérios de conclusão
 
-- [ ] Schemas Zod compilam sem erros
-- [ ] `normalizeNameLower('Óculos Sol')` → `'oculos sol'`
-- [ ] Testes unitários para validação de `CreateOrderSchema` e `CreateProductSchema`
-- [ ] `data-models.md` atualizado com schemas e regras
-- [ ] Atualizar **Status** para `concluída`
+- [x] Schemas Zod compilam sem erros
+- [x] `normalizeNameLower('Óculos Sol')` → `'oculos sol'`
+- [x] Testes unitários para validação de `CreateOrderSchema` e `CreateProductSchema`
+- [x] `data-models.md` atualizado com schemas e regras
+- [x] Atualizar **Status** para `concluída`
