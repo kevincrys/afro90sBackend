@@ -21,13 +21,13 @@ Implementar serviço de upload de imagens de produtos para S3, consumido pelas r
 
 ## O que implementar
 
-### `libs/aws-s3/` (`@afro90s/aws-s3`)
+### `src/lib/s3.ts`
 
 - [ ] Singleton `S3Client`
 - [ ] Bucket via env: `ASSETS_BUCKET`
 - [ ] CDN base via env: `ASSETS_CDN_URL`
 
-### `libs/services/image.service.ts` (`@afro90s/services`)
+### `src/services/image.service.ts`
 
 - [ ] `uploadProductImage(productId, file: { buffer, mimeType, filename })`:
   - Validar mime type

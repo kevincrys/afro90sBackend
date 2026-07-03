@@ -15,6 +15,8 @@ Implementar página de detalhe com galeria, informações e botão adicionar ao 
 | Galeria | Imagem única; clique abre modal com carrossel |
 | URLs `photos[]` | Sempre absolutas (não relativas) |
 | Quantidade | Seletor 1..N limitado a `product.quantity` |
+| Variações | Se `product.options` não vazio: seletor obrigatório antes de adicionar ao carrinho |
+| Descrição | Exibir `product.description` (texto; pode ser vazio) |
 | Esgotado | Botão desabilitado |
 | SEO | `document.title` = nome do produto |
 
@@ -24,7 +26,8 @@ Implementar página de detalhe com galeria, informações e botão adicionar ao 
 
 - [ ] `useProduct(id)` com React Query
 - [ ] Imagem principal clicável → modal com carrossel de `photos[]`
-- [ ] Nome, preço, categoria, descrição (se houver)
+- [ ] Nome, preço, categoria, `description`
+- [ ] Se `options.length > 0`: seletor de variação (ex.: cor)
 - [ ] Seletor de quantidade (1 até `product.quantity`)
 - [ ] Botão "Adicionar ao carrinho" → Zustand store (task 07)
 - [ ] Botão desabilitado se `quantity === 0`

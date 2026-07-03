@@ -32,6 +32,7 @@ interface CartItem {
   quantity: number;
   photo: string;
   maxQuantity: number;
+  selectedOption?: string;  // obrigatório no item se produto tinha options
 }
 // addItem, removeItem, updateQuantity, clear, totalItems, items
 // persist middleware com localStorage
@@ -40,7 +41,7 @@ interface CartItem {
 ### `src/components/CartDrawer.tsx`
 
 - [ ] Drawer lateral aberto pelo ícone carrinho no Header
-- [ ] Lista de itens com imagem, nome, quantidade, subtotal
+- [ ] Lista de itens com imagem, nome, quantidade, opção (se houver), subtotal
 - [ ] Botão remover item
 - [ ] Seção checkout (formulário) no mesmo drawer:
   - Campos: `name`, `address`, `postalCode`, `tel`
@@ -48,7 +49,8 @@ interface CartItem {
   - Validação Zod antes de submit
 - [ ] Botão "Finalizar pedido" com loading state
 - [ ] `useCreateOrder()` mutation
-- [ ] Tratamento de erros: `INSUFFICIENT_STOCK`, `VALIDATION_ERROR` (mapear para pt-BR)
+- [ ] `POST /orders` envia `selectedOption` por item quando aplicável
+- [ ] Tratamento de erros: `INSUFFICIENT_STOCK`, `VALIDATION_ERROR`, `INVALID_OPTION` (mapear para pt-BR)
 - [ ] Após `201`: limpar carrinho → chamar fluxo WhatsApp (task 08)
 
 ### Drawer vazio

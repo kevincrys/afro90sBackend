@@ -19,7 +19,7 @@ Implementar utilitário de cursor opaco Base64URL para listagens paginadas.
 
 ## O que implementar
 
-### `libs/http/pagination.ts` (`@afro90s/http`)
+### `src/utils/pagination.ts`
 
 ```typescript
 interface CursorPayload {

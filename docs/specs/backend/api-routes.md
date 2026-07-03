@@ -222,12 +222,14 @@ Lista produtos com paginação e busca opcional por nome.
     {
       "id": "550e8400-e29b-41d4-a716-446655440000",
       "name": "Óculos Vintage Gold",
+      "description": "Armação dourada estilo anos 90, lentes de demonstração.",
       "price": 89.9,
       "quantity": 12,
       "photos": [
         "https://cdn.afro90s.com.br/products/550e8400/abc.jpg"
       ],
       "category": "oculos",
+      "options": ["Dourado", "Preto"],
       "createdAt": "2025-06-23T12:00:00.000Z",
       "updatedAt": "2025-06-23T12:00:00.000Z"
     }
@@ -273,10 +275,12 @@ Retorna um produto por ID.
 {
   "id": "550e8400-e29b-41d4-a716-446655440000",
   "name": "Óculos Vintage Gold",
+  "description": "Armação dourada estilo anos 90, lentes de demonstração.",
   "price": 89.9,
   "quantity": 12,
   "photos": ["https://cdn.afro90s.com.br/products/550e8400/abc.jpg"],
   "category": "oculos",
+  "options": ["Dourado", "Preto"],
   "createdAt": "2025-06-23T12:00:00.000Z",
   "updatedAt": "2025-06-23T12:00:00.000Z"
 }
@@ -314,7 +318,8 @@ Cria pedido com status inicial `SOLICITADO`. Valida estoque (sem decrementar na 
   "items": [
     {
       "productId": "550e8400-e29b-41d4-a716-446655440000",
-      "quantity": 2
+      "quantity": 1,
+      "selectedOption": "Preto"
     }
   ],
   "customer": {
@@ -331,6 +336,7 @@ Cria pedido com status inicial `SOLICITADO`. Valida estoque (sem decrementar na 
 | `items` | array | Sim | Min 1 item |
 | `items[].productId` | string (UUID) | Sim | Produto deve existir |
 | `items[].quantity` | integer | Sim | >= 1 |
+| `items[].selectedOption` | string | Condicional | Obrigatório se `product.options` não vazio; deve ∈ `product.options` |
 | `customer.name` | string | Sim | Min 2 caracteres |
 | `customer.address` | string | Sim | Min 5 caracteres |
 | `customer.postalCode` | string | Sim | CEP |
@@ -345,11 +351,12 @@ Cria pedido com status inicial `SOLICITADO`. Valida estoque (sem decrementar na 
   "items": [
     {
       "productId": "550e8400-e29b-41d4-a716-446655440000",
-      "quantity": 2,
-      "unitPrice": 89.9
+      "quantity": 1,
+      "unitPrice": 89.9,
+      "selectedOption": "Preto"
     }
   ],
-  "fullPrice": 179.8,
+  "fullPrice": 89.9,
   "customer": {
     "name": "Maria Silva",
     "address": "Rua Exemplo, 123 - Centro",
@@ -366,6 +373,7 @@ Cria pedido com status inicial `SOLICITADO`. Valida estoque (sem decrementar na 
 | Status | `code` | Quando |
 |--------|--------|--------|
 | `400` | `VALIDATION_ERROR` | Body inválido |
+| `400` | `INVALID_OPTION` | `selectedOption` ausente, inválido ou duplicado em `options` |
 | `400` | `PRODUCT_NOT_FOUND` | `productId` inexistente |
 | `409` | `INSUFFICIENT_STOCK` | Quantidade > estoque disponível |
 
@@ -444,9 +452,11 @@ Cria novo produto. **Suporta imagens via URL (string), base64 ou stream (multipa
 ```json
 {
   "name": "Óculos Vintage Gold",
+  "description": "Armação dourada estilo anos 90.",
   "price": 89.9,
   "quantity": 12,
   "category": "oculos",
+  "options": ["Dourado", "Preto"],
   "photos": [
     {
       "type": "url",
@@ -464,10 +474,12 @@ Cria novo produto. **Suporta imagens via URL (string), base64 ou stream (multipa
 
 | Campo | Tipo | Obrigatório | Regras |
 |-------|------|-------------|--------|
-| `name` | string | Sim | |
+| `name` | string | Sim | 2–120 caracteres |
+| `description` | string | Não | Max 2000; default `""` |
 | `price` | number | Sim | > 0 |
 | `quantity` | integer | Sim | >= 0 |
 | `category` | Category | Sim | enum |
+| `options` | string[] | Não | Max 5; cada 1–40 chars; sem duplicatas |
 | `photos` | PhotoInput[] | Não | Default `[]`; ver [upload de imagens](#upload-de-imagens-produtos) |
 
 #### Modo B — Multipart (`multipart/form-data`)
@@ -483,9 +495,11 @@ Cria novo produto. **Suporta imagens via URL (string), base64 ou stream (multipa
 | Campo | Tipo | Obrigatório | Descrição |
 |-------|------|-------------|-----------|
 | `name` | string | Sim | |
+| `description` | string | Não | Max 2000 |
 | `price` | string/number | Sim | |
 | `quantity` | string/number | Sim | |
 | `category` | string | Sim | |
+| `options` | string (JSON) | Não | Array JSON de strings, ex.: `["Preto","Dourado"]` |
 | `photos` | string (JSON) | Não | Array JSON de `PhotoInput`; entradas `stream` referenciam campos de arquivo abaixo |
 | `photo_0` | file (binary) | Condicional | Arquivo de imagem |
 | `photo_1` | file (binary) | Condicional | Arquivo adicional |
@@ -507,6 +521,7 @@ Exemplo do campo `photos` em multipart:
 {
   "id": "550e8400-e29b-41d4-a716-446655440000",
   "name": "Óculos Vintage Gold",
+  "description": "Armação dourada estilo anos 90.",
   "price": 89.9,
   "quantity": 12,
   "photos": [
@@ -515,6 +530,7 @@ Exemplo do campo `photos` em multipart:
     "https://cdn.afro90s.com.br/products/550e8400/uuid-2.jpg"
   ],
   "category": "oculos",
+  "options": ["Dourado", "Preto"],
   "createdAt": "2025-06-23T15:00:00.000Z",
   "updatedAt": "2025-06-23T15:00:00.000Z"
 }
@@ -589,9 +605,11 @@ Atualiza produto. Mesma lógica de imagens do `POST` (url, base64, stream).
 ```json
 {
   "name": "Óculos Vintage Gold (edição)",
+  "description": "Edição limitada.",
   "price": 79.9,
   "quantity": 10,
   "category": "oculos",
+  "options": ["Dourado"],
   "photos": [
     { "type": "url", "value": "https://cdn.afro90s.com.br/products/550e8400/existing.jpg" },
     { "type": "base64", "value": "...", "filename": "nova-foto.jpg" }
@@ -726,9 +744,9 @@ Lista pedidos com filtros.
       "id": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
       "status": "SOLICITADO",
       "items": [
-        { "productId": "550e8400-e29b-41d4-a716-446655440000", "quantity": 2, "unitPrice": 89.9 }
+        { "productId": "550e8400-e29b-41d4-a716-446655440000", "quantity": 1, "unitPrice": 89.9, "selectedOption": "Preto" }
       ],
-      "fullPrice": 179.8,
+      "fullPrice": 89.9,
       "customer": {
         "name": "Maria Silva",
         "address": "Rua Exemplo, 123",
@@ -894,6 +912,7 @@ products/{productId}/{uuid}.{ext}
 | `INVALID_IMAGE` | Imagem inválida ou MIME não suportado |
 | `PAYLOAD_TOO_LARGE` | Arquivo excede limite |
 | `INVALID_STATUS_TRANSITION` | Mudança de status não permitida |
+| `INVALID_OPTION` | `selectedOption` inválido ou ausente quando produto tem opções |
 | `PRODUCT_NOT_FOUND` | productId inexistente no pedido |
 | `INTERNAL_ERROR` | Erro não tratado |
 

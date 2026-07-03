@@ -20,7 +20,7 @@ Implementar `ApiError` e helpers de resposta de erro padronizados usados por tod
 
 ## O que implementar
 
-### `libs/models/errors.ts` (`@afro90s/models`)
+### `src/models/errors.ts`
 
 ```typescript
 export type ApiErrorCode =
@@ -54,7 +54,7 @@ export interface ApiError {
 | `INVALID_STATUS_TRANSITION` | 409 |
 | `INTERNAL_ERROR` | 500 |
 
-- [ ] Implementar `libs/http/errors.ts` com `throwValidationError(fields)`, `throwNotFound(msg)`, etc.
+- [ ] Implementar `src/utils/errors.ts` com `throwValidationError(fields)`, `throwNotFound(msg)`, etc.
 - [ ] Middleware Middy ou wrapper que converte `ApiError` lançado em resposta HTTP correta
 - [ ] `ZodError` → `VALIDATION_ERROR` com `details` mapeado
 

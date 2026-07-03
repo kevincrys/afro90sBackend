@@ -35,7 +35,7 @@ Validar API v1 completa: 3 rotas públicas + 8 rotas admin + e-mail SES + cobert
 
 ### Alinhamento infra
 
-- [ ] Deploy via pipeline infra (`afro90sInfra`) + CI deste repo (`afro90sBackend`)
+- [ ] Deploy via pipeline infra (`afro90sInfra`) + CI repo (`afro90s-api`)
 - [ ] Smoke test infra `smoke-test-completo.sh` passa
 
 ## Pré-requisitos

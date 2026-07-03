@@ -10,7 +10,7 @@ Implementar detalhe de um produto por ID.
 
 ## O que implementar
 
-### `resources/products-public/src/routes/products.ts`
+### `src/routes/products.ts`
 
 - [ ] Handler `GET /products/{id}`
 - [ ] Validar `id` como UUID

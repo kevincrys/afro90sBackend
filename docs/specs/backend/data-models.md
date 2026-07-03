@@ -1,7 +1,7 @@
 # Modelos de dados — Backend
 
 **Status:** Aprovado  
-**Última atualização:** 2025-06-23
+**Última atualização:** 2026-07-03
 
 ## Objetivo
 
@@ -34,14 +34,24 @@ type OrderStatus =
 interface Product {
   id: string;              // UUID v4
   name: string;
+  description: string;     // texto livre; editável só no admin; max 2000 caracteres
   price: number;           // BRL decimal, ex.: 49.90
-  quantity: number;          // inteiro >= 0
+  quantity: number;        // inteiro >= 0
   photos: string[];        // URLs públicas finais (CDN/S3)
   category: Category;
-  createdAt: string;         // ISO 8601 UTC
-  updatedAt: string;         // ISO 8601 UTC
+  options?: string[];      // variações (ex.: cores); max 5; omitir ou [] = sem seletor
+  createdAt: string;       // ISO 8601 UTC
+  updatedAt: string;       // ISO 8601 UTC
 }
 ```
+
+### Regras — `Product`
+
+| Campo | Regra |
+|-------|-------|
+| `description` | String; **0–2000** caracteres; default `""` na criação; **somente admin** altera (`POST/PUT /admin/products*`) |
+| `options` | Array opcional de strings; **máx. 5** itens; cada item **1–40** caracteres, trim; **sem duplicatas** (case-insensitive); ordem preservada |
+| Leitura pública | `GET /products*` retorna `description` e `options` (somente leitura) |
 
 ## PhotoInput (entrada no CRUD admin — não persistido como objeto)
 
@@ -94,8 +104,20 @@ interface OrderItem {
   productId: string;
   quantity: number;          // inteiro >= 1
   unitPrice: number;         // preço no momento do pedido (snapshot)
+  selectedOption?: string;   // variação escolhida (ex.: cor); snapshot; ver regras abaixo
 }
 ```
+
+### Regras — `OrderItem.selectedOption`
+
+| Situação do produto | `selectedOption` no `POST /orders` |
+|---------------------|-------------------------------------|
+| `options` ausente ou `[]` | Omitido |
+| `options` com 1–5 valores | **Obrigatório**; deve existir em `product.options` (match exato após trim) |
+
+Persistido no pedido como snapshot (mesmo que o catálogo mude depois).
+
+**Merge de linhas duplicadas no request:** chave `(productId, selectedOption)` — mesma combinação soma `quantity`; combinações diferentes permanecem em linhas separadas.
 
 ## Customer
 
@@ -119,8 +141,12 @@ interface Order {
   customer: Customer;
   createdAt: string;
   updatedAt: string;
+  /** Epoch segundos (TTL DynamoDB). Preenchido ao atingir status terminal. */
+  expiresAt?: number;
 }
 ```
+
+Retenção: ao transicionar para `CONCLUIDO` ou `CANCELADO`, o backend define `expiresAt = floor(now/1000) + 180 * 86400`. Pedidos ativos não recebem `expiresAt`.
 
 ## Tipos auxiliares de resposta
 

@@ -19,6 +19,8 @@ Implementar painel de gestão de produtos: listagem, criar, editar, excluir e up
 | Reordenar fotos | Sim, na v1 |
 | Confirmação delete | Sim |
 | Estoque | Na mesma tela do formulário |
+| Descrição | Textarea; max 2000 caracteres |
+| Opções | Lista editável; max 5 variações (ex.: cores); cada 1–40 chars |
 
 ## O que implementar
 
@@ -31,7 +33,7 @@ Implementar painel de gestão de produtos: listagem, criar, editar, excluir e up
 
 ### `src/components/admin/ProductFormModal.tsx`
 
-- [ ] Campos: `name`, `price`, `quantity`, `category`
+- [ ] Campos: `name`, `description`, `price`, `quantity`, `category`, `options` (0–5)
 - [ ] Upload de imagens (input file, multipart)
 - [ ] Preview das imagens selecionadas com reordenação (drag ou botões ↑↓)
 - [ ] Validação Zod

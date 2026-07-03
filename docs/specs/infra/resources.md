@@ -132,7 +132,7 @@ Tags obrigatórias em todo recurso (via `TaggingAspect` em `bin/app.ts`): `proje
 | `lambda-products-admin` | `/admin/products*` | DynamoDB products CRUD, S3 assets write |
 | `lambda-orders-admin` | `/admin/orders*` | DynamoDB orders read/update |
 
-Runtime: **Node.js 20.x**. Bundling: **esbuild no afro90sBackend** (monorepo `resources/{flow}/` — [ADR-008](../../foundation/adr/008-backend-monorepo-lerna.md)); CDK cria função com placeholder ([ADR-007](../../foundation/adr/007-backend-lambda-s3-deploy.md)).
+Runtime: **Node.js 20.x**. Bundling: **esbuild no afro90sBackend**; CDK cria função com placeholder ([ADR-007](../../foundation/adr/007-backend-lambda-s3-deploy.md)).
 
 ## DynamoDB
 
@@ -150,6 +150,8 @@ Billing: **on-demand** (`PAY_PER_REQUEST`) — alinhado ao [ADR-004](../../found
 | `price` | Number | |
 | `quantity` | Number | |
 | `photos` | List\<String\> | URLs finais |
+| `description` | String | Texto livre; max 2000 chars; editável via admin |
+| `options` | List\<String\> | Opcional; max 5 variações (ex.: cores) |
 | `category` | String | enum |
 | `createdAt` | String | ISO 8601 |
 | `updatedAt` | String | ISO 8601 |
@@ -164,7 +166,7 @@ Billing: **on-demand** (`PAY_PER_REQUEST`) — alinhado ao [ADR-004](../../found
 |----------|------|-------|
 | PK `id` | String (UUID) | |
 | `status` | String | enum OrderStatus |
-| `items` | List | `{ productId, quantity, unitPrice }` |
+| `items` | List | `{ productId, quantity, unitPrice, selectedOption? }` |
 | `fullPrice` | Number | |
 | `customer` | Map | `{ name, address, postalCode, tel }` |
 | `createdAt` | String | |

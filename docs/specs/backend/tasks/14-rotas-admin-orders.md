@@ -18,25 +18,27 @@ Implementar listagem e atualização de status de pedidos nas rotas `/admin/orde
 
 ## O que implementar
 
-### `resources/orders-admin/src/routes/orders.ts`
+### `src/routes/admin/orders.ts`
 
 - [ ] `GET /admin/orders` — listagem com `status?`, `cursor`, `limit`
-- [ ] `GET /admin/orders/{id}` — detalhe completo com `customer` e `items`
+- [ ] `GET /admin/orders/{id}` — detalhe completo com `customer`, `items` (incl. `selectedOption` por item)
 - [ ] `PUT /admin/orders/{id}` — atualizar status
 
 Todas com middleware auth.
 
-### `libs/services/order.service.ts` (expandir)
+### `src/services/order.service.ts` (expandir)
 
 - [ ] `listOrders(filters)` — query em `gsi-status-createdAt`
 - [ ] `getOrder(id)`
 - [ ] `updateOrderStatus(id, newStatus)` — validar transição; `409 INVALID_STATUS_TRANSITION` se inválida
+- [ ] Ao transicionar para `CONCLUIDO` ou `CANCELADO`: definir `expiresAt` (epoch segundos) = agora + **180 dias**
 
 ### Testes
 
 - [ ] Listagem com filtro `status`
 - [ ] Transição válida → `200`
 - [ ] Transição inválida → `409`
+- [ ] Transição para `CONCLUIDO`/`CANCELADO` grava `expiresAt` (+180 dias)
 - [ ] Pedido inexistente → `404`
 
 ## Pré-requisitos
