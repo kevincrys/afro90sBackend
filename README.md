@@ -1,72 +1,70 @@
 # afro90sBackend
 
-Repositório da **API serverless** do projeto **Afro90s** — Lambda Node.js 20 + TypeScript, exposta via API Gateway.
+Repositório da **API serverless** do projeto **Afro90s** — monorepo Lerna (4 Lambdas + libs compartilhadas), Node.js 20 + TypeScript.
 
 ## Ecossistema
 
 | Repositório | Função |
 |-------------|--------|
 | [afro90sInfra](https://github.com/kevincrys/afro90sInfra) | CDK, recursos AWS, Lambda config (env, IAM) |
-| **afro90sBackend** (este) | Handlers, bundle, deploy código (S3 + Lambda) |
-| [afro90sFrontend](https://github.com/kevincrys/afro90sFrontend) | SPA React consumindo esta API |
+| **afro90sBackend** (este) | `resources/` + `libs/`, bundle, deploy S3 |
+| [afro90sFrontend](https://github.com/kevincrys/afro90sFrontend) | SPA React |
 
 ## Documentação
 
 | Recurso | Descrição |
 |---------|-----------|
-| [Visão do repositório](docs/foundation/vision.md) | Escopo e responsabilidades |
-| [Overview backend](docs/specs/backend/overview.md) | Stack, estrutura |
+| [ADR-008 — monorepo](docs/foundation/adr/008-backend-monorepo-lerna.md) | `resources/` + `libs/` + Lerna |
+| [Overview backend](docs/specs/backend/overview.md) | Stack, estrutura, mapeamento de paths |
 | [**Contrato API**](docs/specs/backend/api-routes.md) | Rotas, headers, payloads |
-| [**Pipeline CI/CD**](docs/specs/pipelines/overview.md) | CI + deploy S3/Lambda |
+| [**Pipeline CI/CD**](docs/specs/pipelines/overview.md) | CI + deploy por fluxo |
 | [**Setup GitHub**](docs/foundation/github-pipeline-setup.md) | Environments, OIDC, roles |
-| [Task deploy](docs/specs/backend/tasks/00-deploy-api.md) | Implementação dos workflows |
 | [Guia para agentes](AGENTS.md) | Instruções para IA |
-| [Como contribuir](CONTRIBUTING.md) | Fluxo de PR |
 
 ## Stack
 
 | Componente | Tecnologia |
 |------------|------------|
+| Monorepo | Lerna + npm workspaces |
 | Runtime | AWS Lambda Node.js 20 |
-| Linguagem | TypeScript (strict) |
-| HTTP | Middy + router interno |
-| Bundle | esbuild (`npm run bundle`) |
-| Deploy | S3 + `update-function-code` ([ADR-007](https://github.com/kevincrys/afro90sInfra/blob/main/docs/foundation/adr/007-backend-lambda-s3-deploy.md)) |
-| Testes | Vitest (cobertura ≥ 80%) |
+| HTTP | Middy (por package em `resources/`) |
+| Bundle | esbuild por fluxo |
+| Deploy | S3 + `update-function-code` × 4 ([ADR-007](docs/foundation/adr/007-backend-lambda-s3-deploy.md)) |
+| Testes | Vitest (cobertura ≥ 80% agregada) |
 
-## Pipeline
-
-| Evento | Ação |
-|--------|------|
-| PR / push | CI: build → test → lint |
-| Push `dev` | Deploy Lambda dev (S3 + update-function-code) |
-| Push `main` | Deploy Lambda production |
-
-## Estrutura (alvo)
+## Estrutura
 
 ```
 afro90sBackend/
-├── src/handler.ts
-├── scripts/bundle.mjs
-├── .github/workflows/
-│   ├── ci.yml
-│   ├── deploy-dev.yml
-│   └── deploy-prod.yml
-└── docs/specs/
+├── lerna.json
+├── libs/                    # @afro90s/models, @afro90s/http, …
+├── resources/               # 1 pasta = 1 Lambda = 1 fluxo de deploy
+│   ├── products-public/
+│   ├── orders-public/
+│   ├── products-admin/
+│   └── orders-admin/
+├── scripts/
+└── .github/workflows/
 ```
-
-## Status
-
-- [x] Specs e ADR-007 (deploy S3)
-- [ ] Implementação `src/`
-- [ ] Workflows GitHub Actions
-- [ ] Primeiro deploy em dev
 
 ## Desenvolvimento local
 
 ```bash
 npm ci
-npm run build
+npm run build          # lerna run build
 npm test
-npm run bundle   # gera dist/ para deploy
+npm run bundle -- --flow=products-public
 ```
+
+## Configuração GitHub (deploy)
+
+Environments `dev` / `prod`: `AWS_ROLE_ARN`, `AWS_REGION`, `ARTIFACT_BUCKET` — ver [github-pipeline-setup.md](docs/foundation/github-pipeline-setup.md).
+
+Nomes das Lambdas: **SSM** em runtime (`deploy-flow.sh`).
+
+## Status
+
+- [x] Specs monorepo (ADR-008)
+- [ ] Monorepo Lerna implementado (task 00-setup-repo)
+- [x] Workflows deploy (matrix 4 fluxos)
+- [ ] Primeiro deploy em dev

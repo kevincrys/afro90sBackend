@@ -5,7 +5,7 @@
 
 ## Objetivo
 
-Definir os tipos de dados persistidos e expostos pela API. Referência para implementação em TypeScript/Zod no repo `afro90s-api`.
+Definir os tipos de dados persistidos e expostos pela API. Referência para implementação em TypeScript/Zod no repo `afro90sBackend`.
 
 ## Enums
 

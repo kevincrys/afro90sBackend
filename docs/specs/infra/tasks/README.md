@@ -42,7 +42,7 @@ Cada task depende apenas da anterior (`task N` requer `task N-1` concluída), sa
 
 | # | Arquivo | O que entrega |
 |---|---------|---------------|
-| 05 | [05-dynamodb.md](05-dynamodb.md) | Tabelas `products` e `orders` + GSIs (free tier) |
+| 05 | [05-dynamodb.md](05-dynamodb.md) | Tabelas `products` e `orders` + GSIs (on-demand) |
 | 06 | [06-frontend-hosting.md](06-frontend-hosting.md) | S3 web + CloudFront OAC (SPA React) |
 | 07 | [07-assets-storage.md](07-assets-storage.md) | S3 assets + behavior `/assets/*` no CloudFront |
 | 08 | [08-iam-publica.md](08-iam-publica.md) | Role Lambda pública (sem SES) |

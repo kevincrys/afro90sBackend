@@ -55,7 +55,7 @@ new CfnTemplate(this, 'OrderTemplate', {
 
 ### IAM — adicionar SES à role pública (task 08)
 
-- [ ] Atualizar `afro90s-{env}-role-lambda-public` com:
+- [ ] Atualizar `afro90s-{env}-role-lambda-orders-public` com:
   - `ses:SendTemplatedEmail`
   - Resource: ARN da identidade verificada (não `*`)
 

@@ -18,7 +18,7 @@ Validar que as 3 rotas públicas funcionam end-to-end em `dev`, alinhadas com a 
 - [ ] Headers `Content-Type` e `X-Request-Id` em todas as respostas
 - [ ] CORS headers para origem CloudFront
 - [ ] `npm run test:coverage` ≥ 80% nas rotas da fase 1
-- [ ] Deploy via CI do repo `afro90s-api` (bundle no CDK infra)
+- [ ] Deploy via CI deste repo (`afro90sBackend` → S3 + `update-function-code` nas 4 Lambdas)
 
 ## Pré-requisitos
 

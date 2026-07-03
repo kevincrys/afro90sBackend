@@ -12,7 +12,7 @@ Configurar pipeline GitHub Actions para build e deploy da SPA no S3/CloudFront d
 
 | Decisão | Valor |
 |---------|-------|
-| CI | GitHub Actions no repo `afro90s-web` |
+| CI | GitHub Actions no repo `afro90sFrontend` |
 | Deploy | `aws s3 sync dist/` + invalidação CloudFront |
 | Env no CI | Injetadas a partir de outputs da infra |
 | `base` Vite | `/` (raiz do CloudFront) |

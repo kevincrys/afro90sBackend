@@ -1,4 +1,4 @@
-# Task 16 — Rotas admin (API Gateway + Lambda admin)
+# Task 16 — Rotas admin (API Gateway + Lambdas admin)
 
 **Fase:** 3 — Rotas admin  
 **Status:** pendente  
@@ -6,14 +6,14 @@
 
 ## Objetivo
 
-Adicionar as rotas `/admin/*` ao HTTP API com o authorizer Cognito JWT e conectar à Lambda admin (ou expandir o router da Lambda existente).
+Adicionar as rotas `/admin/*` ao HTTP API com o authorizer Cognito JWT e conectar às Lambdas admin (`products-admin`, `orders-admin`), já provisionadas como placeholder na task 10.
 
 ## Configurações já definidas
 
 | Decisão | Valor |
 |---------|-------|
 | Authorizer | Cognito JWT criado na task 13 |
-| Lambda | Mesma função da fase 1 (router interno ampliado) ou segunda função |
+| Lambdas | `lambda-products-admin` e `lambda-orders-admin` (task 10) |
 | Rotas admin | Todas com authorizer obrigatório |
 
 ## O que implementar
@@ -25,29 +25,21 @@ Adicionar as rotas `/admin/*` ao HTTP API com o authorizer Cognito JWT e conecta
 
 ### Rotas admin
 
-- [ ] `GET /admin/products` → Lambda admin + authorizer
-- [ ] `POST /admin/products` → Lambda admin + authorizer
-- [ ] `PUT /admin/products/{id}` → Lambda admin + authorizer
-- [ ] `DELETE /admin/products/{id}` → Lambda admin + authorizer
-- [ ] `PUT /admin/products/{id}/stock` → Lambda admin + authorizer
-- [ ] `GET /admin/orders` → Lambda admin + authorizer
-- [ ] `GET /admin/orders/{id}` → Lambda admin + authorizer
-- [ ] `PUT /admin/orders/{id}` → Lambda admin + authorizer
+- [ ] `GET /admin/products` → `lambda-products-admin` + authorizer
+- [ ] `POST /admin/products` → `lambda-products-admin` + authorizer
+- [ ] `PUT /admin/products/{id}` → `lambda-products-admin` + authorizer
+- [ ] `DELETE /admin/products/{id}` → `lambda-products-admin` + authorizer
+- [ ] `PUT /admin/products/{id}/stock` → `lambda-products-admin` + authorizer
+- [ ] `GET /admin/orders` → `lambda-orders-admin` + authorizer
+- [ ] `GET /admin/orders/{id}` → `lambda-orders-admin` + authorizer
+- [ ] `PUT /admin/orders/{id}` → `lambda-orders-admin` + authorizer
 
-### Lambda admin
+### Lambdas admin (já criadas na task 10)
 
-Opção A — mesma Lambda da fase 1 (router interno expandido):
-- [ ] Atualizar `ApiStack` para passar role admin à função existente
-- [ ] Handler reconhece rotas `/admin/*` e usa lógica admin
-
-Opção B — Lambda separada (recomendado para isolamento de IAM):
-- [ ] Criar `afro90s-{env}-lambda-admin` com:
-  - Mesmas configurações de runtime/timeout/memory da Lambda pública
-  - Role: `afro90s-{env}-role-lambda-admin` (task 15)
-  - Variáveis de ambiente: `PRODUCTS_TABLE`, `ORDERS_TABLE`, `ASSETS_BUCKET`, `ASSETS_CDN_URL`
-  - `SES_ENABLED=false` ← permanece false até fase 4
-
-> Escolher uma opção e registrar no `cdk.md`.
+- [x] `afro90s-{env}-lambda-products-admin` — role `role-lambda-admin` (task 15)
+- [x] `afro90s-{env}-lambda-orders-admin` — mesma role admin
+- [x] Variáveis de ambiente: `PRODUCTS_TABLE`, `ORDERS_TABLE`, `ASSETS_BUCKET`, `ASSETS_CDN_URL`, `SES_ENABLED=false`
+- [ ] Conectar rotas HTTP API às funções existentes
 
 ### Upload de imagens (`POST /admin/products`)
 

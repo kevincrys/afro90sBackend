@@ -41,7 +41,7 @@ const apiClient = axios.create({
 
 ### `src/types/` — espelhar backend
 
-- [ ] `product.ts`, `order.ts`, `errors.ts` — mesmos tipos do `afro90s-api`
+- [ ] `product.ts`, `order.ts`, `errors.ts` — mesmos tipos do `afro90sBackend`
 
 ### React Query
 

@@ -59,9 +59,23 @@ Definir requisitos de alto nível para a infraestrutura Afro90s antes e durante 
 
 ## Critérios de aceite (fase 1)
 
-1. Ambiente `dev` provisionável via CDK a partir deste repo
-2. Documentação de outputs disponível para devs de aplicação
-3. Pipeline de CI com validate + diff funcionando
+1. Ambiente `dev` provisionável via CDK a partir deste repo — **código concluído (tasks 05–12)**
+2. Documentação de outputs disponível para devs de aplicação — **concluído**
+3. Pipeline de CI com validate + diff funcionando — **concluído**
+4. Aceite runtime (API 200/404/201, SPA no browser) — **pendente** até `cdk deploy` + deploy do `afro90sBackend`
+
+### Status fase 1 (2025-06-23)
+
+| Task | Descrição | Código |
+|------|-----------|--------|
+| 05 | DynamoDB on-demand + GSIs + TTL | ✅ |
+| 06 | S3 web + CloudFront SPA | ✅ |
+| 07 | S3 assets + behavior CF | ✅ |
+| 08 | IAM role Lambda pública | ✅ |
+| 09 | SSM Parameter Store fase 1 | ✅ |
+| 10 | HTTP API + Lambda placeholder + rotas | ✅ |
+| 11 | CfnOutputs + export-outputs.sh | ✅ |
+| 12 | Smoke test + checklist | ✅ (script/CI; aceite manual pós-deploy) |
 
 ## Referências
 

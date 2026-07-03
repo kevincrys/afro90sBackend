@@ -1,12 +1,12 @@
-# Task 00 — Setup do repositório afro90s-web
+# Task 00 — Setup do repositório afro90sFrontend
 
 **Fase:** 0 — Fundação  
 **Status:** pendente  
-**Repo:** `afro90s-web` (repositório separado)
+**Repo:** `afro90sFrontend`
 
 ## Objetivo
 
-Criar e configurar o repositório `afro90s-web` com stack React + Vite antes de implementar qualquer página.
+Criar e configurar o repositório `afro90sFrontend` com stack React + Vite antes de implementar qualquer página.
 
 ## Configurações já definidas
 
@@ -26,8 +26,8 @@ Criar e configurar o repositório `afro90s-web` com stack React + Vite antes de 
 ### Criar projeto
 
 ```bash
-npm create vite@latest afro90s-web -- --template react-ts
-cd afro90s-web
+npm create vite@latest afro90sFrontend -- --template react-ts
+cd afro90sFrontend
 npm install
 ```
 

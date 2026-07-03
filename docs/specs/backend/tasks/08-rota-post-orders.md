@@ -24,7 +24,7 @@ Implementar criação de pedido. Na fase 1 grava no DynamoDB **sem enviar e-mail
 
 ## O que implementar
 
-### `src/routes/orders.ts`
+### `resources/orders-public/src/routes/orders.ts`
 
 - [ ] Handler `POST /orders`
 - [ ] Validar body com `CreateOrderSchema`
@@ -37,11 +37,11 @@ Implementar criação de pedido. Na fase 1 grava no DynamoDB **sem enviar e-mail
   6. Se `SES_ENABLED === 'true'`: chamar `emailService` (fase 4)
   7. Retornar `201` com subset
 
-### `src/services/order.service.ts`
+### `libs/services/order.service.ts` (`@afro90s/services`)
 
 - [ ] `createOrder(input)` — orquestra validação + persistência + e-mail condicional
 
-### `src/services/email.service.ts` (stub fase 1)
+### `libs/services/email.service.ts` (stub fase 1)
 
 - [ ] `sendOrderNotification(order)` — no-op se `SES_ENABLED=false`; log `"SES disabled, skipping email"`
 

@@ -30,7 +30,7 @@ Implementar schemas Zod e tipos TypeScript para `Product`, `Order`, `Customer` e
 
 ## O que implementar
 
-### `src/models/product.ts`
+### `libs/models/` (`@afro90s/models`)
 
 ```typescript
 export const CategoryEnum = z.enum(['camiseta','bone','acessorio','disco','outro']);
@@ -55,7 +55,7 @@ export const UpdateProductSchema = CreateProductSchema.partial();
 
 - [ ] Implementar função `normalizeNameLower(name: string): string` (lowercase + remove acentos com `normalize('NFD')`)
 
-### `src/models/order.ts`
+### `libs/models/order.ts`
 
 ```typescript
 export const OrderStatusEnum = z.enum(['SOLICITADO','CONFIRMADO','ENVIADO','ENTREGUE','CANCELADO']);
@@ -94,7 +94,7 @@ export const CreateOrderSchema = z.object({
 
 - [ ] Transições de status válidas: `SOLICITADO→CONFIRMADO→ENVIADO→ENTREGUE` / qualquer→`CANCELADO`
 
-### `src/models/errors.ts`
+### `libs/models/errors.ts`
 
 - [ ] Ver task 03
 

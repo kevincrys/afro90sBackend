@@ -22,12 +22,12 @@ Implementar envio de e-mail via SES no `POST /orders`. Ativa quando `SES_ENABLED
 
 ## O que implementar
 
-### `src/lib/ses.ts`
+### `libs/aws-ses/` (`@afro90s/aws-ses`)
 
 - [ ] Singleton `SESClient`
 - [ ] Template name via env: `SES_TEMPLATE_NAME`
 
-### `src/services/email.service.ts` (implementar)
+### `libs/services/email.service.ts` (implementar)
 
 - [ ] `sendOrderNotification(order)`:
   - Se `SES_ENABLED !== 'true'`: log e return (comportamento fase 1)

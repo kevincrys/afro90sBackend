@@ -6,16 +6,15 @@
 
 ## Objetivo
 
-Garantir cobertura mínima de 80% e documentar estratégia de testes do `afro90s-api`.
+Garantir cobertura mínima de **80% agregada** no monorepo e documentar estratégia de testes.
 
 ## Configurações já definidas
 
 | Decisão | Valor |
 |---------|-------|
-| Framework | Vitest |
-| Cobertura mínima | 80% |
+| Framework | Vitest (raiz — projects por package) |
+| Cobertura mínima | 80% lines + branches (agregado) |
 | Integração | DynamoDB Local para rotas críticas |
-| OpenAPI | Gerar a partir da spec (v1) |
 | Mock SES/S3 | `@aws-sdk` mocks nos unitários |
 
 ## O que implementar
@@ -23,30 +22,28 @@ Garantir cobertura mínima de 80% e documentar estratégia de testes do `afro90s
 ### Estrutura de testes
 
 ```
-test/
-├── unit/
-│   ├── models/          # schemas Zod
-│   ├── utils/           # pagination, errors, response
-│   ├── services/        # product, order, image, email
-│   └── routes/          # handlers isolados
-└── integration/
-    ├── products.test.ts
-    └── orders.test.ts
+afro90sBackend/
+├── vitest.config.ts           # projects: libs/*, resources/*
+├── libs/
+│   ├── models/src/**/*.test.ts
+│   ├── http/src/**/*.test.ts
+│   └── services/src/**/*.test.ts
+├── resources/
+│   ├── products-public/src/**/*.test.ts
+│   └── orders-public/src/**/*.test.ts
+└── test/integration/          # opcional — fluxos E2E locais
 ```
 
-- [ ] `vitest.config.ts` com threshold `coverage: { lines: 80, branches: 80 }`
-- [ ] CI falha se cobertura < 80%
+- [ ] `vitest.config.ts` com `projects` ou `workspace` coverage merge
+- [ ] Threshold `coverage: { lines: 80, branches: 80 }` na raiz
+- [ ] CI: `npm run test:coverage` falha abaixo do threshold
 
 ### Testes por camada
 
-- [ ] Unit: todos os services e utils
-- [ ] Unit: cada handler de rota com event mock
-- [ ] Integration: fluxo `POST /orders` completo (DynamoDB Local)
+- [ ] Unit: libs (`models`, `http`, `services`, `repositories`)
+- [ ] Unit: handlers/rotas em cada `resources/{flow}`
+- [ ] Integration: `POST /orders` (DynamoDB Local)
 - [ ] Integration: CRUD admin products
-
-### OpenAPI (opcional v1)
-
-- [ ] Script ou comentários JSDoc para gerar spec OpenAPI futuramente
 
 ## Pré-requisitos
 
@@ -54,7 +51,7 @@ test/
 
 ## Critérios de conclusão
 
-- [ ] `npm run test:coverage` ≥ 80% em lines e branches
-- [ ] CI do repo `afro90s-api` bloqueia merge abaixo do threshold
-- [ ] `overview.md` atualizado com estratégia de testes
+- [ ] `npm run test:coverage` ≥ 80% agregado
+- [ ] CI bloqueia merge abaixo do threshold
+- [ ] `overview.md` atualizado
 - [ ] Atualizar **Status** para `concluída`

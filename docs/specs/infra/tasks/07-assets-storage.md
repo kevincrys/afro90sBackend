@@ -1,20 +1,22 @@
 # Task 07 — Assets storage (imagens de produtos)
 
 **Fase:** 1 — Site público  
-**Status:** pendente  
+**Status:** concluída  
 **Arquivos alvo:** [`resources.md`](../resources.md), [`outputs.md`](../outputs.md)
 
 ## Objetivo
 
-Implementar `StorageStack`: bucket S3 privado de imagens com entrega via behavior `/assets/*` na distribuição CloudFront da [task 06](06-frontend-hosting.md).
+Implementar `StorageStack`: bucket S3 privado de imagens com entrega via behavior `/assets/products/*` na distribuição CloudFront da [task 06](06-frontend-hosting.md).
 
 ## Configurações já definidas
 
 | Decisão | Valor |
 |---------|-------|
-| CDN | Behavior `/assets/*` na distribuição `cf-web` (não distribuição separada) |
+| CDN | Behavior `/assets/products/*` na distribuição `cf-web` (coexiste com `/assets/*` do Vite no bucket web) |
 | Acesso público | OAC via CloudFront |
 | Estrutura de chave | `products/{productId}/{uuid}.{ext}` |
+| URL pública | `{AssetsCdnUrl}/products/{productId}/{uuid}.{ext}` |
+| Rewrite CDN | CloudFront Function remove prefixo `/assets` antes de buscar no bucket |
 | Upload | Via Lambda admin somente (fase 3) |
 | Encryption | SSE-S3 (padrão AWS, sem custo extra) |
 | Lifecycle orphans | Fora de escopo v1 |
@@ -23,33 +25,33 @@ Implementar `StorageStack`: bucket S3 privado de imagens com entrega via behavio
 
 ### S3 — bucket assets
 
-- [ ] Nome: `afro90s-{env}-s3-assets`
-- [ ] `blockPublicAccess: BlockPublicAccess.BLOCK_ALL`
-- [ ] `encryption: BucketEncryption.S3_MANAGED`
-- [ ] `versioned: false` (imagens substituídas por UUID novo)
-- [ ] `removalPolicy: DESTROY` dev / `RETAIN` prod
-- [ ] Sem configuração CORS (upload somente via Lambda, não browser)
+- [x] Nome: `afro90s-{env}-s3-assets`
+- [x] `blockPublicAccess: BlockPublicAccess.BLOCK_ALL`
+- [x] `encryption: BucketEncryption.S3_MANAGED`
+- [x] `versioned: false` (imagens substituídas por UUID novo)
+- [x] `removalPolicy: DESTROY` dev / `RETAIN` prod
+- [x] Sem configuração CORS (upload somente via Lambda, não browser)
 
-### CloudFront — behavior `/assets/*`
+### CloudFront — behavior imagens de produtos
 
-- [ ] Adicionar origin do bucket assets na distribuição criada na [task 06](06-frontend-hosting.md)
-  - `S3BucketOrigin.withOriginAccessControl()` para bucket assets
-- [ ] `additionalBehaviors['assets/*']`:
+- [x] Origin do bucket assets na distribuição `FrontendStack` (`S3BucketOrigin.withOriginAccessControl()`)
+- [x] `additionalBehaviors['assets/products/*']`:
   - `allowedMethods: AllowedMethods.ALLOW_GET_HEAD`
   - `cachePolicy: CachePolicy.CACHING_OPTIMIZED`
   - `viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS`
-
-> A distribuição CloudFront pertence ao `FrontendStack` (task 06). O `StorageStack` exporta o bucket via SSM para que o `FrontendStack` adicione o behavior.
+  - CloudFront Function: `/assets/products/...` → `/products/...` no origin S3
+- [x] `assets/*` (Vite) permanece no bucket **web** (task 06)
 
 ### Exports via SSM
 
-- [ ] `/afro90s/{env}/assets-bucket-name`
-- [ ] `/afro90s/{env}/assets-bucket-arn`
+- [x] `/afro90s/{env}/assets-bucket-name` — `StorageStack`
+- [x] `/afro90s/{env}/assets-bucket-arn` — `StorageStack`
+- [x] `/afro90s/{env}/assets-cdn-url` — `FrontendStack` (depende do domínio CloudFront)
 
 ### Outputs CloudFormation
 
-- [ ] `CfnOutput` `AssetsBucketName`
-- [ ] `CfnOutput` `AssetsCdnUrl` = `https://{cf-domain}/assets` (sem barra final)
+- [x] `CfnOutput` `AssetsBucketName` — `StorageStack`
+- [x] `CfnOutput` `AssetsCdnUrl` = `https://{cf-domain}/assets` — `FrontendStack`
 
 ## Pré-requisitos
 
@@ -60,5 +62,5 @@ Implementar `StorageStack`: bucket S3 privado de imagens com entrega via behavio
 - [ ] Imagem salva em `products/test/uuid.jpg` acessível via `{AssetsCdnUrl}/products/test/uuid.jpg`
 - [ ] URL S3 direta retorna 403
 - [ ] Outputs `AssetsBucketName` e `AssetsCdnUrl` no CloudFormation
-- [ ] `resources.md` e `outputs.md` atualizados
-- [ ] Atualizar **Status** para `concluída`
+- [x] `resources.md` e `outputs.md` atualizados
+- [x] Atualizar **Status** para `concluída`

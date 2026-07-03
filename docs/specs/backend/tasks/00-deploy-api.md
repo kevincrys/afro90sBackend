@@ -1,108 +1,110 @@
 # Task 00-deploy — CI/CD deploy da API (S3 + Lambda)
 
 **Fase:** 0 — Fundação  
-**Status:** pendente  
+**Status:** em progresso  
 **Repo:** `afro90sBackend`  
-**ADR:** [007-backend-lambda-s3-deploy.md](../../../foundation/adr/007-backend-lambda-s3-deploy.md)
+**ADR:** [007-backend-lambda-s3-deploy.md](../../../foundation/adr/007-backend-lambda-s3-deploy.md) · [008-backend-monorepo-lerna.md](../../../foundation/adr/008-backend-monorepo-lerna.md)
 
 ## Objetivo
 
-Configurar pipelines de **deploy do código Lambda** neste repositório: bundle via esbuild, upload para S3 e `update-function-code`. A infra (CDK) provisiona bucket e função; este repo publica o código.
+Pipelines de **deploy do código Lambda**: bundle esbuild **por package** em `resources/{flow}/`, upload S3 e `update-function-code` nas **4 funções**.
 
 ## Configurações já definidas
 
 | Decisão | Valor |
 |---------|-------|
-| Bundle | esbuild (`npm run bundle`) |
-| Artefato | `lambda.zip` (handler + deps bundled) |
-| Bucket | `afro90s-{env}-s3-lambda-artifacts` (criado pela infra) |
-| Chaves S3 | `api/{git-sha}.zip` + `api/latest.zip` |
-| Auth AWS | OIDC — role `afro90s-github-backend-{dev\|prod}` |
-| Trigger dev | Push em branch `dev` |
-| Trigger prod | Push em branch `main` + environment `production` |
+| Bundle | esbuild — **1 zip por fluxo** (`resources/{flow}/`) |
+| Artefato | `lambda.zip` com `handler.js` na raiz (`handler.handler`) |
+| Bucket | `afro90s-{env}-s3-lambda-artifacts` (infra) |
+| Chaves S3 | `{flow}/{git-sha}.zip` + `{flow}/latest.zip` |
+| Fluxos | `products-public`, `orders-public`, `products-admin`, `orders-admin` |
+| Auth AWS | OIDC — `afro90s-github-backend-{dev\|prod}` |
+| Trigger dev | Push em `dev` |
+| Trigger prod | Push em `main` + environment `prod` |
 
-## O que implementar
+## Onde ficam bucket e nomes das funções
 
-### Scripts `package.json`
+| Valor | Fonte (AWS) | Onde o CI lê |
+|-------|-------------|--------------|
+| `ARTIFACT_BUCKET` | Output CDK `LambdaArtifactsBucketName` | GitHub Environment `vars.ARTIFACT_BUCKET` |
+| Nomes das Lambdas | SSM `/afro90s/{env}/lambda-{flow}-name` | `scripts/deploy-flow.sh` |
 
-- [ ] `"bundle": "node scripts/bundle.mjs"` — esbuild em `src/handler.ts` → `dist/`
-- [ ] `"package:lambda": "cd dist && zip -r ../lambda.zip ."` (ou script cross-platform)
-- [ ] Manter `"build": "tsc --noEmit"` para CI typecheck (separado do bundle)
+> **Não** configurar `LAMBDA_FUNCTION_NAME` no GitHub.
 
-### `scripts/bundle.mjs` (esbuild)
+## Onde configurar (GitHub)
 
-- [ ] Entry: `src/handler.ts`
-- [ ] Output: `dist/handler.js` (alinhar com `handler: 'handler.handler'` na Lambda)
-- [ ] `target: node20`, `platform: node`, `format: cjs`, `minify: true`, `sourcemap: true`
-- [ ] `bundle: true`
-
-### `.github/workflows/deploy-dev.yml`
-
-- [ ] Trigger: `push` em `dev`
-- [ ] `environment: dev`
-- [ ] Permissions: `id-token: write`, `contents: read`
-- [ ] Steps:
-  1. Checkout
-  2. Node 20 + `npm ci`
-  3. `npm run test:coverage` (mesmo gate do CI)
-  4. `npm run bundle && npm run package:lambda`
-  5. `configure-aws-credentials` com `${{ vars.AWS_ROLE_ARN }}`
-  6. Upload S3:
-     ```bash
-     SHA=${{ github.sha }}
-     aws s3 cp lambda.zip s3://${{ vars.ARTIFACT_BUCKET }}/api/$SHA.zip
-     aws s3 cp lambda.zip s3://${{ vars.ARTIFACT_BUCKET }}/api/latest.zip
-     ```
-  7. Update Lambda:
-     ```bash
-     aws lambda update-function-code \
-       --function-name ${{ vars.LAMBDA_FUNCTION_NAME }} \
-       --s3-bucket ${{ vars.ARTIFACT_BUCKET }} \
-       --s3-key api/latest.zip
-     ```
-  8. (Opcional) `aws lambda wait function-updated-v2 --function-name ...`
-
-### `.github/workflows/deploy-prod.yml`
-
-- [ ] Trigger: `push` em `main`
-- [ ] `environment: production`
-- [ ] Steps idênticos ao deploy-dev com variables de prod
-
-### Variables GitHub (por environment)
+**Settings → Environments** → `dev` / `prod`:
 
 | Variable | Exemplo dev |
 |----------|-------------|
 | `AWS_ROLE_ARN` | `arn:aws:iam::083171867610:role/afro90s-github-backend-dev` |
 | `AWS_REGION` | `us-east-1` |
 | `ARTIFACT_BUCKET` | `afro90s-dev-s3-lambda-artifacts` |
-| `LAMBDA_FUNCTION_NAME` | `afro90s-dev-lambda-api` |
+
+## O que implementar
+
+### Scripts
+
+- [ ] `scripts/bundle.mjs` — arg `{flow}` → esbuild `resources/{flow}/src/handler.ts` → `resources/{flow}/dist/handler.js`
+- [ ] `scripts/package-lambda.mjs` — zip do `dist/` do fluxo → `resources/{flow}/lambda.zip` (ou temp no CI)
+- [x] `scripts/flows.sh` — lista canônica dos 4 fluxos
+- [x] `scripts/deploy-flow.sh` — S3 + `update-function-code` + wait (SSM)
+
+### `package.json` (raiz)
+
+- [ ] `"bundle": "node scripts/bundle.mjs"` — todos os fluxos
+- [ ] `"bundle:flow": "node scripts/bundle.mjs"` — aceita `--flow=products-public`
+
+### Workflows
+
+- [x] `deploy-reusable.yml` — build (test + bundle all flows) + matrix deploy
+- [x] `deploy-dev.yml` / `deploy-prod.yml`
+
+Build (por fluxo no CI):
+
+```bash
+node scripts/bundle.mjs products-public
+node scripts/package-lambda.mjs products-public
+```
+
+Deploy (matrix):
+
+```bash
+bash scripts/deploy-flow.sh "${FLOW}" dev "resources/${FLOW}/lambda.zip"
+```
+
+### Contrato do zip (infra)
+
+```
+lambda.zip
+└── handler.js    # exports.handler — runtime handler.handler
+```
 
 ## Pré-requisitos
 
-- Task [00-setup-repo.md](00-setup-repo.md) concluída (estrutura + CI)
-- Infra task 10 (API + bucket artefatos + Lambda placeholder) deployada
-- Roles IAM backend criadas (infra task 00)
+- [00-setup-repo.md](00-setup-repo.md) — monorepo + 4 packages em `resources/`
+- Infra task 10 (4 Lambdas + bucket)
+- Roles IAM backend com S3 `{flow}/*`, 4 funções, `ssm:GetParameter`
 
 ## Critérios de conclusão
 
-- [ ] Merge em `dev` publica zip no S3 e Lambda responde com código novo
-- [ ] `api/{sha}.zip` retido no bucket para rollback manual
-- [ ] Merge em `main` deploya em production com approval do environment
+- [ ] Merge em `dev` publica 4 zips e atualiza as 4 Lambdas
+- [ ] `{flow}/{sha}.zip` retido para rollback
+- [ ] Merge em `main` deploya prod com approval
 - [ ] Nenhum `AWS_ACCESS_KEY_ID` no repositório
 - [ ] Atualizar **Status** para `concluída`
 
 ## Rollback
 
 ```bash
-aws s3 cp s3://BUCKET/api/COMMIT_ANTERIOR.zip s3://BUCKET/api/latest.zip
-aws lambda update-function-code \
-  --function-name FUNCTION \
-  --s3-bucket BUCKET \
-  --s3-key api/latest.zip
+FLOW=products-public
+FN=$(aws ssm get-parameter --name /afro90s/dev/lambda-${FLOW}-name --query Parameter.Value --output text)
+aws s3 cp s3://BUCKET/${FLOW}/COMMIT_ANTERIOR.zip s3://BUCKET/${FLOW}/latest.zip
+aws lambda update-function-code --function-name "$FN" --s3-bucket BUCKET --s3-key ${FLOW}/latest.zip
 ```
 
 ## Referências
 
 - [github-pipeline-setup.md](../../../foundation/github-pipeline-setup.md)
 - [pipelines/overview.md](../../pipelines/overview.md)
-- [infra task 10-api-publica.md](../../infra/tasks/10-api-publica.md)
+- [overview.md](../overview.md)

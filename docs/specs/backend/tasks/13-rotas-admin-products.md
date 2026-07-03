@@ -10,7 +10,7 @@ Implementar CRUD completo de produtos nas rotas `/admin/products*`.
 
 ## O que implementar
 
-### `src/routes/admin/products.ts`
+### `resources/products-admin/src/routes/products.ts`
 
 - [ ] `GET /admin/products` — listagem com `name?`, `category?`, `cursor`, `limit`
 - [ ] `POST /admin/products` — criar produto + upload de imagens multipart
@@ -21,7 +21,7 @@ Implementar CRUD completo de produtos nas rotas `/admin/products*`.
 
 Todas com middleware auth (task 10).
 
-### `src/services/product.service.ts` (expandir)
+### `libs/services/product.service.ts` (expandir)
 
 - [ ] `createProduct(input, images?)` — gera `id`, `nameLower`, timestamps, upload S3
 - [ ] `updateProduct(id, fields)`

@@ -77,8 +77,8 @@ Catálogo → Detalhe do produto → Carrinho/Checkout
 | Repo | Responsabilidade | Specs neste repo |
 |------|------------------|------------------|
 | `afro90sInfra` | CDK, ambientes AWS | `docs/specs/infra/` |
-| `afro90s-api` | Lambda handlers, lógica de negócio | `docs/specs/backend/` |
-| `afro90s-web` | React SPA | `docs/specs/frontend/` |
+| `afro90sBackend` | Monorepo API (`resources/` + `libs/`), deploy S3 | `docs/specs/backend/` |
+| `afro90sFrontend` | React SPA | `docs/specs/frontend/` |
 
 O código de aplicação vive em repos separados; **este repositório é a fonte central de specs e contratos**.
 

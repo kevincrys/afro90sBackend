@@ -5,7 +5,7 @@
 
 ## Objetivo
 
-Guia de implementação do frontend Afro90s no repositório futuro `afro90s-web`.
+Guia de implementação do frontend Afro90s no repositório **afro90sFrontend**.
 
 ## Stack
 
@@ -23,7 +23,7 @@ Guia de implementação do frontend Afro90s no repositório futuro `afro90s-web`
 ## Estrutura sugerida
 
 ```
-afro90s-web/
+afro90sFrontend/
 ├── src/
 │   ├── api/
 │   │   ├── client.ts

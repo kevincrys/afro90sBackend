@@ -1,7 +1,7 @@
 # Task 09 — SSM Parameter Store
 
 **Fase:** 1 — Site público (parâmetros iniciais); complementado nas fases 2–4  
-**Status:** pendente  
+**Status:** concluída  
 **Arquivos alvo:** [`outputs.md`](../outputs.md), [`overview.md`](../overview.md)
 
 ## Objetivo
@@ -30,9 +30,14 @@ Criados nas respectivas stacks:
 | `/afro90s/{env}/assets-bucket-name` | StorageStack | auto (bucket name) |
 | `/afro90s/{env}/assets-bucket-arn` | StorageStack | auto (bucket ARN) |
 | `/afro90s/{env}/cloudfront-web-url` | FrontendStack | auto (CF domain) |
-| `/afro90s/{env}/assets-cdn-url` | StorageStack | auto (CF + /assets) |
-| `/afro90s/{env}/api-base-url` | ApiStack | auto (APIGW URL) |
-| `/afro90s/{env}/whatsapp-number` | ApiStack | placeholder (preencher) |
+| `/afro90s/{env}/assets-cdn-url` | FrontendStack | auto (CF + `/assets`) |
+| `/afro90s/{env}/api-base-url` | ApiStack *(task 10)* | auto (APIGW URL) |
+| `/afro90s/{env}/lambda-products-public-name` | ApiStack *(task 10)* | auto |
+| `/afro90s/{env}/lambda-orders-public-name` | ApiStack *(task 10)* | auto |
+| `/afro90s/{env}/lambda-products-admin-name` | ApiStack *(task 10)* | auto |
+| `/afro90s/{env}/lambda-orders-admin-name` | ApiStack *(task 10)* | auto |
+| `/afro90s/{env}/lambda-artifacts-bucket` | ApiStack *(task 10)* | auto |
+| `/afro90s/{env}/whatsapp-number` | ApiStack *(task 10)* | `5521920051220` |
 
 ### Parâmetros adicionados em fases posteriores
 
@@ -45,17 +50,17 @@ Criados nas respectivas stacks:
 
 ### `.env.example`
 
-- [ ] Criar `infra/.env.example`:
+- [x] Criar `infra/.env.example`:
   ```
   AWS_PROFILE=kevincrys-admin
   CDK_DEFAULT_ACCOUNT=083171867610
   CDK_DEFAULT_REGION=us-east-1
   ```
-- [ ] Confirmar que `infra/.env` está no `.gitignore`
+- [x] Confirmar que `infra/.env` está no `.gitignore`
 
 ### IAM para Lambdas
 
-- [ ] Permissão `ssm:GetParameter` restrita a `/afro90s/{env}/*` (configurada nas tasks 08, 15)
+- [x] Permissão `ssm:GetParameter` restrita a `/afro90s/{env}/*` (configurada nas tasks 08, 15)
 
 ## Pré-requisitos
 
@@ -63,7 +68,7 @@ Criados nas respectivas stacks:
 
 ## Critérios de conclusão
 
-- [ ] Parâmetros da fase 1 visíveis em SSM Parameter Store (`us-east-1`)
-- [ ] Lambda consegue ler `/afro90s/dev/products-table-name` sem erro de permissão
-- [ ] `.env.example` criado; `infra/.env` no `.gitignore`
-- [ ] Atualizar **Status** para `concluída`
+- [x] Parâmetros da fase 1 visíveis em SSM Parameter Store (`us-east-1`)
+- [x] Lambda consegue ler `/afro90s/dev/products-table-name` sem erro de permissão
+- [x] `.env.example` criado; `infra/.env` no `.gitignore`
+- [x] Atualizar **Status** para `concluída`

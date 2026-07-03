@@ -2,32 +2,35 @@
 
 ## Objetivo
 
-Implementar a **API REST serverless** do Afro90s e **publicar o código Lambda** via pipeline deste repositório.
+Implementar a **API REST serverless** do Afro90s em monorepo Lerna e **publicar o código** das 4 Lambdas via pipeline.
 
 ## Escopo
 
-- Código-fonte Lambda (handlers, serviços, modelos, testes)
-- CI (build, test, lint)
-- **CD — deploy do código**: esbuild → S3 → `update-function-code` ([ADR-007](https://github.com/kevincrys/afro90sInfra/blob/main/docs/foundation/adr/007-backend-lambda-s3-deploy.md))
+- Monorepo: `resources/` (1 package = 1 Lambda) + `libs/` (código compartilhado)
+- CI (build, test, lint em todos os packages)
+- **CD:** esbuild por fluxo → S3 `{flow}/` → `update-function-code` ([ADR-007](adr/007-backend-lambda-s3-deploy.md), [ADR-008](adr/008-backend-monorepo-lerna.md))
 - Specs locais de backend
 
 ## Fora de escopo
 
-- Criação de recursos AWS (Lambda shell, API GW, DynamoDB) → **afro90sInfra**
-- Env vars, IAM, timeout da Lambda → **afro90sInfra** (CDK)
+- Recursos AWS (Lambda shell, API GW, DynamoDB) → **afro90sInfra**
+- Env vars, IAM, timeout → **afro90sInfra** (CDK)
 - Frontend → **afro90sFrontend**
 
 ## Divisão de responsabilidades
 
 | O quê | Quem |
 |-------|------|
-| Código em runtime | **afro90sBackend** |
+| Código em runtime | **afro90sBackend** (`resources/` + `libs/`) |
 | Bucket `s3-lambda-artifacts` | afro90sInfra |
-| Função Lambda (recurso) | afro90sInfra |
+| 4 funções Lambda | afro90sInfra |
 | Config (env, memory, timeout) | afro90sInfra |
+| CI: `ARTIFACT_BUCKET` | GitHub Environment |
+| Nomes das funções no deploy | SSM (`deploy-flow.sh`) |
 
 ## Referências
 
+- [ADR-008 — monorepo](adr/008-backend-monorepo-lerna.md)
 - [00-deploy-api.md](../specs/backend/tasks/00-deploy-api.md)
-- [pipelines/overview.md](../specs/pipelines/overview.md)
+- [overview.md](../specs/backend/overview.md)
 - [api-routes.md](../specs/backend/api-routes.md)

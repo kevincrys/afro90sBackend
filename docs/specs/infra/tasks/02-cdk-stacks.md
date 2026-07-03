@@ -1,6 +1,6 @@
 # Task 02 — Stacks CDK
 
-**Status:** pendente  
+**Status:** concluída  
 **Arquivos alvo:** [`cdk.md`](../cdk.md)
 
 ## Objetivo
@@ -20,60 +20,35 @@ Criar a estrutura de stacks CDK em `infra/lib/stacks/` com dependências correta
 
 ### `bin/app.ts`
 
-- [ ] Ler contexto `env` via `app.node.tryGetContext('env')`, falhar se ausente
-- [ ] Importar `getConfig` ([task 01](01-cdk-config-deploy.md)) e passar config para cada stack
-- [ ] Passar `env: { account, region }` no `StackProps` de cada stack
-- [ ] Instanciar as stacks na ordem:
-  1. `DatabaseStack` (`lib/stacks/database-stack.ts`)
-  2. `AuthStack` (`lib/stacks/auth-stack.ts`)
-  3. `StorageStack` (`lib/stacks/storage-stack.ts`)
-  4. `ApiStack` (`lib/stacks/api-stack.ts`)
-  5. `FrontendStack` (`lib/stacks/frontend-stack.ts`)
-- [ ] Declarar dependências explícitas via `apiStack.addDependency(databaseStack)` etc.
+- [x] Ler contexto `env` via `app.node.tryGetContext('env')`, falhar se ausente
+- [x] Importar `getConfig` e passar config para cada stack
+- [x] Passar `env: { account, region }` no `StackProps` de cada stack
+- [x] Instanciar Database → Auth → Storage → Api → Frontend
+- [x] `apiStack.addDependency` em database, auth e storage
 
 ### Stacks (scaffolds iniciais)
 
-Criar cada arquivo com classe vazia. Implementação dos recursos fica na fase 1 (tasks 05+).
-
-- [ ] `lib/stacks/database-stack.ts` — DynamoDB
-- [ ] `lib/stacks/auth-stack.ts` — Cognito
-- [ ] `lib/stacks/storage-stack.ts` — S3 assets
-- [ ] `lib/stacks/api-stack.ts` — API Gateway + Lambda
-- [ ] `lib/stacks/frontend-stack.ts` — S3 web + CloudFront
+- [x] `lib/stacks/database-stack.ts`
+- [x] `lib/stacks/auth-stack.ts`
+- [x] `lib/stacks/storage-stack.ts`
+- [x] `lib/stacks/api-stack.ts`
+- [x] `lib/stacks/frontend-stack.ts`
 
 ### Nomes físicos das stacks
 
-Padrão: `afro90s-{env}-stack-{nome}`
-
-| Stack | Nome (exemplo dev) |
-|-------|--------------------|
-| DatabaseStack | `afro90s-dev-stack-database` |
-| AuthStack | `afro90s-dev-stack-auth` |
-| StorageStack | `afro90s-dev-stack-storage` |
-| ApiStack | `afro90s-dev-stack-api` |
-| FrontendStack | `afro90s-dev-stack-frontend` |
-
-### Diagrama de dependências
-
-```
-DatabaseStack ──┬──► ApiStack
-AuthStack      ──┤
-StorageStack   ──┘
-FrontendStack (independente — CORS origin definida via SSM)
-```
-
-### Constructs reutilizáveis (se houver oportunidade)
-
-- [ ] Extrair construct `TaggedConstruct` base se repetição aparecer
-- [ ] Manter em `lib/constructs/` — criar apenas se dois ou mais stacks repetirem o mesmo padrão
+Padrão: `afro90s-{env}-stack-{nome}` — ver [`cdk.md`](../cdk.md).
 
 ## Pré-requisitos
 
-- [Task 01](01-cdk-config-deploy.md) concluída (config por env disponível)
+- [Task 01](01-cdk-config-deploy.md) concluída
 
 ## Critérios de conclusão
 
-- [ ] `npm run synth:dev` gera 5 stacks sem erros
-- [ ] `npm run synth:prod` idem para prod
-- [ ] `cdk.md` atualizado com diagrama de dependências
-- [ ] Atualizar **Status** para `concluída`
+- [x] `npm run synth:dev` gera 5 stacks sem erros
+- [x] `npm run synth:prod` idem para prod
+- [x] `cdk.md` atualizado com diagrama de dependências
+- [x] Atualizar **Status** para `concluída`
+
+## Próxima task
+
+[03 — Tags e naming](03-tags-naming.md)

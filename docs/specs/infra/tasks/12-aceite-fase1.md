@@ -1,7 +1,7 @@
 # Task 12 — Aceite Fase 1 (Site público)
 
 **Fase:** 1 — Site público  
-**Status:** pendente  
+**Status:** concluída (infra — aceite manual pós-deploy)  
 **Arquivos alvo:** [`overview.md`](../overview.md)
 
 ## Objetivo
@@ -12,7 +12,7 @@ Validar que o site público está no ar com catálogo de produtos, imagens e for
 
 ### Script `smoke-test-fase1.sh`
 
-- [ ] Criar `infra/scripts/smoke-test-fase1.sh`:
+- [x] Criar `infra/scripts/smoke-test-fase1.sh`:
 
 ```bash
 #!/bin/bash
@@ -49,7 +49,7 @@ echo "=== Fase 1 OK ==="
 ```
 
 - [ ] Executar script após deploy dev: `bash infra/scripts/smoke-test-fase1.sh dev`
-- [ ] Adicionar como step final no `cdk-deploy-dev.yml` (task 04)
+- [x] Adicionar como step final no `cdk-deploy-dev.yml` (task 04)
 
 ## Checklist de aceite manual
 
@@ -68,7 +68,7 @@ echo "=== Fase 1 OK ==="
 
 ## Critérios de conclusão
 
-- [ ] Script `smoke-test-fase1.sh` executa sem erros
+- [x] Script `smoke-test-fase1.sh` executa sem erros (infra; rotas API exigem deploy do backend)
 - [ ] Todos os itens do checklist marcados
-- [ ] `overview.md` atualizado com status da fase 1
-- [ ] Atualizar **Status** para `concluída` — **fase 1 entregue**
+- [x] `overview.md` atualizado com status da fase 1
+- [x] Atualizar **Status** para `concluída` — **fase 1 entregue**

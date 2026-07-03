@@ -18,7 +18,7 @@ Implementar listagem e atualização de status de pedidos nas rotas `/admin/orde
 
 ## O que implementar
 
-### `src/routes/admin/orders.ts`
+### `resources/orders-admin/src/routes/orders.ts`
 
 - [ ] `GET /admin/orders` — listagem com `status?`, `cursor`, `limit`
 - [ ] `GET /admin/orders/{id}` — detalhe completo com `customer` e `items`
@@ -26,7 +26,7 @@ Implementar listagem e atualização de status de pedidos nas rotas `/admin/orde
 
 Todas com middleware auth.
 
-### `src/services/order.service.ts` (expandir)
+### `libs/services/order.service.ts` (expandir)
 
 - [ ] `listOrders(filters)` — query em `gsi-status-createdAt`
 - [ ] `getOrder(id)`

@@ -18,12 +18,12 @@ Implementar repositórios DynamoDB para `products` e `orders` com queries nos GS
 
 ## O que implementar
 
-### `src/lib/dynamodb.ts`
+### `libs/dynamodb/` (`@afro90s/dynamodb`)
 
 - [ ] Singleton `DynamoDBDocumentClient` com `marshallOptions: { removeUndefinedValues: true }`
 - [ ] Nomes de tabela via env: `PRODUCTS_TABLE`, `ORDERS_TABLE`
 
-### `src/repositories/product.repository.ts`
+### `libs/repositories/product.repository.ts` (`@afro90s/repositories`)
 
 - [ ] `getById(id)` → `GetItem`
 - [ ] `list({ name?, category?, cursor, limit })`:
@@ -33,7 +33,7 @@ Implementar repositórios DynamoDB para `products` e `orders` com queries nos GS
 - [ ] `create(product)`, `update(id, fields)`, `delete(id)`
 - [ ] `updateStock(id, quantity)` → `UpdateItem` em `quantity`
 
-### `src/repositories/order.repository.ts`
+### `libs/repositories/order.repository.ts`
 
 - [ ] `create(order)` → `PutItem`
 - [ ] `getById(id)` → `GetItem`

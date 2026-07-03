@@ -72,8 +72,8 @@ Referência alternativa: template `infra/iam/github-oidc-roles.template.yaml`
 
 ### GitHub — afro90sBackend Environments
 
-- [x] **`dev`**: `AWS_ROLE_ARN`, `AWS_REGION`, `ARTIFACT_BUCKET`, `LAMBDA_FUNCTION_NAME`
-- [x] **`production`**: idem com valores prod + required reviewers
+- [x] **`dev`**: `AWS_ROLE_ARN`, `AWS_REGION`, `ARTIFACT_BUCKET` (+ nomes Lambda via SSM/outputs)
+- [x] **`prod`**: idem com valores prod + required reviewers
 
 ### GitHub — Branches e Environments (afro90sInfra)
 
@@ -82,7 +82,7 @@ Conforme [github-pipeline-setup.md](../../../foundation/github-pipeline-setup.md
 - [x] Branch `dev` criada no repositório `kevincrys/afro90sInfra`
 - [x] Branch `main` protegida (PR + checks / ruleset)
 - [x] **Settings → Environments → `dev`** (variables do runbook)
-- [x] **Settings → Environments → `production`**
+- [x] **Settings → Environments → `prod`**
 - [x] **Repository variables**: `AWS_REGION`, `AWS_ROLE_ARN_PR`
 
 > **Próxima task:** [01 — Configuração por ambiente](01-cdk-config-deploy.md)

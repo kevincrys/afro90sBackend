@@ -24,7 +24,10 @@ Configurar log groups com retenção e dashboard CloudWatch dentro do free tier.
 ### Log Groups
 
 - [ ] Criar `LogGroup` explícito para cada Lambda:
-  - `/aws/lambda/afro90s-{env}-lambda-api`
+  - `/aws/lambda/afro90s-{env}-lambda-products-public`
+  - `/aws/lambda/afro90s-{env}-lambda-orders-public`
+  - `/aws/lambda/afro90s-{env}-lambda-products-admin`
+  - `/aws/lambda/afro90s-{env}-lambda-orders-admin`
   - `/aws/lambda/afro90s-{env}-lambda-admin` (se Lambda separada na fase 3)
   - `retention: RetentionDays.TWO_WEEKS`
   - `removalPolicy: DESTROY` em dev

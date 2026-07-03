@@ -21,7 +21,7 @@ Implementar middleware de autenticação para rotas `/admin/*`. O authorizer JWT
 
 ## O que implementar
 
-### `src/middleware/auth.ts`
+### `libs/auth/` (`@afro90s/auth`)
 
 - [ ] Extrair claims do `event.requestContext.authorizer.jwt.claims`
 - [ ] Verificar presença de `cognito:groups` contendo `admins`

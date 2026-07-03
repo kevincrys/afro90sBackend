@@ -1,6 +1,6 @@
 # Task 01 — Configuração por ambiente
 
-**Status:** pendente  
+**Status:** concluída  
 **Arquivos alvo:** [`cdk.md`](../cdk.md)
 
 ## Objetivo
@@ -20,56 +20,26 @@ Criar os arquivos de configuração por ambiente (`dev` e `prod`) e a interface 
 
 ### Interface de configuração
 
-- [ ] Criar `lib/config/types.ts` com interface `AppConfig`:
-
-```typescript
-export interface AppConfig {
-  env: 'dev' | 'prod';
-  region: string;
-  account: string;
-  domainName?: string;   // placeholder, domínio a comprar
-  adminEmail: string;    // e-mail admin para SES
-}
-```
+- [x] Criar `lib/config/types.ts` com interface `AppConfig`
 
 ### Arquivos de config
 
-- [ ] Criar `lib/config/dev.ts`:
-
-```typescript
-import { AppConfig } from './types';
-export const devConfig: AppConfig = {
-  env: 'dev',
-  region: 'us-east-1',
-  account: '083171867610',
-  adminEmail: '',        // preencher com e-mail real
-};
-```
-
-- [ ] Criar `lib/config/prod.ts` com mesma estrutura, `env: 'prod'`
-- [ ] Criar `lib/config/index.ts` que exporta config pelo env:
-
-```typescript
-import { devConfig } from './dev';
-import { prodConfig } from './prod';
-export function getConfig(env: string) {
-  if (env === 'dev') return devConfig;
-  if (env === 'prod') return prodConfig;
-  throw new Error(`env inválido: ${env}`);
-}
-```
+- [x] Criar `lib/config/dev.ts`
+- [x] Criar `lib/config/prod.ts`
+- [x] Criar `lib/config/index.ts` com `getConfig(env)`
 
 ### Uso em `bin/app.ts`
 
-- [ ] Integração com stacks na [task 02](02-cdk-stacks.md) (`getConfig` + `StackProps`)
+- [x] `getConfig` usado para `account` / `region` no `StackProps`
+- [x] Passar `config` completo para stacks via `Afro90sStackProps`
 
 ### Scripts npm validados
 
-- [ ] `npm run build` — compila TypeScript sem erros
-- [ ] `npm run synth:dev` — gera CloudFormation dev
-- [ ] `npm run synth:prod` — gera CloudFormation prod
-- [ ] `npm run diff:dev` — compara com estado AWS dev
-- [ ] `npm run deploy:dev` — deploya todas as stacks dev
+- [x] `npm run build` — compila TypeScript sem erros
+- [x] `npm run synth:dev` — gera CloudFormation dev
+- [x] `npm run synth:prod` — gera CloudFormation prod
+- [x] `npm run diff:dev` — script disponível (requer credenciais AWS)
+- [x] `npm run deploy:dev` — script disponível
 
 ## Pré-requisitos
 
@@ -77,8 +47,12 @@ export function getConfig(env: string) {
 
 ## Critérios de conclusão
 
-- [ ] `getConfig('dev')` e `getConfig('prod')` retornam configs sem erro
-- [ ] Todos os stacks recebem config via props na task 02 (sem hardcode de conta/região)
-- [ ] `npm run build` sem erros TypeScript
-- [ ] `cdk.md` atualizado com tabela de parâmetros por env
-- [ ] Atualizar **Status** para `concluída`
+- [x] `getConfig('dev')` e `getConfig('prod')` retornam configs sem erro
+- [x] `app.ts` usa config para conta/região (stacks completos na task 02)
+- [x] `npm run build` sem erros TypeScript
+- [x] `cdk.md` atualizado com tabela de parâmetros por env
+- [x] Atualizar **Status** para `concluída`
+
+## Próxima task
+
+[02 — Stacks CDK](02-cdk-stacks.md)

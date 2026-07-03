@@ -18,7 +18,7 @@ Implementar listagem pública de produtos com busca, filtro por categoria e pagi
 
 ## O que implementar
 
-### `src/routes/products.ts`
+### `resources/products-public/src/routes/products.ts`
 
 - [ ] Handler `GET /products`
 - [ ] Query params: `name?`, `category?`, `cursor?`, `limit?`
@@ -26,7 +26,7 @@ Implementar listagem pública de produtos com busca, filtro por categoria e pagi
 - [ ] Resposta: `{ items: Product[], nextCursor: string | null }`
 - [ ] Não expor `nameLower` na resposta
 
-### `src/services/product.service.ts`
+### `libs/services/product.service.ts` (`@afro90s/services`)
 
 - [ ] `listProducts(filters)` — orquestra repositório + paginação
 

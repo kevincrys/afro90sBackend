@@ -6,8 +6,9 @@ Termos usados neste repositório e no ecossistema Afro90s.
 |-------|-----------|
 | **Afro90s** | Projeto principal — e-commerce com temática anos 90 para público negro. |
 | **afro90sInfra** | Repositório de infraestrutura (CDK) e documentação central de specs. |
-| **afro90s-api** | Repositório futuro do backend (Lambda handlers). |
-| **afro90s-web** | Repositório futuro do frontend (React SPA). |
+| **afro90sBackend** | Monorepo da API — `resources/` (Lambdas) + `libs/` + deploy S3. |
+| **afro90sFrontend** | Repositório da SPA React. |
+| **afro90sInfra** | Repositório CDK (recursos AWS). |
 | **Product** | Item do catálogo: nome, preço, estoque, fotos, categoria. |
 | **Order** | Pedido de compra criado pelo cliente no checkout. |
 | **OrderStatus** | Estado do pedido: `SOLICITADO`, `EM_ATENDIMENTO`, `AGUARDANDO_PAGAMENTO`, `EM_PREPARACAO`, `ENVIADO`, `CONCLUIDO`, `CANCELADO`. |
@@ -21,7 +22,8 @@ Termos usados neste repositório e no ecossistema Afro90s.
 | **ADR** | Architecture Decision Record — documento curto que registra uma decisão, contexto e consequências. |
 | **Spec** | Especificação técnica descrevendo *o que* deve existir ou se comportar. |
 | **Ambiente** | Instância isolada de infra (`dev`, `production` na v1). |
-| **Foundation** | Documentação de fundamentação: visão, arquitetura, glossário, ADRs. |
+| **Flow** | Nome de um package Lambda em `resources/` (ex.: `products-public`) — igual ao path S3 e SSM no deploy. |
+| **Lib** | Package compartilhado em `libs/` (ex.: `@afro90s/models`). |
 | **Output** | Valor exportado pela infra para consumo externo (URL, ARN, nome de tabela). |
 | **Least privilege** | Princípio de conceder apenas permissões mínimas necessárias. |
 | **Plan / Apply** | Ciclo IaC: `cdk diff` previewa mudanças; `cdk deploy` executa no ambiente alvo. |

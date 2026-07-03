@@ -14,14 +14,18 @@ infra/
 ├── bin/
 │   └── app.ts                 # entry point; instancia stacks por env
 ├── lib/
+│   ├── config/
+│   │   ├── types.ts           # AppConfig
+│   │   ├── dev.ts / prod.ts
+│   │   └── index.ts           # getConfig()
 │   ├── stacks/
-│   │   ├── frontend-stack.ts  # S3 SPA + CloudFront
-│   │   ├── assets-stack.ts    # S3 imagens de produtos + CloudFront (ou path no CF web)
-│   │   ├── data-stack.ts      # DynamoDB tables
-│   │   ├── auth-stack.ts      # Cognito User Pool
-│   │   └── api-stack.ts       # API Gateway + Lambdas + SES permissions
-│   └── constructs/            # constructs reutilizáveis (ex.: ApiRoute, Table)
-├── test/                      # snapshot ou unit tests de synth
+│   │   ├── database-stack.ts  # DynamoDB
+│   │   ├── auth-stack.ts      # Cognito
+│   │   ├── storage-stack.ts   # S3 assets
+│   │   ├── api-stack.ts       # API Gateway + Lambda
+│   │   └── frontend-stack.ts  # S3 web + CloudFront
+│   └── constructs/            # constructs reutilizáveis
+├── test/
 ├── cdk.json
 ├── package.json
 └── tsconfig.json
@@ -29,41 +33,85 @@ infra/
 
 ## Stacks e dependências
 
+Nomes físicos: `afro90s-{env}-stack-{nome}`
+
+| Stack | Sufixo | Recursos (fase) |
+|-------|--------|-----------------|
+| DatabaseStack | `database` | DynamoDB (task 05) |
+| AuthStack | `auth` | Cognito (task 13) |
+| StorageStack | `storage` | S3 assets (task 07) |
+| ApiStack | `api` | API GW + Lambda (task 10) |
+| FrontendStack | `frontend` | S3 web + CloudFront (task 06) |
+
 ```
-DataStack ──┬──► ApiStack
-AuthStack  ──┘
-FrontendStack (independente)
-AssetsStack ──► ApiStack (Lambda precisa de PutObject no bucket)
+DatabaseStack ──┬──► ApiStack
+AuthStack      ──┤
+StorageStack   ──┘
+FrontendStack (independente — CORS via SSM)
 ```
 
-Ordem de deploy sugerida: `DataStack` → `AuthStack` → `AssetsStack` → `ApiStack` → `FrontendStack`
+Ordem de instanciação em `bin/app.ts`: Database → Auth → Storage → Api → Frontend.
 
 ## Contexto de ambiente
 
 ```bash
 cdk deploy --all -c env=dev
-cdk deploy --all -c env=production
+cdk deploy --all -c env=prod
 ```
 
-Valores em `cdk.json` context ou `lib/config/{env}.ts`:
+Configuração centralizada em `lib/config/` (`getConfig(env)`).
 
-| Parâmetro | Exemplo dev |
-|-----------|-------------|
-| `env` | `dev` |
-| `domainName` | `dev.afro90s.com.br` (opcional v1) |
-| `corsAllowedOrigins` | URL do CloudFront frontend |
+## Mensagens de erro (código e CI)
+
+Specs, docs e comentários podem permanecer em português. **Mensagens de erro operacionais** devem ser **sempre em inglês**:
+
+| Escopo | Exemplos | Idioma |
+|--------|----------|--------|
+| `throw new Error(...)` em CDK/scripts | contexto CDK ausente, env inválido | **English** |
+| Annotations `::error::` em GitHub Actions | variável AWS ausente | **English** |
+| Logs de operador / stack traces / CI | synth, bootstrap, deploy | **English** |
+
+Exemplos:
+
+```typescript
+throw new Error('Required context: pass -c env=dev or -c env=prod');
+throw new Error(`Invalid env: ${env}. Expected 'dev' or 'prod'.`);
+```
+
+```yaml
+echo "::error::AWS_ROLE_ARN is empty in GitHub Environment 'prod'."
+```
+
+> Mensagens **voltadas ao usuário final** da API (`ApiError.message`) seguem pt-BR — ver [backend task 01](../../backend/tasks/01-convencoes-globais.md).
+
+| Parâmetro | dev | prod | Origem |
+|-----------|-----|------|--------|
+| `env` | `dev` | `prod` | contexto CDK `-c env=` |
+| `account` | `083171867610` | `083171867610` | `lib/config/{env}.ts` |
+| `region` | `us-east-1` | `us-east-1` | `lib/config/{env}.ts` |
+| `domainName` | *(opcional)* | *(opcional)* | `lib/config/{env}.ts` — domínio a comprar |
+| `adminEmail` | *(preencher)* | *(preencher)* | `lib/config/{env}.ts` — SES (fase 4) |
+| `corsAllowedOrigins` | URL CloudFront dev | URL CloudFront prod | SSM / outputs (fase 1) |
 
 ## Tags obrigatórias
 
-Aplicar em todo recurso via `Tags.of(this).add(...)`:
+Aplicadas globalmente via `TaggingAspect` (`lib/constructs/tagging-aspect.ts`) em `bin/app.ts` **após** instanciar as stacks:
+
+```typescript
+cdk.Aspects.of(app).add(new TaggingAspect(config.env));
+```
+
+Tags em todo recurso CDK:
 
 ```typescript
 {
   project: 'afro90s',
-  env: 'dev',           // ou production
+  env: 'dev',           // ou prod
   'managed-by': 'afro90sInfra',
 }
 ```
+
+Convenção de nomes físicos: ver [resources.md](resources.md).
 
 ## Comandos
 
@@ -75,14 +123,17 @@ Aplicar em todo recurso via `Tags.of(this).add(...)`:
 | `cdk deploy --all -c env=dev` | Deploy completo |
 | `cdk destroy -c env=dev` | Remove recursos (cuidado em prod) |
 
-## CI/CD (alvo)
+## CI/CD
 
-```yaml
-# .github/workflows/cdk.yml (a implementar)
-# PR: npm ci → npm run build → cdk synth → cdk diff
-# merge main: cdk deploy dev
-# manual workflow: cdk deploy production
-```
+Workflows em `.github/workflows/`:
+
+| Workflow | Arquivo | Trigger |
+|----------|---------|---------|
+| Validate | `cdk-validate.yml` | PR em `infra/**` |
+| Deploy dev | `cdk-deploy-dev.yml` | Push `dev` |
+| Deploy prod | `cdk-deploy-prod.yml` | Push `main` |
+
+Guia de configuração GitHub: [github-pipeline-setup.md](../../foundation/github-pipeline-setup.md)
 
 ## Referências
 
