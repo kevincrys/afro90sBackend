@@ -78,3 +78,20 @@ jobs:
           FLOW: ${{ matrix.flow }}
           GITHUB_SHA: ${{ github.sha }}
         run: bash scripts/deploy-flow.sh "${FLOW}" "${{ inputs.deploy_env }}" "resources/${FLOW}/lambda.zip"
+
+  smoke-test:
+    needs: deploy
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.github_environment }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Smoke test (API phase 1)
+        run: bash scripts/smoke-test-api-fase1.sh "${{ inputs.deploy_env }}"

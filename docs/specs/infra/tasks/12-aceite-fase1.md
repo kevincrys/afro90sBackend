@@ -12,53 +12,28 @@ Validar que o site público está no ar com catálogo de produtos, imagens e for
 
 ### Script `smoke-test-fase1.sh`
 
-- [x] Criar `infra/scripts/smoke-test-fase1.sh`:
+- [x] `infra/scripts/smoke-test-fase1.sh` — API (stage `/{env}/…`) + CloudFront
+- [x] Step final em `cdk-deploy-dev.yml`
+- [x] Rotas SPA alinhadas ao frontend: `/` e `/products/{id}` (não `/catalogo`)
+- [x] API: UUID inválido → `400`; UUID inexistente → `404`; `?name=cat` → `200`
+- [x] `POST /orders` vazio → `400`; com produto no catálogo → `201` ou `409`
+- [x] Placeholder Lambda (`503`) → SKIP na API até deploy do backend
 
-```bash
-#!/bin/bash
-set -e
-ENV=${1:-dev}
+### Backend
 
-API=$(aws ssm get-parameter --name "/afro90s/${ENV}/api-base-url" --query Parameter.Value --output text)
-CF=$(aws ssm get-parameter --name "/afro90s/${ENV}/cloudfront-web-url" --query Parameter.Value --output text)
-
-echo "=== Smoke test Fase 1 — ${ENV} ==="
-
-echo -n "GET /products (200)... "
-STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${API}/products")
-[ "$STATUS" = "200" ] && echo "OK" || (echo "FALHOU ($STATUS)" && exit 1)
-
-echo -n "GET /products/{id} inexistente (404)... "
-STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${API}/products/naoexiste")
-[ "$STATUS" = "404" ] && echo "OK" || (echo "FALHOU ($STATUS)" && exit 1)
-
-echo -n "POST /orders sem body (400)... "
-STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST "${API}/orders" -H "Content-Type: application/json" -d '{}')
-[ "$STATUS" = "400" ] && echo "OK" || echo "AVISO ($STATUS — verificar validação)"
-
-echo -n "CloudFront index.html (200)... "
-STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${CF}")
-[ "$STATUS" = "200" ] && echo "OK" || (echo "FALHOU ($STATUS)" && exit 1)
-
-echo -n "CloudFront SPA routing /catalogo (200)... "
-STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${CF}/catalogo")
-[ "$STATUS" = "200" ] && echo "OK" || (echo "FALHOU ($STATUS)" && exit 1)
-
-echo ""
-echo "=== Fase 1 OK ==="
-```
-
-- [ ] Executar script após deploy dev: `bash infra/scripts/smoke-test-fase1.sh dev`
-- [x] Adicionar como step final no `cdk-deploy-dev.yml` (task 04)
+- [x] `scripts/smoke-test-api-fase1.sh` — subset API
+- [x] Step pós-deploy em `deploy-reusable.yml` (`smoke-test` job)
 
 ## Checklist de aceite manual
 
 - [ ] `cdk deploy --all -c env=dev` sem erros
 - [ ] Todas as stacks da fase 1 com status `CREATE_COMPLETE`
-- [ ] Script `smoke-test-fase1.sh dev` passa sem erros
+- [ ] `bash infra/scripts/smoke-test-fase1.sh dev` passa (API SKIP ok se backend pendente)
+- [ ] Após deploy backend: smoke API verde (sem SKIP)
 - [ ] CloudFront URL abre o frontend no browser
-- [ ] Rotas SPA (`/catalogo`, `/produto/123`) servem `index.html`
-- [ ] `GET /products` retorna JSON com `items: []`
+- [ ] Rotas SPA (`/`, `/products/{uuid}`) servem `index.html`
+- [ ] `GET /products` retorna JSON com `items`
+- [ ] `GET /products?name=…` retorna `200` (não `500`)
 - [ ] `POST /orders` com body válido retorna `201` (sem e-mail)
 - [ ] Pipeline CI: PR → validate/diff; merge dev → deploy automático
 
@@ -68,7 +43,7 @@ echo "=== Fase 1 OK ==="
 
 ## Critérios de conclusão
 
-- [x] Script `smoke-test-fase1.sh` executa sem erros (infra; rotas API exigem deploy do backend)
-- [ ] Todos os itens do checklist marcados
+- [x] Scripts de smoke test e CI configurados
+- [ ] Checklist manual marcado após deploy dev/prod
 - [x] `overview.md` atualizado com status da fase 1
-- [x] Atualizar **Status** para `concluída` — **fase 1 entregue**
+- [x] **Status** infra: concluída — aceite runtime pendente até deploys
