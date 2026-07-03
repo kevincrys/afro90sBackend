@@ -14,7 +14,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "lint": "eslint \"resources/**/src/**/*.ts\""
+    "lint": "eslint \"resources/**/src/**/*.ts\" \"libs/**/src/**/*.ts\""
   },
   "engines": {
     "node": ">=20"

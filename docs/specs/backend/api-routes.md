@@ -27,7 +27,21 @@
 https://{api-id}.execute-api.{region}.amazonaws.com/{stage}
 ```
 
-Exemplo: `https://abc123.execute-api.sa-east-1.amazonaws.com/dev`
+Exemplo: `https://abc123.execute-api.us-east-1.amazonaws.com/dev`
+
+### Implementação (`@afro90s/http`)
+
+Pacote compartilhado em `libs/http`, consumido por cada Lambda em `resources/{flow}/`.
+
+| Export | Uso |
+|--------|-----|
+| `ok()`, `created()`, `noContent()`, `apiError()` | Respostas JSON com `Content-Type: application/json; charset=utf-8` e `X-Request-Id` |
+| `createHandler()` | Wrapper Middy: gera/ecoa `X-Request-Id`, CORS, `OPTIONS` → 204, catch → `500 INTERNAL_ERROR` |
+| `resolveRequestId()` | Lê header `X-Request-Id`; gera UUID v4 se ausente |
+
+**CORS:** `Access-Control-Allow-Origin` vem de `CLOUDFRONT_WEB_URL`; em `NODE_ENV=development` aceita `http://localhost:5173` se a env não estiver definida.
+
+**Idioma:** `ApiError.message` em pt-BR; `ApiError.code` em inglês (`NOT_FOUND`, `VALIDATION_ERROR`, …).
 
 ### Headers comuns (todas as rotas)
 

@@ -6,5 +6,8 @@
   "scripts": {
     "build": "tsc --noEmit -p tsconfig.json",
     "bundle": "node ../../scripts/bundle.mjs orders-public"
+  },
+  "dependencies": {
+    "@afro90s/http": "*"
   }
 }

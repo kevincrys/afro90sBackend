@@ -1,12 +1,12 @@
 # Task 01 — Convenções globais da API
 
 **Fase:** 0 — Fundação  
-**Status:** pendente  
-**Arquivos alvo:** [`api-routes.md`](../api-routes.md)
+**Status:** concluída  
+**Arquivos alvo:** [`api-routes.md`](../api-routes.md), `libs/http/`
 
 ## Objetivo
 
-Implementar convenções transversais em `src/utils/response.ts` e documentar contratos HTTP base que todas as rotas seguem.
+Implementar convenções transversais em `libs/http` e documentar contratos HTTP base que todas as rotas seguem.
 
 ## Configurações já definidas
 
@@ -30,13 +30,13 @@ Implementar convenções transversais em `src/utils/response.ts` e documentar co
 
 ## O que implementar
 
-### `src/utils/response.ts`
+### `libs/http/src/response.ts`
 
-- [ ] Função `ok(body)` → `{ statusCode: 200, headers, body: JSON.stringify(body) }`
-- [ ] Função `created(body)` → `{ statusCode: 201, ... }`
-- [ ] Função `noContent()` → `{ statusCode: 204, headers, body: '' }`
-- [ ] Função `error(statusCode, code, message, details?)` → corpo `ApiError`
-- [ ] Headers obrigatórios em todas as respostas:
+- [x] Função `ok(body)` → `{ statusCode: 200, headers, body: JSON.stringify(body) }`
+- [x] Função `created(body)` → `{ statusCode: 201, ... }`
+- [x] Função `noContent()` → `{ statusCode: 204, headers, body: '' }`
+- [x] Função `apiError(statusCode, code, message, details?)` → corpo `ApiError`
+- [x] Headers obrigatórios em todas as respostas:
   ```typescript
   {
     'Content-Type': 'application/json; charset=utf-8',
@@ -44,24 +44,24 @@ Implementar convenções transversais em `src/utils/response.ts` e documentar co
   }
   ```
 
-### `src/handler.ts` — entry point com Middy
+### `resources/{flow}/src/handler.ts` — entry point com Middy
 
-- [ ] Middleware Middy: `httpRouterHandler` ou roteamento manual
-- [ ] Extrair `X-Request-Id` do evento; gerar UUID v4 se ausente
-- [ ] Adicionar `requestId` ao contexto para uso nos handlers
-- [ ] Catch global de erros não tratados → `500 INTERNAL_ERROR` com `requestId`
+- [x] `createHandler()` em `@afro90s/http` (Middy)
+- [x] Extrair `X-Request-Id` do evento; gerar UUID v4 se ausente
+- [x] Adicionar `requestId` ao contexto para uso nos handlers
+- [x] Catch global de erros não tratados → `500 INTERNAL_ERROR` com `requestId`
 
 ### CORS
 
-- [ ] Responder `OPTIONS` com headers CORS corretos
-- [ ] `Access-Control-Allow-Origin`: valor de `CLOUDFRONT_WEB_URL` (env var)
-- [ ] `Access-Control-Allow-Headers`: `Content-Type, Authorization`
-- [ ] Para teste local: aceitar `http://localhost:5173` se `NODE_ENV=development`
+- [x] Responder `OPTIONS` com headers CORS corretos
+- [x] `Access-Control-Allow-Origin`: valor de `CLOUDFRONT_WEB_URL` (env var)
+- [x] `Access-Control-Allow-Headers`: `Content-Type, Authorization`
+- [x] Para teste local: aceitar `http://localhost:5173` se `NODE_ENV=development`
 
 ### Formato base URL
 
-- [ ] `{ApiBaseUrl}/{stage}/{path}` — ex.: `https://abc.execute-api.us-east-1.amazonaws.com/dev/products`
-- [ ] `ApiBaseUrl` sem stage e sem barra final (conforme infra task 10)
+- [x] `{ApiBaseUrl}/{stage}/{path}` — ex.: `https://abc.execute-api.us-east-1.amazonaws.com/dev/products`
+- [x] `ApiBaseUrl` sem stage e sem barra final (conforme infra task 10)
 
 ## Pré-requisitos
 
@@ -69,7 +69,7 @@ Implementar convenções transversais em `src/utils/response.ts` e documentar co
 
 ## Critérios de conclusão
 
-- [ ] `ok()`, `created()`, `error()` cobertos por testes unitários
-- [ ] Handler retorna `X-Request-Id` em todas as respostas
-- [ ] `api-routes.md` seção "Convenções globais" atualizada
-- [ ] Atualizar **Status** para `concluída`
+- [x] `ok()`, `created()`, `apiError()` cobertos por testes unitários
+- [x] Handler retorna `X-Request-Id` em todas as respostas
+- [x] `api-routes.md` seção "Convenções globais" atualizada
+- [x] Atualizar **Status** para `concluída`
