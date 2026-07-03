@@ -1,0 +1,36 @@
+{
+  "name": "afro90s-backend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Afro90s API — monorepo Lerna (4 Lambdas + libs)",
+  "workspaces": [
+    "resources/*",
+    "libs/*"
+  ],
+  "scripts": {
+    "build": "lerna run build",
+    "bundle": "node scripts/bundle.mjs",
+    "package:lambda": "node scripts/package-lambda.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint \"resources/**/src/**/*.ts\""
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/aws-lambda": "^8.10.162",
+    "@types/node": "^26.1.0",
+    "@vitest/coverage-v8": "^4.1.9",
+    "archiver": "^8.0.0",
+    "esbuild": "^0.28.1",
+    "eslint": "^10.6.0",
+    "lerna": "^8.2.4",
+    "prettier": "^3.6.2",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.62.1",
+    "vitest": "^4.1.9"
+  }
+}

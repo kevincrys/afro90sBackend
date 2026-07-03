@@ -1,0 +1,10 @@
+{
+  "name": "@afro90s/orders-public",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/handler.js",
+  "scripts": {
+    "build": "tsc --noEmit -p tsconfig.json",
+    "bundle": "node ../../scripts/bundle.mjs orders-public"
+  }
+}
