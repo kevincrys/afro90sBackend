@@ -54,6 +54,7 @@ Implementar convenções transversais em `libs/http` e documentar contratos HTTP
 ### CORS
 
 - [x] Responder `OPTIONS` com headers CORS corretos
+- [x] CORS embutido em `baseHeaders()` — todas as respostas JSON e de erro
 - [x] `Access-Control-Allow-Origin`: valor de `CLOUDFRONT_WEB_URL` (env var)
 - [x] `Access-Control-Allow-Headers`: `Content-Type, Authorization`
 - [x] Para teste local: aceitar `http://localhost:5173` se `NODE_ENV=development`

@@ -11,6 +11,8 @@
     "build": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
-    "@middy/core": "^6.4.5"
+    "@afro90s/models": "*",
+    "@middy/core": "^6.4.5",
+    "zod": "^3.25.76"
   }
 }

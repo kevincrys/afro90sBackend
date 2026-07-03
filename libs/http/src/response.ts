@@ -1,12 +1,13 @@
 import type { APIGatewayProxyStructuredResultV2 } from 'aws-lambda';
-import type { ApiErrorBody } from './types';
+import type { ApiErrorBody } from '@afro90s/models';
+import { corsHeaders } from './cors';
 
 const JSON_CONTENT_TYPE = 'application/json; charset=utf-8';
 
 export function baseHeaders(requestId: string): Record<string, string> {
   return {
+    ...corsHeaders(requestId),
     'Content-Type': JSON_CONTENT_TYPE,
-    'X-Request-Id': requestId,
   };
 }
 
@@ -36,7 +37,7 @@ export function noContent(requestId: string): APIGatewayProxyStructuredResultV2 
 
 export function apiError(
   statusCode: number,
-  code: string,
+  code: ApiErrorBody['code'],
   message: string,
   requestId: string,
   details?: Record<string, string>,

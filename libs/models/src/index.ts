@@ -1,3 +1,11 @@
+export {
+  ApiError,
+  API_ERROR_STATUS,
+  isApiError,
+  statusForApiErrorCode,
+  type ApiErrorBody,
+  type ApiErrorCode,
+} from './errors';
 export { normalizeNameLower } from './normalize';
 export { ProductOptionSchema, refineUniqueOptions } from './options';
 export {

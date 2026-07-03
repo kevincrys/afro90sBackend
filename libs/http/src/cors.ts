@@ -31,16 +31,3 @@ export function optionsResponse(requestId: string): APIGatewayProxyStructuredRes
     body: '',
   };
 }
-
-export function withCors(
-  result: APIGatewayProxyStructuredResultV2,
-  requestId: string,
-): APIGatewayProxyStructuredResultV2 {
-  return {
-    ...result,
-    headers: {
-      ...result.headers,
-      ...corsHeaders(requestId),
-    },
-  };
-}

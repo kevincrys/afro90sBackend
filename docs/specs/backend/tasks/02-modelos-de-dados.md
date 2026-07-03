@@ -47,7 +47,7 @@ Implementar schemas Zod e tipos TypeScript para `Product`, `Order`, `Customer` e
 
 ### `libs/models/src/errors.ts`
 
-- [ ] Ver task 03
+- [x] Ver task 03 (`ApiError`, `ApiErrorCode`)
 
 ## Pré-requisitos
 

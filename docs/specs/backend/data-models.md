@@ -171,11 +171,14 @@ O cliente **não decodifica** `nextCursor`: repassa o valor na query `cursor` da
 
 ```typescript
 interface ApiError {
-  code: string;            // ex.: NOT_FOUND, VALIDATION_ERROR, INSUFFICIENT_STOCK
-  message: string;
-  details?: Record<string, unknown>;
+  code: ApiErrorCode;      // ex.: NOT_FOUND, VALIDATION_ERROR, INSUFFICIENT_STOCK
+  message: string;         // pt-BR para clientes
+  details?: Record<string, string>;
+  requestId?: string;
 }
 ```
+
+Implementação: classe `ApiError` e tipo `ApiErrorCode` em `@afro90s/models`; helpers `throwNotFound()`, `throwValidationError()`, etc. em `@afro90s/http`.
 
 ## Transições de status (Order)
 
