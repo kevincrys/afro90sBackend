@@ -200,6 +200,7 @@ Implementação: classe `ApiError` e tipo `ApiErrorCode` em `@afro90s/models`; h
 | `OrderSchema` / `CreateOrderSchema` | Pedido persistido e `POST /orders` |
 | `CustomerSchema` | Cliente no pedido |
 | `isValidOrderStatusTransition(from, to)` | `PATCH /admin/orders/{id}/status` |
+| `@afro90s/pagination` | `encodeCursor`, `decodeCursor`, `parseLimit`, `buildPaginatedResponse` |
 
 Validação de `selectedOption` contra `product.options` ocorre em runtime na rota `POST /orders` (task 08), não no Zod isolado.
 

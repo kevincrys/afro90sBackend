@@ -42,6 +42,10 @@ export function throwInsufficientStock(message = 'Estoque insuficiente.'): never
   throw new ApiError('INSUFFICIENT_STOCK', message);
 }
 
+export function throwInvalidQuery(message = 'Parâmetro de consulta inválido.'): never {
+  throw new ApiError('INVALID_QUERY', message);
+}
+
 export function throwInvalidCursor(message = 'Cursor inválido.'): never {
   throw new ApiError('INVALID_CURSOR', message);
 }

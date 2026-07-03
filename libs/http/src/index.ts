@@ -7,6 +7,7 @@ export {
   throwFromZod,
   throwInsufficientStock,
   throwInvalidCursor,
+  throwInvalidQuery,
   throwInvalidStatusTransition,
   throwNotFound,
   throwUnauthorized,

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { CreateOrderSchema, isValidOrderStatusTransition } from './order';
+import { CreateOrderSchema, isTerminalOrderStatus, isValidOrderStatusTransition } from './order';
 
 const validOrder = {
   customer: {
@@ -68,5 +68,10 @@ describe('isValidOrderStatusTransition', () => {
   it('rejects invalid transitions', () => {
     expect(isValidOrderStatusTransition('SOLICITADO', 'ENVIADO')).toBe(false);
     expect(isValidOrderStatusTransition('CONCLUIDO', 'CANCELADO')).toBe(false);
+  });
+
+  it('identifies terminal statuses', () => {
+    expect(isTerminalOrderStatus('CONCLUIDO')).toBe(true);
+    expect(isTerminalOrderStatus('SOLICITADO')).toBe(false);
   });
 });

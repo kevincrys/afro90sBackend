@@ -5,6 +5,7 @@ describe('ApiError', () => {
   it('maps code to HTTP status', () => {
     expect(statusForApiErrorCode('NOT_FOUND')).toBe(404);
     expect(statusForApiErrorCode('VALIDATION_ERROR')).toBe(400);
+    expect(statusForApiErrorCode('INVALID_QUERY')).toBe(400);
     expect(statusForApiErrorCode('INSUFFICIENT_STOCK')).toBe(409);
     expect(statusForApiErrorCode('INTERNAL_ERROR')).toBe(500);
   });

@@ -1,8 +1,8 @@
 # Task 04 — Paginação por cursor
 
 **Fase:** 0 — Fundação  
-**Status:** pendente  
-**Arquivos alvo:** [`api-routes.md`](../api-routes.md)
+**Status:** concluída  
+**Arquivos alvo:** [`api-routes.md`](../api-routes.md), `libs/pagination/`
 
 ## Objetivo
 
@@ -12,53 +12,23 @@ Implementar utilitário de cursor opaco Base64URL para listagens paginadas.
 
 | Decisão | Valor |
 |---------|-------|
-| Formato cursor | Base64URL de JSON interno |
+| Formato cursor | Base64URL de JSON interno (`v`, `index`, `key`, `filters`) |
 | `limit` default | 20 |
-| `limit` máximo | 50 |
+| `limit` máximo | 100 (`api-routes.md`) |
 | Cursor inválido | `400 INVALID_CURSOR` |
+| `limit` inválido | `400 INVALID_QUERY` |
 
 ## O que implementar
 
-### `src/utils/pagination.ts`
+### `libs/pagination/`
 
-```typescript
-interface CursorPayload {
-  lastEvaluatedKey: Record<string, unknown>;
-  filters?: { name?: string; category?: string; status?: string };
-}
-
-export function encodeCursor(payload: CursorPayload): string;
-export function decodeCursor(cursor: string): CursorPayload; // lança INVALID_CURSOR se inválido
-export function parseLimit(raw?: string): number; // default 20, max 50
-```
-
-- [ ] `encodeCursor` / `decodeCursor` com Base64URL
-- [ ] Validar que cursor decodificado tem estrutura esperada
-- [ ] `parseLimit`: retorna 20 se ausente; clamp em 50
-
-### Resposta padrão de listagem
-
-```typescript
-interface PaginatedResponse<T> {
-  items: T[];
-  nextCursor: string | null;
-}
-```
-
-- [ ] Helper `paginated(items, lastKey, filters?)` que retorna `nextCursor` ou `null`
-
-### Testes
-
-- [ ] Round-trip encode/decode
-- [ ] Cursor corrompido → `INVALID_CURSOR`
-- [ ] `limit=100` → clamped para 50
-
-## Pré-requisitos
-
-- Task 03 concluída (para `INVALID_CURSOR`)
+- [x] `encodeCursor` / `decodeCursor` com Base64URL
+- [x] Validar estrutura e compatibilidade de `filters`
+- [x] `parseLimit` — default 20, rejeita fora de 1–100
+- [x] `buildPaginatedResponse` com `hasMore` e `nextCursor`
 
 ## Critérios de conclusão
 
-- [ ] Utilitário coberto por testes unitários
-- [ ] `api-routes.md` documenta formato de `cursor` e `limit`
-- [ ] Atualizar **Status** para `concluída`
+- [x] Utilitário coberto por testes unitários
+- [x] `api-routes.md` documenta formato de `cursor` e `limit`
+- [x] Atualizar **Status** para `concluída`

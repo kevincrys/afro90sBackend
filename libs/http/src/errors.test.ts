@@ -3,6 +3,7 @@ import { ZodError, z } from 'zod';
 import { ApiError } from '@afro90s/models';
 import {
   throwForbidden,
+  throwInvalidQuery,
   throwInsufficientStock,
   throwInvalidCursor,
   throwInvalidStatusTransition,
@@ -11,6 +12,7 @@ import {
   throwValidationError,
   toErrorResponse,
   zodErrorToDetails,
+  parseOrThrow,
 } from './errors';
 
 const REQUEST_ID = 'req-test';
@@ -89,12 +91,32 @@ describe('throw helpers', () => {
     }
   });
 
+  it('throwInvalidQuery throws 400', () => {
+    try {
+      throwInvalidQuery();
+    } catch (error) {
+      expect(error).toMatchObject({ code: 'INVALID_QUERY', statusCode: 400 });
+    }
+  });
+
   it('throwInvalidStatusTransition throws 409', () => {
     try {
       throwInvalidStatusTransition();
     } catch (error) {
       expect(error).toMatchObject({ code: 'INVALID_STATUS_TRANSITION', statusCode: 409 });
     }
+  });
+});
+
+describe('parseOrThrow', () => {
+  it('returns parsed value', () => {
+    const schema = z.object({ name: z.string() });
+    expect(parseOrThrow(schema, { name: 'ok' })).toEqual({ name: 'ok' });
+  });
+
+  it('throws ApiError on invalid data', () => {
+    const schema = z.object({ name: z.string().min(2) });
+    expect(() => parseOrThrow(schema, { name: 'A' })).toThrow(ApiError);
   });
 });
 

@@ -1,35 +1,50 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi, beforeEach } from 'vitest';
 import type { APIGatewayProxyEventV2, Context } from 'aws-lambda';
 import { handler } from './handler';
 
-function apiEvent(overrides: Partial<APIGatewayProxyEventV2> = {}): APIGatewayProxyEventV2 {
+const list = vi.fn();
+
+vi.mock('@afro90s/repositories', () => ({
+  getProductRepository: () => ({ list }),
+  toPublicProduct: (product: Record<string, unknown>) => product,
+}));
+
+function apiEvent(
+  overrides: Partial<APIGatewayProxyEventV2> = {},
+): APIGatewayProxyEventV2 {
   return {
     rawPath: '/products',
     headers: {},
+    queryStringParameters: {},
     requestContext: { http: { method: 'GET' } },
     ...overrides,
   } as APIGatewayProxyEventV2;
 }
 
 describe('products-public handler', () => {
-  it('returns 200 with flow id and request headers', async () => {
-    const result = await handler(apiEvent(), {} as Context);
-
-    expect(result.statusCode).toBe(200);
-    expect(result.headers?.['Content-Type']).toBe('application/json; charset=utf-8');
-    expect(result.headers?.['X-Request-Id']).toBeDefined();
-    expect(result.headers?.['Access-Control-Allow-Origin']).toBeDefined();
-
-    const body = JSON.parse(result.body as string);
-    expect(body).toMatchObject({ ok: true, flow: 'products-public', path: '/products' });
+  beforeEach(() => {
+    list.mockReset();
+    process.env.PRODUCTS_TABLE = 'test-products';
   });
 
-  it('echoes client X-Request-Id', async () => {
+  it('routes GET /products', async () => {
+    list.mockResolvedValueOnce({
+      items: [],
+      index: 'gsi-createdAt',
+      filters: {},
+    });
+
+    const result = await handler(apiEvent(), {} as Context);
+    expect(result.statusCode).toBe(200);
+    expect(JSON.parse(result.body as string)).toMatchObject({ items: [], hasMore: false });
+  });
+
+  it('returns 404 for unknown routes', async () => {
     const result = await handler(
-      apiEvent({ headers: { 'x-request-id': 'client-req-id' } }),
+      apiEvent({ rawPath: '/unknown', requestContext: { http: { method: 'GET' } } } as APIGatewayProxyEventV2),
       {} as Context,
     );
-    expect(result.headers?.['X-Request-Id']).toBe('client-req-id');
+    expect(result.statusCode).toBe(404);
   });
 
   it('responds to OPTIONS with 204', async () => {

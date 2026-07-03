@@ -3,6 +3,7 @@ export type ApiErrorCode =
   | 'NOT_FOUND'
   | 'INSUFFICIENT_STOCK'
   | 'INVALID_CURSOR'
+  | 'INVALID_QUERY'
   | 'INVALID_STATUS_TRANSITION'
   | 'UNAUTHORIZED'
   | 'FORBIDDEN'
@@ -18,6 +19,7 @@ export interface ApiErrorBody {
 export const API_ERROR_STATUS: Record<ApiErrorCode, number> = {
   VALIDATION_ERROR: 400,
   INVALID_CURSOR: 400,
+  INVALID_QUERY: 400,
   UNAUTHORIZED: 401,
   FORBIDDEN: 403,
   NOT_FOUND: 404,
