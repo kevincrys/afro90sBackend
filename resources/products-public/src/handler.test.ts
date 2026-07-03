@@ -3,11 +3,14 @@ import type { APIGatewayProxyEventV2, Context } from 'aws-lambda';
 import { handler } from './handler';
 
 const list = vi.fn();
+const getById = vi.fn();
 
 vi.mock('@afro90s/repositories', () => ({
-  getProductRepository: () => ({ list }),
+  getProductRepository: () => ({ list, getById }),
   toPublicProduct: (product: Record<string, unknown>) => product,
 }));
+
+const PRODUCT_ID = '550e8400-e29b-41d4-a716-446655440000';
 
 function apiEvent(
   overrides: Partial<APIGatewayProxyEventV2> = {},
@@ -24,6 +27,7 @@ function apiEvent(
 describe('products-public handler', () => {
   beforeEach(() => {
     list.mockReset();
+    getById.mockReset();
     process.env.PRODUCTS_TABLE = 'test-products';
   });
 
@@ -37,6 +41,31 @@ describe('products-public handler', () => {
     const result = await handler(apiEvent(), {} as Context);
     expect(result.statusCode).toBe(200);
     expect(JSON.parse(result.body as string)).toMatchObject({ items: [], hasMore: false });
+  });
+
+  it('routes GET /products/{id}', async () => {
+    getById.mockResolvedValueOnce({
+      id: PRODUCT_ID,
+      name: 'Óculos',
+      nameLower: 'oculos',
+      description: '',
+      price: 49.9,
+      quantity: 1,
+      photos: [],
+      category: 'oculos',
+      createdAt: '2025-01-01T00:00:00.000Z',
+      updatedAt: '2025-01-01T00:00:00.000Z',
+    });
+
+    const result = await handler(
+      apiEvent({
+        rawPath: `/products/${PRODUCT_ID}`,
+        pathParameters: { id: PRODUCT_ID },
+      }),
+      {} as Context,
+    );
+    expect(result.statusCode).toBe(200);
+    expect(JSON.parse(result.body as string)).toMatchObject({ id: PRODUCT_ID });
   });
 
   it('returns 404 for unknown routes', async () => {

@@ -1,6 +1,7 @@
 import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { ApiError } from '@afro90s/models';
 import { createHandler } from '@afro90s/http';
+import { handleGetProductById } from './routes/get-product-by-id';
 import { handleGetProducts } from './routes/get-products';
 
 function matchProductsList(event: APIGatewayProxyEventV2): boolean {
@@ -10,9 +11,25 @@ function matchProductsList(event: APIGatewayProxyEventV2): boolean {
   );
 }
 
+function matchProductById(event: APIGatewayProxyEventV2): boolean {
+  if (event.requestContext.http.method !== 'GET') {
+    return false;
+  }
+
+  if (event.routeKey === 'GET /products/{id}') {
+    return true;
+  }
+
+  return /^\/products\/[^/]+$/.test(event.rawPath);
+}
+
 export const handler = createHandler(async (event, context) => {
   if (matchProductsList(event)) {
     return handleGetProducts(event, context);
+  }
+
+  if (matchProductById(event)) {
+    return handleGetProductById(event, context);
   }
 
   throw new ApiError('NOT_FOUND', 'Rota não encontrada.');
