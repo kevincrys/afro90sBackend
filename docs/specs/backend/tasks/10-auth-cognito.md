@@ -1,8 +1,8 @@
 # Task 10 — Autenticação Cognito (middleware admin)
 
 **Fase:** 2 — Login admin  
-**Status:** pendente  
-**Arquivos alvo:** [`api-routes.md`](../api-routes.md), [ADR-005](../../../foundation/adr/005-admin-auth-v1.md)
+**Status:** concluída  
+**Arquivos alvo:** [`api-routes.md`](../api-routes.md), [ADR-005](../../../foundation/adr/005-admin-auth-v1.md), `libs/http/`, `resources/*-admin/`
 
 ## Objetivo
 
@@ -21,22 +21,22 @@ Implementar middleware de autenticação para rotas `/admin/*`. O authorizer JWT
 
 ## O que implementar
 
-### `src/middleware/auth.ts`
+### `libs/http/src/auth.ts`
 
-- [ ] Extrair claims do `event.requestContext.authorizer.jwt.claims`
-- [ ] Verificar presença de `cognito:groups` contendo `admins`
-- [ ] Sem grupo `admins` → `401 UNAUTHORIZED`
-- [ ] Exportar `adminUserId` (claim `sub`) para handlers
+- [x] Extrair claims do `event.requestContext.authorizer.jwt.claims`
+- [x] Verificar presença de `cognito:groups` contendo `admins`
+- [x] Sem grupo `admins` → `401 UNAUTHORIZED`
+- [x] Exportar `adminUserId` (claim `sub`) via `createAdminHandler`
 
 ### Router
 
-- [ ] Registrar rotas `/admin/*` com flag `requiresAuth: true`
-- [ ] Rotas públicas sem middleware de auth
+- [x] Handlers admin (`products-admin`, `orders-admin`) usam `createAdminHandler`
+- [x] Rotas públicas continuam com `createHandler` (sem auth)
 
 ### Documentação em `api-routes.md`
 
-- [ ] Bloco reutilizável de header `Authorization` para rotas admin
-- [ ] Exemplos JSON de `401`
+- [x] Bloco reutilizável de header `Authorization` para rotas admin
+- [x] Exemplos JSON de `401`
 
 ## Pré-requisitos
 
@@ -45,7 +45,7 @@ Implementar middleware de autenticação para rotas `/admin/*`. O authorizer JWT
 
 ## Critérios de conclusão
 
-- [ ] Rota admin stub com token válido → não retorna `401`
-- [ ] Rota admin sem token → `401` (via API Gateway)
-- [ ] Middleware testado com claims mock
-- [ ] Atualizar **Status** para `concluída`
+- [x] Rota admin stub com token válido → não retorna `401`
+- [x] Rota admin sem claims → `401` (middleware; sem token → API Gateway)
+- [x] Middleware testado com claims mock
+- [x] Atualizar **Status** para `concluída`

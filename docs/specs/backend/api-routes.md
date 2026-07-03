@@ -471,6 +471,20 @@ Autenticação: **Cognito JWT obrigatório**.
 | `Authorization` | Sim | `Bearer <access_token>` |
 | `Accept` | Recomendado | `application/json` |
 
+#### Erros de autenticação (`401`)
+
+Token ausente ou inválido: respondido pelo **API Gateway** (request não chega à Lambda).
+
+Token válido mas sem grupo `admins`: respondido pela **Lambda** (middleware task 10):
+
+```json
+{
+  "code": "UNAUTHORIZED",
+  "message": "Não autorizado.",
+  "requestId": "550e8400-e29b-41d4-a716-446655440000"
+}
+```
+
 ---
 
 ### `GET /admin/products`

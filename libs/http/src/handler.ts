@@ -10,14 +10,24 @@ import { isOptionsRequest, optionsResponse } from './cors';
 import { toErrorResponse, zodErrorToDetails } from './errors';
 import { apiError, internalError } from './response';
 import { resolveRequestId } from './request-id';
+import { requireAdminAuth } from './auth';
 
 export interface ApiContext extends Context {
   requestId: string;
 }
 
+export interface AdminApiContext extends ApiContext {
+  adminUserId: string;
+}
+
 export type ApiHandler = (
   event: APIGatewayProxyEventV2,
   context: ApiContext,
+) => Promise<APIGatewayProxyStructuredResultV2>;
+
+export type AdminApiHandler = (
+  event: APIGatewayProxyEventV2,
+  context: AdminApiContext,
 ) => Promise<APIGatewayProxyStructuredResultV2>;
 
 export function createHandler(fn: ApiHandler) {
@@ -50,5 +60,13 @@ export function createHandler(fn: ApiHandler) {
       console.error('Unhandled error', { requestId, error });
       return internalError(requestId);
     }
+  });
+}
+
+export function createAdminHandler(fn: AdminApiHandler) {
+  return createHandler(async (event, context) => {
+    const adminUserId = requireAdminAuth(event);
+    const adminContext = Object.assign(context, { adminUserId }) as AdminApiContext;
+    return fn(event, adminContext);
   });
 }

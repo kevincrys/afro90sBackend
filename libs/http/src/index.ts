@@ -1,4 +1,11 @@
-export { createHandler, type ApiContext, type ApiHandler } from './handler';
+export { createHandler, createAdminHandler, type AdminApiContext, type AdminApiHandler, type ApiContext, type ApiHandler } from './handler';
+export {
+  ADMIN_GROUP,
+  extractJwtClaims,
+  parseCognitoGroups,
+  requireAdminAuth,
+  type JwtClaims,
+} from './auth';
 export { getAllowedOrigin, isOptionsRequest, optionsResponse } from './cors';
 export { resolveRequestId } from './request-id';
 export {
