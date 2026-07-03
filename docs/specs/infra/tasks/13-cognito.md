@@ -1,7 +1,7 @@
 # Task 13 — Cognito (login admin)
 
 **Fase:** 2 — Login admin  
-**Status:** pendente  
+**Status:** concluída (código; usuário admin manual pós-deploy)  
 **Arquivos alvo:** [`resources.md`](../resources.md), [`outputs.md`](../outputs.md)
 
 ## Objetivo
@@ -23,41 +23,36 @@ Implementar `AuthStack` com o User Pool Cognito e configurar o authorizer JWT no
 
 ### User Pool
 
-- [ ] Nome: `afro90s-{env}-cognito-admins`
-- [ ] `selfSignUpEnabled: false`
-- [ ] `mfa: Mfa.OFF`
-- [ ] Política de senha padrão CDK
-- [ ] `removalPolicy: DESTROY` dev / `RETAIN` prod
+- [x] Nome: `afro90s-{env}-cognito-admins`
+- [x] `selfSignUpEnabled: false`
+- [x] `mfa: Mfa.OFF`
+- [x] Política de senha padrão CDK
+- [x] `removalPolicy: DESTROY` dev / `RETAIN` prod
 
 ### Grupo e App Client
 
-- [ ] `CfnUserPoolGroup` com nome `admins`
-- [ ] `UserPoolClient`:
+- [x] `CfnUserPoolGroup` com nome `admins`
+- [x] `UserPoolClient`:
   - `generateSecret: false`
   - `authFlows: { userSrp: true }`
   - `preventUserExistenceErrors: true`
 
 ### Authorizer JWT no HTTP API
 
-- [ ] Criar `HttpJwtAuthorizer` na `ApiStack` (lê User Pool ID via SSM):
-  ```typescript
-  new HttpJwtAuthorizer('CognitoAuthorizer', issuerUrl, {
-    jwtAudience: [cognitoClientId],
-  })
-  ```
-- [ ] O authorizer é criado mas **não aplicado em nenhuma rota ainda** (fase 3 aplica)
+- [x] `HttpJwtAuthorizer` na `ApiStack` (issuer + audience via SSM `/afro90s/{env}/cognito-*`)
+- [x] Propriedade `cognitoAuthorizer` exposta — **não aplicado em rotas** (task 16)
 
 ### Exports via SSM
 
-- [ ] `/afro90s/{env}/cognito-user-pool-id`
-- [ ] `/afro90s/{env}/cognito-client-id`
-- [ ] `/afro90s/{env}/cognito-region` = `us-east-1`
+- [x] `/afro90s/{env}/cognito-user-pool-id`
+- [x] `/afro90s/{env}/cognito-client-id`
+- [x] `/afro90s/{env}/cognito-region` = `us-east-1`
 
 ### Outputs CloudFormation
 
-- [ ] `CfnOutput` `CognitoUserPoolId`
-- [ ] `CfnOutput` `CognitoClientId`
-- [ ] `CfnOutput` `CognitoRegion`
+- [x] `CfnOutput` `CognitoUserPoolId`
+- [x] `CfnOutput` `CognitoClientId`
+- [x] `CfnOutput` `CognitoRegion`
 
 ### Pós-deploy — criar usuário admin (manual)
 
@@ -73,11 +68,11 @@ Implementar `AuthStack` com o User Pool Cognito e configurar o authorizer JWT no
 
 ## Critérios de conclusão
 
-- [ ] User Pool criado no CloudFormation
-- [ ] App client sem secret, SRP habilitado
-- [ ] Grupo `admins` existente
+- [x] User Pool criado no CloudFormation (`AuthStack`)
+- [x] App client sem secret, SRP habilitado
+- [x] Grupo `admins` existente
 - [ ] Usuário admin criado manualmente e adicionado ao grupo `admins`
 - [ ] Login funcional via Amplify/Cognito JS SDK no frontend admin (ou Postman)
-- [ ] Outputs `CognitoUserPoolId`, `CognitoClientId`, `CognitoRegion` no CloudFormation
-- [ ] `resources.md` e `outputs.md` atualizados
-- [ ] Atualizar **Status** para `concluída`
+- [x] Outputs `CognitoUserPoolId`, `CognitoClientId`, `CognitoRegion` no CloudFormation
+- [x] `resources.md` e `outputs.md` atualizados
+- [x] **Status** código: concluída — aceite manual fase 2 (task 14)
