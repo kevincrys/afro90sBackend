@@ -14,7 +14,7 @@ Criar a role IAM da Lambda admin com permissões de CRUD em DynamoDB e escrita n
 
 - [ ] DynamoDB `products` (CRUD completo):
   - `dynamodb:GetItem`, `dynamodb:PutItem`, `dynamodb:UpdateItem`, `dynamodb:DeleteItem`, `dynamodb:Query`, `dynamodb:Scan`
-  - Índices: `dynamodb:Query` em `gsi-name` e `gsi-createdAt`
+  - Índices: `dynamodb:Scan` em `gsi-createdAt`
   - Resource: ARN específico + `ARN/index/*`
 - [ ] DynamoDB `orders`:
   - `dynamodb:GetItem`, `dynamodb:Query`, `dynamodb:UpdateItem`

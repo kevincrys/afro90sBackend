@@ -4,7 +4,6 @@ export const CURSOR_VERSION = 1 as const;
 
 export const CursorIndexSchema = z.enum([
   'primary',
-  'gsi-name',
   'gsi-createdAt',
   'gsi-status-createdAt',
 ]);

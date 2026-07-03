@@ -5,12 +5,12 @@ import { buildPaginatedResponse } from './paginated';
 import { parseLimit } from './limit';
 
 describe('cursor', () => {
-  const filters = { category: 'oculos' };
+  const filters = { name: 'oculos', category: 'oculos' };
   const payload = {
     v: 1 as const,
-    index: 'gsi-name' as const,
-    key: { nameLower: 'oculos', id: '550e8400-e29b-41d4-a716-446655440000' },
-    filters,
+    index: 'primary' as const,
+    key: { id: '550e8400-e29b-41d4-a716-446655440000' },
+    filters: { name: 'oculos', category: 'oculos' },
   };
 
   it('round-trips encode/decode', () => {
@@ -59,7 +59,7 @@ describe('parseLimit', () => {
 
 describe('buildPaginatedResponse', () => {
   it('returns hasMore false without last key', () => {
-    expect(buildPaginatedResponse([{ id: '1' }], undefined, { index: 'gsi-name', filters: {} })).toEqual({
+    expect(buildPaginatedResponse([{ id: '1' }], undefined, { index: 'primary', filters: {} })).toEqual({
       items: [{ id: '1' }],
       hasMore: false,
     });

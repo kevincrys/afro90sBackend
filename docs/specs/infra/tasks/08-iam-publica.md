@@ -16,7 +16,7 @@ Criar as roles IAM das Lambdas públicas (`products-public` e `orders-public`) c
 
 - [x] DynamoDB `products`:
   - `dynamodb:GetItem`, `dynamodb:Query`, `dynamodb:Scan`
-  - Em índices: `dynamodb:Query` no `gsi-name` e `gsi-createdAt`
+  - Em índices: `dynamodb:Scan` no `gsi-createdAt`
   - Resource: ARN específico da tabela + `ARN/index/*`
 - [x] SSM:
   - `ssm:GetParameter` restrito a `/afro90s/{env}/*`

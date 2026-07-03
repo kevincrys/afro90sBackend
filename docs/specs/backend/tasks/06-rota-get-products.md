@@ -14,7 +14,8 @@ Implementar listagem pública de produtos com busca, filtro por categoria e pagi
 
 - [x] Handler `GET /products`
 - [x] Query params: `name?`, `category?`, `cursor?`, `limit?`
-- [x] `ProductRepository.list(...)` + `buildPaginatedResponse`
+- [x] `ProductRepository.list` — com `name`: Scan na tabela base + `begins_with(nameLower)`; sem `name`: Scan em `gsi-createdAt`
+- [x] `buildPaginatedResponse` (cursor `index: primary` quando há `name`)
 - [x] Não expõe `nameLower` (`toPublicProduct`)
 
 ### `resources/products-public/src/handler.ts`

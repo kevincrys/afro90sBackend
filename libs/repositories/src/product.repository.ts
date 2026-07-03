@@ -2,7 +2,6 @@ import {
   DeleteCommand,
   GetCommand,
   PutCommand,
-  QueryCommand,
   ScanCommand,
   UpdateCommand,
   type DynamoDBDocumentClient,
@@ -17,8 +16,8 @@ import {
 } from '@afro90s/models';
 import { decodeCursor, type CursorFilters } from '@afro90s/pagination';
 
-const GSI_NAME = 'gsi-name';
 const GSI_CREATED_AT = 'gsi-createdAt';
+const LIST_INDEX_PRIMARY = 'primary' as const;
 
 export interface ListProductsParams {
   name?: string;
@@ -30,7 +29,7 @@ export interface ListProductsParams {
 export interface ListProductsResult {
   items: Product[];
   lastEvaluatedKey?: Record<string, string>;
-  index: 'gsi-name' | 'gsi-createdAt';
+  index: typeof LIST_INDEX_PRIMARY | typeof GSI_CREATED_AT;
   filters: CursorFilters;
 }
 
@@ -60,7 +59,7 @@ export class ProductRepository {
       ...(params.name ? { name: params.name } : {}),
       ...(params.category ? { category: params.category } : {}),
     };
-    const index = params.name ? GSI_NAME : GSI_CREATED_AT;
+    const index = params.name ? LIST_INDEX_PRIMARY : GSI_CREATED_AT;
     const exclusiveStartKey = params.cursor
       ? this.resolveStartKey(params.cursor, filters, index)
       : undefined;
@@ -172,7 +171,7 @@ export class ProductRepository {
   private resolveStartKey(
     cursor: string,
     filters: CursorFilters,
-    expectedIndex: 'gsi-name' | 'gsi-createdAt',
+    expectedIndex: typeof LIST_INDEX_PRIMARY | typeof GSI_CREATED_AT,
   ): Record<string, string> {
     const decoded = decodeCursor(cursor, filters);
     if (decoded.index !== expectedIndex) {
@@ -188,23 +187,22 @@ export class ProductRepository {
     exclusiveStartKey?: Record<string, string>;
   }): Promise<{ items: Product[]; lastEvaluatedKey?: Record<string, string> }> {
     const prefix = normalizeNameLower(params.name);
-    const values: Record<string, string> = {
-      ':prefix': prefix,
-      ':prefixEnd': `${prefix}\uffff`,
-    };
-    let filterExpression: string | undefined;
+    const names: Record<string, string> = { '#nameLower': 'nameLower' };
+    const values: Record<string, string> = { ':prefix': prefix };
+    const filterParts = ['begins_with(#nameLower, :prefix)'];
 
     if (params.category) {
-      filterExpression = 'category = :category';
+      names['#category'] = 'category';
       values[':category'] = params.category;
+      filterParts.push('#category = :category');
     }
 
+    // Busca por prefixo: Scan na tabela base (nameLower é atributo, não GSI).
     const result = await this.client.send(
-      new QueryCommand({
+      new ScanCommand({
         TableName: this.tableName,
-        IndexName: GSI_NAME,
-        KeyConditionExpression: 'nameLower BETWEEN :prefix AND :prefixEnd',
-        ...(filterExpression ? { FilterExpression: filterExpression } : {}),
+        FilterExpression: filterParts.join(' AND '),
+        ExpressionAttributeNames: names,
         ExpressionAttributeValues: values,
         Limit: params.limit,
         ExclusiveStartKey: params.exclusiveStartKey,

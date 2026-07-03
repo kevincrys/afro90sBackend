@@ -43,10 +43,23 @@ describe('ProductRepository', () => {
     expect(send).toHaveBeenCalledOnce();
   });
 
-  it('list queries gsi-name when name filter is present', async () => {
+  it('list scans table with begins_with when name filter is present', async () => {
     send.mockResolvedValueOnce({ Items: [] });
-    await repository.list({ name: 'Óculos', limit: 20 });
-    expect(send.mock.calls[0][0].input.IndexName).toBe('gsi-name');
+    const result = await repository.list({ name: 'Óculos', limit: 20 });
+    const input = send.mock.calls[0][0].input;
+    expect(input.IndexName).toBeUndefined();
+    expect(input.FilterExpression).toBe('begins_with(#nameLower, :prefix)');
+    expect(input.ExpressionAttributeValues).toMatchObject({ ':prefix': 'oculos' });
+    expect(result.index).toBe('primary');
+  });
+
+  it('list applies category filter together with name', async () => {
+    send.mockResolvedValueOnce({ Items: [] });
+    await repository.list({ name: 'Óculos', category: 'oculos', limit: 20 });
+    const input = send.mock.calls[0][0].input;
+    expect(input.FilterExpression).toBe(
+      'begins_with(#nameLower, :prefix) AND #category = :category',
+    );
   });
 
   it('list scans gsi-createdAt without name filter', async () => {
@@ -74,6 +87,19 @@ describe('ProductRepository', () => {
       key: { createdAt: '2025-01-01T00:00:00.000Z' },
       filters: { name: 'oculos' },
     });
+    await expect(repository.list({ name: 'oculos', cursor, limit: 20 })).rejects.toThrow(ApiError);
+  });
+
+  it('rejects legacy gsi-name cursor after index removal', async () => {
+    const cursor = Buffer.from(
+      JSON.stringify({
+        v: 1,
+        index: 'gsi-name',
+        key: { nameLower: 'oculos', id: PRODUCT_ID },
+        filters: { name: 'oculos' },
+      }),
+      'utf8',
+    ).toString('base64url');
     await expect(repository.list({ name: 'oculos', cursor, limit: 20 })).rejects.toThrow(ApiError);
   });
 

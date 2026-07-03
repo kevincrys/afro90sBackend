@@ -36,7 +36,7 @@ type OrderStatus =
 interface Product {
   id: string;              // UUID v4
   name: string;
-  nameLower: string;       // interno (GSI gsi-name); não exposto em GET público
+  nameLower: string;       // interno (filtro de busca); não exposto em GET público
   description: string;     // texto livre; editável só no admin; max 2000 caracteres
   price: number;           // BRL decimal, ex.: 49.90
   quantity: number;        // inteiro >= 0

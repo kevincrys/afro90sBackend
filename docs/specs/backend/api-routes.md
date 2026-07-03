@@ -151,13 +151,13 @@ Listagem de produtos **sem** `name` (tabela principal, PK `id`):
 }
 ```
 
-Listagem de produtos **com** `name` (GSI `gsi-name`, PK `nameLower`, SK `id`):
+Listagem de produtos **com** `name` (tabela base, PK `id`):
 
 ```json
 {
   "v": 1,
-  "index": "gsi-name",
-  "key": { "nameLower": "oculos vintage", "id": "550e8400-e29b-41d4-a716-446655440000" },
+  "index": "primary",
+  "key": { "id": "550e8400-e29b-41d4-a716-446655440000" },
   "filters": { "name": "óculos" }
 }
 ```

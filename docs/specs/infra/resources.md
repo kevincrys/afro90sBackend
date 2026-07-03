@@ -156,7 +156,7 @@ Billing: **on-demand** (`PAY_PER_REQUEST`) — alinhado ao [ADR-004](../../found
 | `createdAt` | String | ISO 8601 |
 | `updatedAt` | String | ISO 8601 |
 
-**GSI `gsi-name`**: PK `nameLower`, SK `id` — busca por prefixo de nome (v1).
+**Busca por nome (v1):** `Scan` na tabela base com `begins_with(nameLower, :prefix)` — atributo `nameLower` (lowercase + remoção de acentos); **sem GSI**.
 
 **GSI `gsi-createdAt`**: PK `createdAt` — listagem pública por data de criação.
 

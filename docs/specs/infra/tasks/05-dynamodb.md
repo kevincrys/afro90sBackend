@@ -17,8 +17,8 @@ Implementar `DatabaseStack`: tabelas `products` e `orders` com GSIs em **on-dema
 | Free tier | 25 GB storage (conta/região); requisições cobradas por uso (centavos com volume v1) |
 | PITR | Somente prod, somente tabela `orders` |
 | TTL `orders` | Atributo `expiresAt`; **180 dias** após estado terminal (`CONCLUIDO` / `CANCELADO`) — backend define o valor |
-| GSI products | `gsi-name` (PK: `nameLower`, SK: `id`) |
 | GSI products | `gsi-createdAt` (PK: `createdAt`) para listagem pública |
+| Busca por nome | `Scan` na tabela + `begins_with(nameLower, …)` — atributo `nameLower`, sem GSI |
 | GSI orders | `gsi-status-createdAt` (PK: `status`, SK: `createdAt`) |
 | `nameLower` | lowercase + remoção de acentos |
 | Deletion protection | Prod apenas |
@@ -32,7 +32,6 @@ Implementar `DatabaseStack`: tabelas `products` e `orders` com GSIs em **on-dema
 - [x] `billingMode: BillingMode.PAY_PER_REQUEST`
 - [x] `removalPolicy: DESTROY` dev / `RETAIN` prod
 - [x] `deletionProtection: true` em prod
-- [x] GSI `gsi-name`: PK `nameLower` (S), SK `id` (S)
 - [x] GSI `gsi-createdAt`: PK `createdAt` (S)
 
 ### Tabela `orders`
