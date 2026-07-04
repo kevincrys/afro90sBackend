@@ -889,15 +889,21 @@ Objeto `Order` completo.
 
 ---
 
-### `PATCH /admin/orders/{id}/status`
+### `PUT /admin/orders/{id}`
 
-Atualiza status do pedido.
+Atualiza status do pedido. Única mutação permitida neste recurso.
 
 | | |
 |---|---|
-| **Método** | `PATCH` |
-| **Path** | `/admin/orders/{id}/status` |
+| **Método** | `PUT` |
+| **Path** | `/admin/orders/{id}` |
 | **Auth** | Cognito JWT |
+
+#### Path parameters
+
+| Param | Tipo | Descrição |
+|-------|------|-----------|
+| `id` | string (UUID) | ID do pedido |
 
 #### Request headers
 
@@ -926,8 +932,8 @@ Objeto `Order` com status atualizado.
 | Status | `code` | Quando |
 |--------|--------|--------|
 | `404` | `NOT_FOUND` | Pedido não existe |
-| `400` | `INVALID_STATUS_TRANSITION` | Transição não permitida |
-| `400` | `VALIDATION_ERROR` | Status desconhecido |
+| `409` | `INVALID_STATUS_TRANSITION` | Transição não permitida |
+| `400` | `VALIDATION_ERROR` | Status desconhecido ou body inválido |
 | `401` | | Auth |
 
 ---
@@ -1021,7 +1027,7 @@ products/{productId}/{uuid}.{ext}
 | `PATCH` | `/admin/products/{id}/stock` | JWT | `application/json` |
 | `GET` | `/admin/orders` | JWT | — |
 | `GET` | `/admin/orders/{id}` | JWT | — |
-| `PATCH` | `/admin/orders/{id}/status` | JWT | `application/json` |
+| `PUT` | `/admin/orders/{id}` | JWT | `application/json` |
 
 ## Referências
 

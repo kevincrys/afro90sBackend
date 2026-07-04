@@ -20,7 +20,7 @@ function parseJsonBody(event: APIGatewayProxyEventV2): unknown {
   }
 }
 
-export async function handlePatchAdminOrderStatus(
+export async function handlePutAdminOrder(
   event: APIGatewayProxyEventV2,
   context: AdminApiContext,
 ) {

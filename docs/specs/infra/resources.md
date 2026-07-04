@@ -130,7 +130,7 @@ Tags obrigatórias em todo recurso (via `TaggingAspect` em `bin/app.ts`): `proje
 | `lambda-products-public` | `GET /products`, `GET /products/{id}` | DynamoDB products read |
 | `lambda-orders-public` | `POST /orders` | DynamoDB orders write, products read, SES send |
 | `lambda-products-admin` | `/admin/products*` | DynamoDB products CRUD, S3 assets write |
-| `lambda-orders-admin` | `/admin/orders*` | DynamoDB orders read/update |
+| `lambda-orders-admin` | `GET /admin/orders`, `GET /admin/orders/{id}`, `PUT /admin/orders/{id}` | DynamoDB orders read/update |
 
 Runtime: **Node.js 20.x**. Bundling: **esbuild no afro90sBackend**; CDK cria função com placeholder ([ADR-007](../../foundation/adr/007-backend-lambda-s3-deploy.md)).
 

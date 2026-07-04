@@ -16,13 +16,15 @@ Implementar listagem e atualização de status de pedidos nas rotas `/admin/orde
 | Pular estados | Não permitido |
 | Ordenação default | Mais recentes primeiro (`createdAt` desc) |
 
+| Mutação de pedido | Apenas `PUT /admin/orders/{id}` com body `{ "status": "..." }` |
+
 ## O que implementar
 
 ### `resources/orders-admin/`
 
 - [x] `GET /admin/orders` — listagem com `status?`, `cursor`, `limit`
 - [x] `GET /admin/orders/{id}` — detalhe completo com `customer`, `items`
-- [x] `PATCH /admin/orders/{id}/status` — atualizar status
+- [x] `PUT /admin/orders/{id}` — atualizar status
 
 Todas com middleware auth.
 

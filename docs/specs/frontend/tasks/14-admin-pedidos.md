@@ -33,7 +33,7 @@ Implementar listagem de pedidos e atualização de status no painel admin.
 - [ ] Dados do `customer` (nome, endereço, CEP, tel)
 - [ ] Lista de itens com `productId`, quantidade, `unitPrice`
 - [ ] Dropdown de status com apenas transições válidas
-- [ ] `PUT /admin/orders/{id}` ao mudar status
+- [x] `PUT /admin/orders/{id}` ao mudar status
 - [ ] Toast de sucesso/erro
 
 ### Labels pt-BR

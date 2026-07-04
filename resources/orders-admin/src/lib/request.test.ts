@@ -3,7 +3,7 @@ import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 import {
   extractAdminOrderId,
   isAdminOrderById,
-  isAdminOrderStatus,
+  isAdminOrderUpdate,
   isAdminOrdersCollection,
 } from './request';
 
@@ -29,16 +29,15 @@ describe('admin order request helpers', () => {
     expect(
       isAdminOrderById(event('GET', '/admin/orders/uuid', 'GET /admin/orders/{id}')),
     ).toBe(true);
-    expect(isAdminOrderById(event('PATCH', '/admin/orders/uuid'))).toBe(false);
+    expect(isAdminOrderById(event('PUT', '/admin/orders/uuid'))).toBe(false);
   });
 
-  it('matches status route', () => {
+  it('matches order update route', () => {
     expect(
-      isAdminOrderStatus(
-        event('PATCH', '/admin/orders/uuid/status', 'PATCH /admin/orders/{id}/status'),
-      ),
+      isAdminOrderUpdate(event('PUT', '/admin/orders/uuid', 'PUT /admin/orders/{id}')),
     ).toBe(true);
-    expect(isAdminOrderStatus(event('PUT', '/admin/orders/uuid/status'))).toBe(false);
+    expect(isAdminOrderUpdate(event('PATCH', '/admin/orders/uuid'))).toBe(false);
+    expect(isAdminOrderUpdate(event('PUT', '/admin/orders/uuid/status'))).toBe(false);
   });
 
   it('extracts order id from path', () => {
@@ -50,7 +49,7 @@ describe('admin order request helpers', () => {
     ).toBe('550e8400-e29b-41d4-a716-446655440000');
     expect(
       extractAdminOrderId({
-        rawPath: '/admin/orders/550e8400-e29b-41d4-a716-446655440000/status',
+        rawPath: '/admin/orders/550e8400-e29b-41d4-a716-446655440000',
       } as APIGatewayProxyEventV2),
     ).toBe('550e8400-e29b-41d4-a716-446655440000');
   });

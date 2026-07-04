@@ -115,8 +115,8 @@ if ! echo "${ORDERS}" | grep -q "${ORDER_ID}"; then
 fi
 echo "OK"
 
-echo -n "PATCH /admin/orders/{id}/status... "
-STATUS_HTTP=$(curl -s -o /dev/null -w "%{http_code}" -X PATCH "$(api_url "/admin/orders/${ORDER_ID}/status")" \
+echo -n "PUT /admin/orders/{id}... "
+STATUS_HTTP=$(curl -s -o /dev/null -w "%{http_code}" -X PUT "$(api_url "/admin/orders/${ORDER_ID}")" \
   "${AUTH[@]}" \
   -H "Content-Type: application/json" \
   -d '{"status":"EM_ATENDIMENTO"}')

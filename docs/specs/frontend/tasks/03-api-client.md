@@ -37,7 +37,7 @@ const apiClient = axios.create({
 - [ ] `src/api/products.ts` — `getProducts`, `getProductById`
 - [ ] `src/api/orders.ts` — `createOrder`
 - [ ] `src/api/admin/products.ts` — CRUD (fase 3, criar stubs)
-- [ ] `src/api/admin/orders.ts` — list, get, updateStatus (fase 3, stubs)
+- [ ] `src/api/admin/orders.ts` — list, get, `updateStatus` via `PUT /admin/orders/{id}`
 
 ### `src/types/` — espelhar backend
 

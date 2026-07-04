@@ -70,6 +70,7 @@ Ver [outputs da infra](../infra/outputs.md). Injetadas pelo CDK no deploy da Lam
 - `POST /orders` valida estoque mas **não decrementa** automaticamente
 - Itens com `selectedOption` quando o produto define `options`
 - Decremento de estoque via `PATCH /admin/products/{id}/stock` (admin)
+- Atualização de status de pedido via `PUT /admin/orders/{id}` (admin; body `{ "status": "..." }`)
 - Pedido criado sempre com status `SOLICITADO`
 - Imagens admin: suportar `url`, `base64` e `stream` (ver api-routes.md)
 

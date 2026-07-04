@@ -110,14 +110,14 @@ describe('orders-admin handler', () => {
     expect(result.statusCode).toBe(404);
   });
 
-  it('routes PATCH /admin/orders/{id}/status', async () => {
+  it('routes PUT /admin/orders/{id}', async () => {
     updateOrderStatus.mockResolvedValueOnce({ ...order, status: 'EM_ATENDIMENTO' });
     const result = await handler(
       adminEvent({
-        rawPath: `/admin/orders/${ORDER_ID}/status`,
+        rawPath: `/admin/orders/${ORDER_ID}`,
         pathParameters: { id: ORDER_ID },
         requestContext: {
-          http: { method: 'PATCH' },
+          http: { method: 'PUT' },
           authorizer: { jwt: { claims: { sub: 'admin-uuid', 'cognito:groups': 'admins' } } },
         },
         headers: { authorization: 'Bearer t', 'content-type': 'application/json' },
@@ -135,10 +135,10 @@ describe('orders-admin handler', () => {
     );
     const result = await handler(
       adminEvent({
-        rawPath: `/admin/orders/${ORDER_ID}/status`,
+        rawPath: `/admin/orders/${ORDER_ID}`,
         pathParameters: { id: ORDER_ID },
         requestContext: {
-          http: { method: 'PATCH' },
+          http: { method: 'PUT' },
           authorizer: { jwt: { claims: { sub: 'admin-uuid', 'cognito:groups': 'admins' } } },
         },
         headers: { authorization: 'Bearer t', 'content-type': 'application/json' },
@@ -168,13 +168,13 @@ describe('orders-admin handler', () => {
     expect(result.statusCode).toBe(400);
   });
 
-  it('returns 400 for invalid PATCH status body', async () => {
+  it('returns 400 for invalid PUT status body', async () => {
     const result = await handler(
       adminEvent({
-        rawPath: `/admin/orders/${ORDER_ID}/status`,
+        rawPath: `/admin/orders/${ORDER_ID}`,
         pathParameters: { id: ORDER_ID },
         requestContext: {
-          http: { method: 'PATCH' },
+          http: { method: 'PUT' },
           authorizer: { jwt: { claims: { sub: 'admin-uuid', 'cognito:groups': 'admins' } } },
         },
         headers: { authorization: 'Bearer t', 'content-type': 'application/json' },
@@ -185,13 +185,13 @@ describe('orders-admin handler', () => {
     expect(result.statusCode).toBe(400);
   });
 
-  it('returns 400 when PATCH status has no body', async () => {
+  it('returns 400 when PUT status has no body', async () => {
     const result = await handler(
       adminEvent({
-        rawPath: `/admin/orders/${ORDER_ID}/status`,
+        rawPath: `/admin/orders/${ORDER_ID}`,
         pathParameters: { id: ORDER_ID },
         requestContext: {
-          http: { method: 'PATCH' },
+          http: { method: 'PUT' },
           authorizer: { jwt: { claims: { sub: 'admin-uuid', 'cognito:groups': 'admins' } } },
         },
         headers: { authorization: 'Bearer t', 'content-type': 'application/json' },
@@ -201,13 +201,13 @@ describe('orders-admin handler', () => {
     expect(result.statusCode).toBe(400);
   });
 
-  it('returns 400 when PATCH status body is invalid JSON', async () => {
+  it('returns 400 when PUT status body is invalid JSON', async () => {
     const result = await handler(
       adminEvent({
-        rawPath: `/admin/orders/${ORDER_ID}/status`,
+        rawPath: `/admin/orders/${ORDER_ID}`,
         pathParameters: { id: ORDER_ID },
         requestContext: {
-          http: { method: 'PATCH' },
+          http: { method: 'PUT' },
           authorizer: { jwt: { claims: { sub: 'admin-uuid', 'cognito:groups': 'admins' } } },
         },
         headers: { authorization: 'Bearer t', 'content-type': 'application/json' },
