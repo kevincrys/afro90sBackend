@@ -43,6 +43,7 @@ export {
   OrderItemSchema,
   OrderSchema,
   OrderStatusEnum,
+  UpdateOrderStatusSchema,
   isTerminalOrderStatus,
   isValidOrderStatusTransition,
   type CreateOrderInput,
@@ -51,4 +52,5 @@ export {
   type Order,
   type OrderItem,
   type OrderStatus,
+  type UpdateOrderStatusInput,
 } from './order';

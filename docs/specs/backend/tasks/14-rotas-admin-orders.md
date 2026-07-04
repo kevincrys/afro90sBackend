@@ -1,7 +1,7 @@
 # Task 14 — Rotas admin de pedidos
 
 **Fase:** 3 — Rotas admin  
-**Status:** pendente  
+**Status:** concluída  
 **Arquivos alvo:** [`api-routes.md`](../api-routes.md)
 
 ## Objetivo
@@ -18,28 +18,28 @@ Implementar listagem e atualização de status de pedidos nas rotas `/admin/orde
 
 ## O que implementar
 
-### `src/routes/admin/orders.ts`
+### `resources/orders-admin/`
 
-- [ ] `GET /admin/orders` — listagem com `status?`, `cursor`, `limit`
-- [ ] `GET /admin/orders/{id}` — detalhe completo com `customer`, `items` (incl. `selectedOption` por item)
-- [ ] `PUT /admin/orders/{id}` — atualizar status
+- [x] `GET /admin/orders` — listagem com `status?`, `cursor`, `limit`
+- [x] `GET /admin/orders/{id}` — detalhe completo com `customer`, `items`
+- [x] `PATCH /admin/orders/{id}/status` — atualizar status
 
 Todas com middleware auth.
 
-### `src/services/order.service.ts` (expandir)
+### `resources/orders-admin/src/services/order.service.ts`
 
-- [ ] `listOrders(filters)` — query em `gsi-status-createdAt`
-- [ ] `getOrder(id)`
-- [ ] `updateOrderStatus(id, newStatus)` — validar transição; `409 INVALID_STATUS_TRANSITION` se inválida
-- [ ] Ao transicionar para `CONCLUIDO` ou `CANCELADO`: definir `expiresAt` (epoch segundos) = agora + **180 dias**
+- [x] `listOrders(filters)` — query em `gsi-status-createdAt` ou scan sem filtro
+- [x] `getOrder(id)`
+- [x] `updateOrderStatus(id, newStatus)` — validar transição; `409 INVALID_STATUS_TRANSITION` se inválida
+- [x] Ao transicionar para `CONCLUIDO` ou `CANCELADO`: definir `expiresAt` (epoch segundos) = agora + **180 dias**
 
 ### Testes
 
-- [ ] Listagem com filtro `status`
-- [ ] Transição válida → `200`
-- [ ] Transição inválida → `409`
-- [ ] Transição para `CONCLUIDO`/`CANCELADO` grava `expiresAt` (+180 dias)
-- [ ] Pedido inexistente → `404`
+- [x] Listagem com filtro `status`
+- [x] Transição válida → `200`
+- [x] Transição inválida → `409`
+- [x] Transição para `CONCLUIDO`/`CANCELADO` grava `expiresAt` (+180 dias)
+- [x] Pedido inexistente → `404`
 
 ## Pré-requisitos
 
@@ -47,6 +47,6 @@ Todas com middleware auth.
 
 ## Critérios de conclusão
 
-- [ ] 3 rotas admin de pedidos funcionais em dev
-- [ ] Transições de status validadas
-- [ ] Atualizar **Status** para `concluída`
+- [x] 3 rotas admin de pedidos funcionais em dev
+- [x] Transições de status validadas
+- [x] Atualizar **Status** para `concluída`

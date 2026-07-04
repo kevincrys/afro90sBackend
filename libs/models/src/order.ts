@@ -71,3 +71,8 @@ export const CreateOrderSchema = z.object({
   items: z.array(CreateOrderItemSchema).min(1).max(99),
 });
 export type CreateOrderInput = z.infer<typeof CreateOrderSchema>;
+
+export const UpdateOrderStatusSchema = z.object({
+  status: OrderStatusEnum,
+});
+export type UpdateOrderStatusInput = z.infer<typeof UpdateOrderStatusSchema>;

@@ -2,6 +2,7 @@ import {
   GetCommand,
   PutCommand,
   QueryCommand,
+  ScanCommand,
   UpdateCommand,
   type DynamoDBDocumentClient,
 } from '@aws-sdk/lib-dynamodb';
@@ -16,6 +17,7 @@ import {
 import { decodeCursor, type CursorFilters } from '@afro90s/pagination';
 
 const GSI_STATUS_CREATED_AT = 'gsi-status-createdAt';
+const LIST_INDEX_PRIMARY = 'primary' as const;
 const TERMINAL_TTL_DAYS = 180;
 
 export interface ListOrdersParams {
@@ -27,6 +29,7 @@ export interface ListOrdersParams {
 export interface ListOrdersResult {
   items: Order[];
   lastEvaluatedKey?: Record<string, string>;
+  index: typeof LIST_INDEX_PRIMARY | typeof GSI_STATUS_CREATED_AT;
   filters: CursorFilters;
 }
 
@@ -61,13 +64,16 @@ export class OrderRepository {
   }
 
   async list(params: ListOrdersParams): Promise<ListOrdersResult> {
-    if (!params.status) {
-      throw new ApiError('INVALID_QUERY', 'Parâmetro status é obrigatório.');
+    if (params.status !== undefined) {
+      return this.listByStatus({ ...params, status: params.status });
     }
+    return this.listAll(params);
+  }
 
+  private async listByStatus(params: ListOrdersParams & { status: OrderStatus }): Promise<ListOrdersResult> {
     const filters: CursorFilters = { status: params.status };
     const exclusiveStartKey = params.cursor
-      ? this.resolveStartKey(params.cursor, filters)
+      ? this.resolveStartKey(params.cursor, filters, GSI_STATUS_CREATED_AT)
       : undefined;
 
     const result = await this.client.send(
@@ -86,6 +92,33 @@ export class OrderRepository {
     return {
       items: (result.Items ?? []).map((item) => OrderSchema.parse(item)),
       lastEvaluatedKey: result.LastEvaluatedKey as Record<string, string> | undefined,
+      index: GSI_STATUS_CREATED_AT,
+      filters,
+    };
+  }
+
+  private async listAll(params: ListOrdersParams): Promise<ListOrdersResult> {
+    const filters: CursorFilters = {};
+    const exclusiveStartKey = params.cursor
+      ? this.resolveStartKey(params.cursor, filters, LIST_INDEX_PRIMARY)
+      : undefined;
+
+    const result = await this.client.send(
+      new ScanCommand({
+        TableName: this.tableName,
+        Limit: params.limit,
+        ExclusiveStartKey: exclusiveStartKey,
+      }),
+    );
+
+    const items = (result.Items ?? [])
+      .map((item) => OrderSchema.parse(item))
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+
+    return {
+      items,
+      lastEvaluatedKey: result.LastEvaluatedKey as Record<string, string> | undefined,
+      index: LIST_INDEX_PRIMARY,
       filters,
     };
   }
@@ -131,9 +164,13 @@ export class OrderRepository {
     return OrderSchema.parse(result.Attributes);
   }
 
-  private resolveStartKey(cursor: string, filters: CursorFilters): Record<string, string> {
+  private resolveStartKey(
+    cursor: string,
+    filters: CursorFilters,
+    expectedIndex: typeof LIST_INDEX_PRIMARY | typeof GSI_STATUS_CREATED_AT,
+  ): Record<string, string> {
     const decoded = decodeCursor(cursor, filters);
-    if (decoded.index !== GSI_STATUS_CREATED_AT) {
+    if (decoded.index !== expectedIndex) {
       throw new ApiError('INVALID_CURSOR', 'Cursor inválido.');
     }
     return decoded.key;

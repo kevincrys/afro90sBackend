@@ -8,6 +8,9 @@
     "bundle": "node ../../scripts/bundle.mjs orders-admin"
   },
   "dependencies": {
-    "@afro90s/http": "*"
+    "@afro90s/http": "*",
+    "@afro90s/models": "*",
+    "@afro90s/pagination": "*",
+    "@afro90s/repositories": "*"
   }
 }

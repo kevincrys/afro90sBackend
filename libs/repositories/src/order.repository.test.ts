@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { QueryCommand } from '@aws-sdk/lib-dynamodb';
+import { ScanCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
 import { OrderRepository } from './order.repository';
 import { ApiError } from '@afro90s/models';
 
@@ -33,11 +33,16 @@ describe('OrderRepository', () => {
     await expect(repository.updateStatus(ORDER_ID, 'ENVIADO')).rejects.toThrow(ApiError);
   });
 
-  it('list requires status filter', async () => {
-    await expect(repository.list({ limit: 20 } as never)).rejects.toThrow(ApiError);
+  it('list without status scans table', async () => {
+    send.mockResolvedValueOnce({ Items: [orderItem] });
+    const result = await repository.list({ limit: 20 });
+    const command = send.mock.calls[0][0] as ScanCommand;
+    expect(command.input.TableName).toBe('test-orders');
+    expect(result.index).toBe('primary');
+    expect(result.items).toHaveLength(1);
   });
 
-  it('list queries gsi-status-createdAt', async () => {
+  it('list queries gsi-status-createdAt when status filter is set', async () => {
     send.mockResolvedValueOnce({ Items: [] });
     await repository.list({ status: 'SOLICITADO', limit: 20 });
     const command = send.mock.calls[0][0] as QueryCommand;
