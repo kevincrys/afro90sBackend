@@ -83,8 +83,8 @@ if [ "${PUT_HTTP}" != "200" ]; then
 fi
 echo "OK"
 
-echo -n "PATCH /admin/products/{id}/stock... "
-STOCK_HTTP=$(curl -s -o /dev/null -w "%{http_code}" -X PATCH "$(api_url "/admin/products/${PRODUCT_ID}/stock")" \
+echo -n "PUT /admin/products/{id}/stock... "
+STOCK_HTTP=$(curl -s -o /dev/null -w "%{http_code}" -X PUT "$(api_url "/admin/products/${PRODUCT_ID}/stock")" \
   "${AUTH[@]}" \
   -H "Content-Type: application/json" \
   -d '{"delta":-1}')

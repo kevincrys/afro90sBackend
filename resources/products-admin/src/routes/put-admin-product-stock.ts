@@ -20,7 +20,7 @@ function parseJsonBody(event: APIGatewayProxyEventV2): unknown {
   }
 }
 
-export async function handlePatchAdminProductStock(
+export async function handlePutAdminProductStock(
   event: APIGatewayProxyEventV2,
   context: AdminApiContext,
 ) {

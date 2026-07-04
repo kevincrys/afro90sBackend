@@ -50,10 +50,10 @@ export function isAdminProductById(event: APIGatewayProxyEventV2): boolean {
 }
 
 export function isAdminProductStock(event: APIGatewayProxyEventV2): boolean {
-  if (event.requestContext.http.method !== 'PATCH') {
+  if (event.requestContext.http.method !== 'PUT') {
     return false;
   }
-  if (event.routeKey === 'PATCH /admin/products/{id}/stock') {
+  if (event.routeKey === 'PUT /admin/products/{id}/stock') {
     return true;
   }
   return /^\/admin\/products\/[^/]+\/stock$/.test(event.rawPath);

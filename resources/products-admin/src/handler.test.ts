@@ -176,14 +176,14 @@ describe('products-admin handler', () => {
     expect(result.statusCode).toBe(204);
   });
 
-  it('routes PATCH /admin/products/{id}/stock', async () => {
+  it('routes PUT /admin/products/{id}/stock', async () => {
     updateStock.mockResolvedValueOnce({ id: PRODUCT_ID, quantity: 3 });
     const result = await handler(
       adminEvent({
         rawPath: `/admin/products/${PRODUCT_ID}/stock`,
         pathParameters: { id: PRODUCT_ID },
         requestContext: {
-          http: { method: 'PATCH' },
+          http: { method: 'PUT' },
           authorizer: { jwt: { claims: { sub: 'admin-uuid', 'cognito:groups': 'admins' } } },
         },
         headers: { authorization: 'Bearer t', 'content-type': 'application/json' },
@@ -230,13 +230,13 @@ describe('products-admin handler', () => {
     expect(result.statusCode).toBe(404);
   });
 
-  it('returns 400 for invalid PATCH stock body', async () => {
+  it('returns 400 for invalid PUT stock body', async () => {
     const result = await handler(
       adminEvent({
         rawPath: `/admin/products/${PRODUCT_ID}/stock`,
         pathParameters: { id: PRODUCT_ID },
         requestContext: {
-          http: { method: 'PATCH' },
+          http: { method: 'PUT' },
           authorizer: { jwt: { claims: { sub: 'admin-uuid', 'cognito:groups': 'admins' } } },
         },
         headers: { authorization: 'Bearer t', 'content-type': 'application/json' },
@@ -247,13 +247,13 @@ describe('products-admin handler', () => {
     expect(result.statusCode).toBe(400);
   });
 
-  it('returns 400 when PATCH stock has no body', async () => {
+  it('returns 400 when PUT stock has no body', async () => {
     const result = await handler(
       adminEvent({
         rawPath: `/admin/products/${PRODUCT_ID}/stock`,
         pathParameters: { id: PRODUCT_ID },
         requestContext: {
-          http: { method: 'PATCH' },
+          http: { method: 'PUT' },
           authorizer: { jwt: { claims: { sub: 'admin-uuid', 'cognito:groups': 'admins' } } },
         },
         headers: { authorization: 'Bearer t', 'content-type': 'application/json' },
@@ -263,13 +263,13 @@ describe('products-admin handler', () => {
     expect(result.statusCode).toBe(400);
   });
 
-  it('returns 400 when PATCH stock body is invalid JSON', async () => {
+  it('returns 400 when PUT stock body is invalid JSON', async () => {
     const result = await handler(
       adminEvent({
         rawPath: `/admin/products/${PRODUCT_ID}/stock`,
         pathParameters: { id: PRODUCT_ID },
         requestContext: {
-          http: { method: 'PATCH' },
+          http: { method: 'PUT' },
           authorizer: { jwt: { claims: { sub: 'admin-uuid', 'cognito:groups': 'admins' } } },
         },
         headers: { authorization: 'Bearer t', 'content-type': 'application/json' },

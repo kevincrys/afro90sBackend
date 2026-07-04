@@ -20,7 +20,7 @@ Validar CRUD de produtos, upload de imagens e gestão de pedidos com autenticaç
 - [x] `POST /admin/products` com token → `201`, produto em `GET /products` (smoke E2E com token)
 - [ ] Imagem acessível via `AssetsCdnUrl` (manual — smoke usa JSON sem upload)
 - [x] `PUT /admin/products/{id}` atualiza campos (smoke E2E)
-- [x] `PATCH /admin/products/{id}/stock` atualiza quantidade (smoke E2E)
+- [x] `PUT /admin/products/{id}/stock` atualiza quantidade (smoke E2E)
 - [x] `DELETE /admin/products/{id}` remove produto (smoke E2E cleanup)
 
 ### Pedidos

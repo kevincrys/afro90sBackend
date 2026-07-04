@@ -8,7 +8,7 @@ import {
 import { handleDeleteAdminProduct } from './routes/delete-admin-product';
 import { handleGetAdminProductById } from './routes/get-admin-product-by-id';
 import { handleGetAdminProducts } from './routes/get-admin-products';
-import { handlePatchAdminProductStock } from './routes/patch-admin-product-stock';
+import { handlePutAdminProductStock } from './routes/put-admin-product-stock';
 import { handlePostAdminProducts } from './routes/post-admin-products';
 import { handlePutAdminProduct } from './routes/put-admin-product';
 
@@ -21,7 +21,7 @@ export const handler = createAdminHandler(async (event, context) => {
   }
 
   if (isAdminProductStock(event)) {
-    return handlePatchAdminProductStock(event, context);
+    return handlePutAdminProductStock(event, context);
   }
 
   if (isAdminProductById(event)) {

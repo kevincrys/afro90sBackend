@@ -16,7 +16,7 @@ Implementar CRUD completo de produtos nas rotas `/admin/products*`.
 - [x] `GET /admin/products/{id}` — detalhe
 - [x] `PUT /admin/products/{id}` — atualizar campos
 - [x] `DELETE /admin/products/{id}` — remover produto e imagens CDN do S3
-- [x] `PATCH /admin/products/{id}/stock` — ajuste por `delta` ([api-routes.md](../api-routes.md))
+- [x] `PUT /admin/products/{id}/stock` — ajuste por `delta` ([api-routes.md](../api-routes.md))
 
 Todas com middleware auth (task 10).
 

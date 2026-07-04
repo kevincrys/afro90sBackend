@@ -758,13 +758,13 @@ Sem body.
 
 ---
 
-### `PATCH /admin/products/{id}/stock`
+### `PUT /admin/products/{id}/stock`
 
 Ajusta estoque por delta (positivo aumenta, negativo reduz).
 
 | | |
 |---|---|
-| **Método** | `PATCH` |
+| **Método** | `PUT` |
 | **Path** | `/admin/products/{id}/stock` |
 | **Auth** | Cognito JWT |
 
@@ -1024,7 +1024,7 @@ products/{productId}/{uuid}.{ext}
 | `GET` | `/admin/products/{id}` | JWT | — |
 | `PUT` | `/admin/products/{id}` | JWT | `application/json` ou `multipart/form-data` |
 | `DELETE` | `/admin/products/{id}` | JWT | — |
-| `PATCH` | `/admin/products/{id}/stock` | JWT | `application/json` |
+| `PUT` | `/admin/products/{id}/stock` | JWT | `application/json` |
 | `GET` | `/admin/orders` | JWT | — |
 | `GET` | `/admin/orders/{id}` | JWT | — |
 | `PUT` | `/admin/orders/{id}` | JWT | `application/json` |

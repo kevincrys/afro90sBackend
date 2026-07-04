@@ -41,10 +41,10 @@ describe('admin request helpers', () => {
   it('matches stock route', () => {
     expect(
       isAdminProductStock(
-        event('PATCH', '/admin/products/uuid/stock', 'PATCH /admin/products/{id}/stock'),
+        event('PUT', '/admin/products/uuid/stock', 'PUT /admin/products/{id}/stock'),
       ),
     ).toBe(true);
-    expect(isAdminProductStock(event('PUT', '/admin/products/uuid/stock'))).toBe(false);
+    expect(isAdminProductStock(event('PATCH', '/admin/products/uuid/stock'))).toBe(false);
   });
 
   it('extracts product id from path', () => {
