@@ -75,4 +75,17 @@ describe('OrderRepository', () => {
     send.mockResolvedValueOnce({});
     await expect(repository.updateStatus(ORDER_ID, 'EM_ATENDIMENTO')).resolves.toBeNull();
   });
+
+  it('rejects cursor with mismatched index', async () => {
+    const { encodeCursor } = await import('@afro90s/pagination');
+    const cursor = encodeCursor({
+      v: 1,
+      index: 'primary',
+      key: { id: ORDER_ID },
+      filters: { status: 'SOLICITADO' },
+    });
+    await expect(
+      repository.list({ status: 'SOLICITADO', cursor, limit: 20 }),
+    ).rejects.toThrow(ApiError);
+  });
 });

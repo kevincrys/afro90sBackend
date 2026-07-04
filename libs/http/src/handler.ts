@@ -1,5 +1,5 @@
 import middy from '@middy/core';
-import { isApiError } from '@afro90s/models';
+import { isApiError, logApiError } from '@afro90s/models';
 import { ZodError } from 'zod';
 import type {
   APIGatewayProxyEventV2,
@@ -9,7 +9,7 @@ import type {
 import { isOptionsRequest, optionsResponse } from './cors';
 import { toErrorResponse, zodErrorToDetails } from './errors';
 import { apiError, internalError } from './response';
-import { resolveRequestId } from './request-id';
+import { requestLogContext, resolveRequestId } from './request-id';
 import { requireAdminAuth } from './auth';
 
 export interface ApiContext extends Context {
@@ -48,13 +48,9 @@ export function createHandler(fn: ApiHandler) {
       }
 
       if (error instanceof ZodError) {
-        return apiError(
-          400,
-          'VALIDATION_ERROR',
-          'Dados inválidos.',
-          requestId,
-          zodErrorToDetails(error),
-        );
+        const details = { ...zodErrorToDetails(error), ...requestLogContext(event) };
+        logApiError('VALIDATION_ERROR', 'Dados inválidos.', details);
+        return apiError(400, 'VALIDATION_ERROR', 'Dados inválidos.', requestId);
       }
 
       console.error('Unhandled error', { requestId, error });

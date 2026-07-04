@@ -1,6 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ApiError } from '@afro90s/models';
-import { AdminOrderService } from './order.service';
+import {
+  AdminOrderService,
+  getAdminOrderService,
+  resetAdminOrderServiceForTests,
+} from './order.service';
 
 const list = vi.fn();
 const getById = vi.fn();
@@ -26,6 +30,7 @@ const order = {
 describe('AdminOrderService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    resetAdminOrderServiceForTests();
   });
 
   const service = () =>
@@ -61,5 +66,10 @@ describe('AdminOrderService', () => {
     await expect(service().updateOrderStatus(ORDER_ID, 'EM_ATENDIMENTO')).rejects.toMatchObject({
       code: 'NOT_FOUND',
     });
+  });
+
+  it('getAdminOrderService returns singleton', () => {
+    process.env.ORDERS_TABLE = 'test-orders';
+    expect(getAdminOrderService()).toBe(getAdminOrderService());
   });
 });

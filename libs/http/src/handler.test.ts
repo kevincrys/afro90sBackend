@@ -59,7 +59,7 @@ describe('createHandler', () => {
       code: 'VALIDATION_ERROR',
       message: 'Dados inválidos.',
     });
-    expect(body.details).toHaveProperty('name');
+    expect(body.details).toBeUndefined();
   });
 
   it('wraps successful responses with CORS', async () => {

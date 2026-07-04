@@ -24,16 +24,13 @@ describe('response helpers', () => {
     expect(result.body).toBe('');
   });
 
-  it('apiError returns structured error with requestId', () => {
-    const result = apiError(400, 'VALIDATION_ERROR', 'Campo inválido.', REQUEST_ID, {
-      email: 'required',
-    });
+  it('apiError returns structured error with requestId only', () => {
+    const result = apiError(400, 'VALIDATION_ERROR', 'Campo inválido.', REQUEST_ID);
     expect(result.statusCode).toBe(400);
     expect(JSON.parse(result.body as string)).toEqual({
       code: 'VALIDATION_ERROR',
       message: 'Campo inválido.',
       requestId: REQUEST_ID,
-      details: { email: 'required' },
     });
   });
 

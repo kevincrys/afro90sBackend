@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { DeleteObjectCommand, PutObjectCommand, type S3Client } from '@aws-sdk/client-s3';
-import { ApiError } from '@afro90s/models';
+import { raiseApiError } from '@afro90s/models';
 import { getAssetsBucket, getAssetsCdnUrl, getS3Client } from './client';
 
 /** Limite por imagem — ver api-routes.md */
@@ -93,7 +93,7 @@ function inferMimeFromFilename(filename?: string): string | undefined {
 
 function assertAllowedMimeType(mimeType: string): asserts mimeType is AllowedImageMimeType {
   if (!(ALLOWED_IMAGE_MIME_TYPES as readonly string[]).includes(mimeType)) {
-    throw new ApiError(
+    raiseApiError(
       'INVALID_IMAGE',
       'Formato de imagem não suportado.',
       { mimeType: 'Use image/jpeg, image/png ou image/webp.' },
@@ -103,7 +103,7 @@ function assertAllowedMimeType(mimeType: string): asserts mimeType is AllowedIma
 
 function assertMaxSize(size: number): void {
   if (size > MAX_PRODUCT_IMAGE_BYTES) {
-    throw new ApiError(
+    raiseApiError(
       'PAYLOAD_TOO_LARGE',
       'Imagem excede o tamanho máximo permitido.',
       { size: `Máximo ${MAX_PRODUCT_IMAGE_BYTES} bytes por imagem.` },

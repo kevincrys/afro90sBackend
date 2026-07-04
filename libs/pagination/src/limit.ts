@@ -1,4 +1,4 @@
-import { ApiError } from '@afro90s/models';
+import { raiseApiError } from '@afro90s/models';
 
 export const DEFAULT_LIMIT = 20;
 export const MAX_LIMIT = 100;
@@ -10,7 +10,10 @@ export function parseLimit(raw?: string): number {
 
   const parsed = Number(raw);
   if (!Number.isInteger(parsed) || parsed < 1 || parsed > MAX_LIMIT) {
-    throw new ApiError('INVALID_QUERY', 'Parâmetro limit inválido.');
+    raiseApiError('INVALID_QUERY', 'Parâmetro limit inválido.', {
+      param: 'limit',
+      value: raw ?? '',
+    });
   }
 
   return parsed;

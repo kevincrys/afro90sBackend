@@ -54,13 +54,25 @@ export function parseCognitoGroups(claims: JwtClaims): string[] {
 export function requireAdminAuth(event: APIGatewayProxyEventV2): string {
   const claims = extractJwtClaims(event);
   const sub = claims?.sub;
+  const path = event.rawPath;
+  const method = event.requestContext.http.method ?? '';
 
   if (typeof sub !== 'string' || !sub) {
-    throwUnauthorized('Não autorizado.');
+    throwUnauthorized('Não autorizado.', {
+      reason: claims ? 'missing_sub' : 'missing_claims',
+      path: path ?? '',
+      method,
+    });
   }
 
-  if (!parseCognitoGroups(claims).includes(ADMIN_GROUP)) {
-    throwUnauthorized('Não autorizado.');
+  const groups = parseCognitoGroups(claims);
+  if (!groups.includes(ADMIN_GROUP)) {
+    throwUnauthorized('Não autorizado.', {
+      reason: 'missing_admin_group',
+      path: path ?? '',
+      method,
+      groups: groups.join(','),
+    });
   }
 
   return sub;

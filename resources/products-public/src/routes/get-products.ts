@@ -1,5 +1,5 @@
 import type { APIGatewayProxyEventV2 } from 'aws-lambda';
-import { ApiError, CategoryEnum } from '@afro90s/models';
+import { raiseApiError, CategoryEnum } from '@afro90s/models';
 import type { ApiContext } from '@afro90s/http';
 import { ok } from '@afro90s/http';
 import { buildPaginatedResponse, parseLimit } from '@afro90s/pagination';
@@ -10,7 +10,10 @@ export async function handleGetProducts(event: APIGatewayProxyEventV2, context: 
   const limit = parseLimit(query.limit);
 
   if (query.category && !CategoryEnum.safeParse(query.category).success) {
-    throw new ApiError('INVALID_QUERY', 'Categoria inválida.');
+    raiseApiError('INVALID_QUERY', 'Categoria inválida.', {
+      param: 'category',
+      value: query.category ?? '',
+    });
   }
 
   const result = await getProductRepository().list({

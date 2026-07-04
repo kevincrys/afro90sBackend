@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import {
-  ApiError,
+  raiseApiError,
   normalizeNameLower,
   ProductSchema,
   type AdminCreateProductBody,
@@ -52,7 +52,7 @@ export class AdminProductService {
   ): Promise<Product> {
     const existing = await this.repository.getById(id);
     if (!existing) {
-      throw new ApiError('NOT_FOUND', 'Produto não encontrado.');
+      raiseApiError('NOT_FOUND', 'Produto não encontrado.', { productId: id });
     }
 
     const updateFields: UpdateProductInput = {};
@@ -86,7 +86,7 @@ export class AdminProductService {
 
     const updated = await this.repository.update(id, updateFields);
     if (!updated) {
-      throw new ApiError('NOT_FOUND', 'Produto não encontrado.');
+      raiseApiError('NOT_FOUND', 'Produto não encontrado.', { productId: id });
     }
 
     return updated;
@@ -95,7 +95,7 @@ export class AdminProductService {
   async deleteProduct(id: string): Promise<void> {
     const existing = await this.repository.getById(id);
     if (!existing) {
-      throw new ApiError('NOT_FOUND', 'Produto não encontrado.');
+      raiseApiError('NOT_FOUND', 'Produto não encontrado.', { productId: id });
     }
 
     await this.photos.deleteCdnPhotos(existing.photos);
@@ -105,7 +105,7 @@ export class AdminProductService {
   async updateStock(id: string, input: UpdateStockInput): Promise<{ id: string; quantity: number }> {
     const updated = await this.repository.updateStock(id, input.delta);
     if (!updated) {
-      throw new ApiError('NOT_FOUND', 'Produto não encontrado.');
+      raiseApiError('NOT_FOUND', 'Produto não encontrado.', { productId: id });
     }
 
     return { id: updated.id, quantity: updated.quantity };

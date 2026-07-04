@@ -32,6 +32,11 @@ describe('cursor', () => {
     expect(() => decodeCursor(cursor, { category: 'maquiagem' })).toThrow(ApiError);
   });
 
+  it('throws filter_mismatch when expected filters are empty', () => {
+    const cursor = encodeCursor(payload);
+    expect(() => decodeCursor(cursor, {})).toThrow(ApiError);
+  });
+
   it('parseExclusiveStartKey returns undefined without cursor', () => {
     expect(parseExclusiveStartKey(undefined, {})).toBeUndefined();
   });
@@ -54,6 +59,11 @@ describe('parseLimit', () => {
 
   it('rejects limit above 100', () => {
     expect(() => parseLimit('101')).toThrow(ApiError);
+  });
+
+  it('rejects non-integer limit', () => {
+    expect(() => parseLimit('abc')).toThrow(ApiError);
+    expect(() => parseLimit('0')).toThrow(ApiError);
   });
 });
 

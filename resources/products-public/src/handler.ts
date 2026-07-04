@@ -1,6 +1,6 @@
 import type { APIGatewayProxyEventV2 } from 'aws-lambda';
-import { ApiError } from '@afro90s/models';
-import { createHandler } from '@afro90s/http';
+import { raiseApiError } from '@afro90s/models';
+import { createHandler, requestLogContext } from '@afro90s/http';
 import { handleGetProductById } from './routes/get-product-by-id';
 import { handleGetProducts } from './routes/get-products';
 
@@ -32,5 +32,5 @@ export const handler = createHandler(async (event, context) => {
     return handleGetProductById(event, context);
   }
 
-  throw new ApiError('NOT_FOUND', 'Rota não encontrada.');
+  raiseApiError('NOT_FOUND', 'Rota não encontrada.', requestLogContext(event));
 });

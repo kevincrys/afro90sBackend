@@ -1,5 +1,5 @@
-import { ApiError } from '@afro90s/models';
-import { createAdminHandler } from '@afro90s/http';
+import { raiseApiError } from '@afro90s/models';
+import { createAdminHandler, requestLogContext } from '@afro90s/http';
 import {
   isAdminOrderById,
   isAdminOrderStatus,
@@ -22,5 +22,5 @@ export const handler = createAdminHandler(async (event, context) => {
     return handleGetAdminOrderById(event, context);
   }
 
-  throw new ApiError('NOT_FOUND', 'Rota não encontrada.');
+  raiseApiError('NOT_FOUND', 'Rota não encontrada.', requestLogContext(event));
 });

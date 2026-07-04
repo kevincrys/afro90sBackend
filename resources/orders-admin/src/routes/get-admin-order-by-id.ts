@@ -1,6 +1,6 @@
 import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { z } from 'zod';
-import { ApiError } from '@afro90s/models';
+import { raiseApiError } from '@afro90s/models';
 import type { AdminApiContext } from '@afro90s/http';
 import { ok } from '@afro90s/http';
 import { extractAdminOrderId } from '../lib/request';
@@ -12,9 +12,13 @@ export async function handleGetAdminOrderById(
   event: APIGatewayProxyEventV2,
   context: AdminApiContext,
 ) {
-  const parsed = orderIdSchema.safeParse(extractAdminOrderId(event));
+  const rawId = extractAdminOrderId(event);
+  const parsed = orderIdSchema.safeParse(rawId);
   if (!parsed.success) {
-    throw new ApiError('VALIDATION_ERROR', 'ID do pedido inválido.', { id: 'UUID inválido' });
+    raiseApiError('VALIDATION_ERROR', 'ID do pedido inválido.', {
+      reason: 'invalid_uuid',
+      idValue: rawId ?? 'missing',
+    });
   }
 
   const order = await getAdminOrderService().getOrder(parsed.data);

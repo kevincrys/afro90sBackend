@@ -18,7 +18,7 @@ import {
 const REQUEST_ID = 'req-test';
 
 describe('toErrorResponse', () => {
-  it('maps VALIDATION_ERROR to 400 with details', () => {
+  it('maps VALIDATION_ERROR to 400 without details in response', () => {
     const error = new ApiError('VALIDATION_ERROR', 'Dados inválidos.', { email: 'required' });
     const result = toErrorResponse(error, REQUEST_ID);
     expect(result.statusCode).toBe(400);
@@ -26,7 +26,6 @@ describe('toErrorResponse', () => {
       code: 'VALIDATION_ERROR',
       message: 'Dados inválidos.',
       requestId: REQUEST_ID,
-      details: { email: 'required' },
     });
   });
 

@@ -1,4 +1,4 @@
-import { ApiError, type Order, type OrderStatus } from '@afro90s/models';
+import { raiseApiError, type Order, type OrderStatus } from '@afro90s/models';
 import {
   getOrderRepository,
   type ListOrdersParams,
@@ -16,7 +16,7 @@ export class AdminOrderService {
   async getOrder(id: string): Promise<Order> {
     const order = await this.repository.getById(id);
     if (!order) {
-      throw new ApiError('NOT_FOUND', 'Pedido não encontrado.');
+      raiseApiError('NOT_FOUND', 'Pedido não encontrado.', { orderId: id });
     }
     return order;
   }
@@ -24,7 +24,7 @@ export class AdminOrderService {
   async updateOrderStatus(id: string, status: OrderStatus): Promise<Order> {
     const updated = await this.repository.updateStatus(id, status);
     if (!updated) {
-      throw new ApiError('NOT_FOUND', 'Pedido não encontrado.');
+      raiseApiError('NOT_FOUND', 'Pedido não encontrado.', { orderId: id });
     }
     return updated;
   }

@@ -7,7 +7,7 @@ export {
   type JwtClaims,
 } from './auth';
 export { getAllowedOrigin, isOptionsRequest, optionsResponse } from './cors';
-export { resolveRequestId } from './request-id';
+export { resolveRequestId, requestLogContext } from './request-id';
 export {
   parseOrThrow,
   throwForbidden,

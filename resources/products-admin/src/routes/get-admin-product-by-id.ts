@@ -1,6 +1,6 @@
 import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { z } from 'zod';
-import { ApiError } from '@afro90s/models';
+import { raiseApiError } from '@afro90s/models';
 import type { AdminApiContext } from '@afro90s/http';
 import { ok } from '@afro90s/http';
 import { getProductRepository, toPublicProduct } from '@afro90s/repositories';
@@ -12,14 +12,18 @@ export async function handleGetAdminProductById(
   event: APIGatewayProxyEventV2,
   context: AdminApiContext,
 ) {
-  const parsed = productIdSchema.safeParse(extractAdminProductId(event));
+  const rawId = extractAdminProductId(event);
+  const parsed = productIdSchema.safeParse(rawId);
   if (!parsed.success) {
-    throw new ApiError('VALIDATION_ERROR', 'ID do produto inválido.', { id: 'UUID inválido' });
+    raiseApiError('VALIDATION_ERROR', 'ID do produto inválido.', {
+      reason: 'invalid_uuid',
+      idValue: rawId ?? 'missing',
+    });
   }
 
   const product = await getProductRepository().getById(parsed.data);
   if (!product) {
-    throw new ApiError('NOT_FOUND', 'Produto não encontrado.');
+    raiseApiError('NOT_FOUND', 'Produto não encontrado.', { productId: parsed.data });
   }
 
   return ok(toPublicProduct(product), context.requestId);

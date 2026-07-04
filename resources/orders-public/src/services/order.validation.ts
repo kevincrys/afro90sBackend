@@ -1,4 +1,4 @@
-import { ApiError, type CreateOrderItemInput, type OrderItem, type Product } from '@afro90s/models';
+import { raiseApiError, type CreateOrderItemInput, type OrderItem, type Product } from '@afro90s/models';
 
 function itemKey(productId: string, selectedOption?: string): string {
   return `${productId}::${selectedOption ?? ''}`;
@@ -25,7 +25,7 @@ export function assertProductFound(
   productId: string,
 ): asserts product is Product {
   if (!product) {
-    throw new ApiError('NOT_FOUND', 'Produto não encontrado.', { productId });
+    raiseApiError('NOT_FOUND', 'Produto não encontrado.', { productId });
   }
 }
 
@@ -34,12 +34,12 @@ export function validateSelectedOption(product: Product, item: CreateOrderItemIn
 
   if (options.length > 0) {
     if (!item.selectedOption) {
-      throw new ApiError('INVALID_OPTION', 'Opção do produto é obrigatória.', {
+      raiseApiError('INVALID_OPTION', 'Opção do produto é obrigatória.', {
         productId: item.productId,
       });
     }
     if (!options.includes(item.selectedOption)) {
-      throw new ApiError('INVALID_OPTION', 'Opção do produto inválida.', {
+      raiseApiError('INVALID_OPTION', 'Opção do produto inválida.', {
         productId: item.productId,
         selectedOption: item.selectedOption,
       });
@@ -48,7 +48,7 @@ export function validateSelectedOption(product: Product, item: CreateOrderItemIn
   }
 
   if (item.selectedOption) {
-    throw new ApiError('INVALID_OPTION', 'Produto não possui opções.', {
+    raiseApiError('INVALID_OPTION', 'Produto não possui opções.', {
       productId: item.productId,
     });
   }
@@ -56,8 +56,10 @@ export function validateSelectedOption(product: Product, item: CreateOrderItemIn
 
 export function validateStock(product: Product, item: CreateOrderItemInput): void {
   if (product.quantity < item.quantity) {
-    throw new ApiError('INSUFFICIENT_STOCK', 'Estoque insuficiente.', {
+    raiseApiError('INSUFFICIENT_STOCK', 'Estoque insuficiente.', {
       productId: item.productId,
+      requestedQuantity: String(item.quantity),
+      availableQuantity: String(product.quantity),
     });
   }
 }

@@ -40,13 +40,11 @@ export function apiError(
   code: ApiErrorBody['code'],
   message: string,
   requestId: string,
-  details?: Record<string, string>,
 ): APIGatewayProxyStructuredResultV2 {
   const payload: ApiErrorBody = {
     code,
     message,
     requestId,
-    ...(details ? { details } : {}),
   };
 
   return {

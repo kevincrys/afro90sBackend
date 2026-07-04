@@ -87,4 +87,16 @@ describe('handleGetProductById', () => {
       statusCode: 400,
     });
   });
+
+  it('returns 400 when id is missing from path', async () => {
+    await expect(
+      handleGetProductById(
+        event({ pathParameters: undefined, rawPath: '/products' }),
+        context,
+      ),
+    ).rejects.toMatchObject({
+      code: 'VALIDATION_ERROR',
+      statusCode: 400,
+    });
+  });
 });

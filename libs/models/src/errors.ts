@@ -12,10 +12,10 @@ export type ApiErrorCode =
   | 'FORBIDDEN'
   | 'INTERNAL_ERROR';
 
+/** Corpo de erro exposto ao cliente — sem `details` (contexto extra fica só nos logs). */
 export interface ApiErrorBody {
   code: ApiErrorCode;
   message: string;
-  details?: Record<string, string>;
   requestId?: string;
 }
 
@@ -41,6 +41,7 @@ export function statusForApiErrorCode(code: ApiErrorCode): number {
 export class ApiError extends Error {
   readonly code: ApiErrorCode;
   readonly statusCode: number;
+  /** Contexto interno para logs (CloudWatch) — não enviado ao cliente. Evitar PII, tokens e body. */
   readonly details?: Record<string, string>;
 
   constructor(code: ApiErrorCode, message: string, details?: Record<string, string>) {
@@ -54,4 +55,26 @@ export class ApiError extends Error {
 
 export function isApiError(error: unknown): error is ApiError {
   return error instanceof ApiError;
+}
+
+export function logApiError(
+  code: ApiErrorCode,
+  message: string,
+  details?: Record<string, string>,
+): void {
+  console.error('ApiError', {
+    code,
+    statusCode: statusForApiErrorCode(code),
+    message,
+    ...(details ? { details } : {}),
+  });
+}
+
+export function raiseApiError(
+  code: ApiErrorCode,
+  message: string,
+  details?: Record<string, string>,
+): never {
+  logApiError(code, message, details);
+  throw new ApiError(code, message, details);
 }

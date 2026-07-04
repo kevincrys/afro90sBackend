@@ -2,6 +2,8 @@ export {
   ApiError,
   API_ERROR_STATUS,
   isApiError,
+  logApiError,
+  raiseApiError,
   statusForApiErrorCode,
   type ApiErrorBody,
   type ApiErrorCode,

@@ -1,5 +1,6 @@
 import { ZodError, z } from 'zod';
-import { ApiError } from '@afro90s/models';
+import { raiseApiError } from '@afro90s/models';
+import type { ApiError } from '@afro90s/models';
 import { apiError } from './response';
 
 export function zodErrorToDetails(error: ZodError): Record<string, string> {
@@ -16,55 +17,74 @@ export function zodErrorToDetails(error: ZodError): Record<string, string> {
 }
 
 export function toErrorResponse(error: ApiError, requestId: string) {
-  return apiError(error.statusCode, error.code, error.message, requestId, error.details);
+  return apiError(error.statusCode, error.code, error.message, requestId);
 }
 
 export function throwValidationError(
   details: Record<string, string>,
   message = 'Dados inválidos.',
 ): never {
-  throw new ApiError('VALIDATION_ERROR', message, details);
+  raiseApiError('VALIDATION_ERROR', message, details);
 }
 
-export function throwNotFound(message = 'Recurso não encontrado.'): never {
-  throw new ApiError('NOT_FOUND', message);
+export function throwNotFound(
+  message = 'Recurso não encontrado.',
+  details?: Record<string, string>,
+): never {
+  raiseApiError('NOT_FOUND', message, details);
 }
 
-export function throwUnauthorized(message = 'Não autorizado.'): never {
-  throw new ApiError('UNAUTHORIZED', message);
+export function throwUnauthorized(
+  message = 'Não autorizado.',
+  details?: Record<string, string>,
+): never {
+  raiseApiError('UNAUTHORIZED', message, details);
 }
 
-export function throwForbidden(message = 'Acesso negado.'): never {
-  throw new ApiError('FORBIDDEN', message);
+export function throwForbidden(
+  message = 'Acesso negado.',
+  details?: Record<string, string>,
+): never {
+  raiseApiError('FORBIDDEN', message, details);
 }
 
-export function throwInsufficientStock(message = 'Estoque insuficiente.'): never {
-  throw new ApiError('INSUFFICIENT_STOCK', message);
+export function throwInsufficientStock(
+  message = 'Estoque insuficiente.',
+  details?: Record<string, string>,
+): never {
+  raiseApiError('INSUFFICIENT_STOCK', message, details);
 }
 
 export function throwInvalidOption(
   details: Record<string, string>,
   message = 'Opção do produto inválida.',
 ): never {
-  throw new ApiError('INVALID_OPTION', message, details);
+  raiseApiError('INVALID_OPTION', message, details);
 }
 
-export function throwInvalidQuery(message = 'Parâmetro de consulta inválido.'): never {
-  throw new ApiError('INVALID_QUERY', message);
+export function throwInvalidQuery(
+  message = 'Parâmetro de consulta inválido.',
+  details?: Record<string, string>,
+): never {
+  raiseApiError('INVALID_QUERY', message, details);
 }
 
-export function throwInvalidCursor(message = 'Cursor inválido.'): never {
-  throw new ApiError('INVALID_CURSOR', message);
+export function throwInvalidCursor(
+  message = 'Cursor inválido.',
+  details?: Record<string, string>,
+): never {
+  raiseApiError('INVALID_CURSOR', message, details);
 }
 
 export function throwInvalidStatusTransition(
   message = 'Transição de status não permitida.',
+  details?: Record<string, string>,
 ): never {
-  throw new ApiError('INVALID_STATUS_TRANSITION', message);
+  raiseApiError('INVALID_STATUS_TRANSITION', message, details);
 }
 
 export function throwFromZod(error: ZodError, message = 'Dados inválidos.'): never {
-  throw new ApiError('VALIDATION_ERROR', message, zodErrorToDetails(error));
+  raiseApiError('VALIDATION_ERROR', message, zodErrorToDetails(error));
 }
 
 export function parseOrThrow<T extends z.ZodTypeAny>(schema: T, data: unknown): z.output<T> {

@@ -1,6 +1,6 @@
 import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { z } from 'zod';
-import { ApiError, UpdateStockSchema } from '@afro90s/models';
+import { raiseApiError, UpdateStockSchema } from '@afro90s/models';
 import type { AdminApiContext } from '@afro90s/http';
 import { ok, parseOrThrow, throwValidationError } from '@afro90s/http';
 import { extractAdminProductId } from '../lib/request';
@@ -24,9 +24,13 @@ export async function handlePatchAdminProductStock(
   event: APIGatewayProxyEventV2,
   context: AdminApiContext,
 ) {
-  const parsed = productIdSchema.safeParse(extractAdminProductId(event));
+  const rawId = extractAdminProductId(event);
+  const parsed = productIdSchema.safeParse(rawId);
   if (!parsed.success) {
-    throw new ApiError('VALIDATION_ERROR', 'ID do produto inválido.', { id: 'UUID inválido' });
+    raiseApiError('VALIDATION_ERROR', 'ID do produto inválido.', {
+      reason: 'invalid_uuid',
+      idValue: rawId ?? 'missing',
+    });
   }
 
   const input = parseOrThrow(UpdateStockSchema, parseJsonBody(event));

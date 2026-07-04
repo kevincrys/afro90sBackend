@@ -51,6 +51,17 @@ describe('parseCognitoGroups', () => {
     ]);
   });
 
+  it('parses JSON array string groups', () => {
+    expect(parseCognitoGroups({ 'cognito:groups': '["admins","editors"]' })).toEqual([
+      'admins',
+      'editors',
+    ]);
+  });
+
+  it('coerces non-string groups claim to string array', () => {
+    expect(parseCognitoGroups({ 'cognito:groups': 42 })).toEqual(['42']);
+  });
+
   it('returns empty when groups claim is missing', () => {
     expect(parseCognitoGroups({})).toEqual([]);
   });

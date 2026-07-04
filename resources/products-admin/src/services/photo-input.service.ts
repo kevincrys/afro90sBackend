@@ -1,4 +1,4 @@
-import { ApiError, type PhotoInput } from '@afro90s/models';
+import { raiseApiError, type PhotoInput } from '@afro90s/models';
 import { createImageService, getAssetsCdnUrl, MAX_PRODUCT_IMAGE_BYTES, type ImageService } from '@afro90s/storage';
 import type { MultipartFile } from '../lib/multipart';
 
@@ -31,10 +31,14 @@ export class PhotoInputService {
     }
 
     if (totalBytes > MAX_TOTAL_IMAGE_BYTES) {
-      throw new ApiError(
+      raiseApiError(
         'PAYLOAD_TOO_LARGE',
         'Total de imagens excede o limite permitido.',
-        { size: `Máximo ${MAX_TOTAL_IMAGE_BYTES} bytes por requisição.` },
+        {
+          productId,
+          totalBytes: String(totalBytes),
+          maxBytes: String(MAX_TOTAL_IMAGE_BYTES),
+        },
       );
     }
 
@@ -57,15 +61,16 @@ export class PhotoInputService {
       case 'url':
         return { url: photo.value, bytes: 0 };
       case 'base64': {
-        const decoded = decodeBase64Photo(photo);
+        const decoded = decodeBase64Photo(productId, photo);
         const url = await this.images.uploadProductImage(productId, decoded);
         return { url, bytes: decoded.buffer.length };
       }
       case 'stream': {
         const file = files[photo.fieldName];
         if (!file) {
-          throw new ApiError('VALIDATION_ERROR', 'Arquivo de imagem ausente.', {
-            [photo.fieldName]: 'Campo multipart não encontrado.',
+          raiseApiError('VALIDATION_ERROR', 'Arquivo de imagem ausente.', {
+            productId,
+            fieldName: photo.fieldName,
           });
         }
         const url = await this.images.uploadProductImage(productId, {
@@ -83,7 +88,10 @@ export class PhotoInputService {
   }
 }
 
-function decodeBase64Photo(photo: Extract<PhotoInput, { type: 'base64' }>): {
+function decodeBase64Photo(
+  productId: string,
+  photo: Extract<PhotoInput, { type: 'base64' }>,
+): {
   buffer: Buffer;
   mimeType: string;
   filename?: string;
@@ -101,18 +109,22 @@ function decodeBase64Photo(photo: Extract<PhotoInput, { type: 'base64' }>): {
   try {
     buffer = Buffer.from(payload, 'base64');
   } catch {
-    throw new ApiError('INVALID_IMAGE', 'Imagem base64 inválida.');
+    raiseApiError('INVALID_IMAGE', 'Imagem base64 inválida.', { productId });
   }
 
   if (buffer.length === 0) {
-    throw new ApiError('INVALID_IMAGE', 'Imagem base64 vazia.');
+    raiseApiError('INVALID_IMAGE', 'Imagem base64 vazia.', { productId });
   }
 
   if (buffer.length > MAX_PRODUCT_IMAGE_BYTES) {
-    throw new ApiError(
+    raiseApiError(
       'PAYLOAD_TOO_LARGE',
       'Imagem excede o tamanho máximo permitido.',
-      { size: `Máximo ${MAX_PRODUCT_IMAGE_BYTES} bytes por imagem.` },
+      {
+        productId,
+        bytes: String(buffer.length),
+        maxBytes: String(MAX_PRODUCT_IMAGE_BYTES),
+      },
     );
   }
 

@@ -185,6 +185,39 @@ describe('orders-admin handler', () => {
     expect(result.statusCode).toBe(400);
   });
 
+  it('returns 400 when PATCH status has no body', async () => {
+    const result = await handler(
+      adminEvent({
+        rawPath: `/admin/orders/${ORDER_ID}/status`,
+        pathParameters: { id: ORDER_ID },
+        requestContext: {
+          http: { method: 'PATCH' },
+          authorizer: { jwt: { claims: { sub: 'admin-uuid', 'cognito:groups': 'admins' } } },
+        },
+        headers: { authorization: 'Bearer t', 'content-type': 'application/json' },
+      }),
+      {} as Context,
+    );
+    expect(result.statusCode).toBe(400);
+  });
+
+  it('returns 400 when PATCH status body is invalid JSON', async () => {
+    const result = await handler(
+      adminEvent({
+        rawPath: `/admin/orders/${ORDER_ID}/status`,
+        pathParameters: { id: ORDER_ID },
+        requestContext: {
+          http: { method: 'PATCH' },
+          authorizer: { jwt: { claims: { sub: 'admin-uuid', 'cognito:groups': 'admins' } } },
+        },
+        headers: { authorization: 'Bearer t', 'content-type': 'application/json' },
+        body: '{',
+      }),
+      {} as Context,
+    );
+    expect(result.statusCode).toBe(400);
+  });
+
   it('returns 404 for unknown routes', async () => {
     const result = await handler(
       adminEvent({

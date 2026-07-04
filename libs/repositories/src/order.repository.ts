@@ -8,7 +8,7 @@ import {
 } from '@aws-sdk/lib-dynamodb';
 import { getDocClient, getOrdersTableName } from '@afro90s/dynamodb';
 import {
-  ApiError,
+  raiseApiError,
   OrderSchema,
   isValidOrderStatusTransition,
   type Order,
@@ -130,7 +130,11 @@ export class OrderRepository {
     }
 
     if (!isValidOrderStatusTransition(current.status, nextStatus)) {
-      throw new ApiError('INVALID_STATUS_TRANSITION', 'Transição de status não permitida.');
+      raiseApiError('INVALID_STATUS_TRANSITION', 'Transição de status não permitida.', {
+        orderId: id,
+        fromStatus: current.status,
+        toStatus: nextStatus,
+      });
     }
 
     const now = new Date().toISOString();
@@ -171,7 +175,11 @@ export class OrderRepository {
   ): Record<string, string> {
     const decoded = decodeCursor(cursor, filters);
     if (decoded.index !== expectedIndex) {
-      throw new ApiError('INVALID_CURSOR', 'Cursor inválido.');
+      raiseApiError('INVALID_CURSOR', 'Cursor inválido.', {
+        reason: 'index_mismatch',
+        expectedIndex,
+        actualIndex: decoded.index,
+      });
     }
     return decoded.key;
   }

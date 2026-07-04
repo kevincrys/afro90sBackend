@@ -1,5 +1,5 @@
 import type { APIGatewayProxyEventV2 } from 'aws-lambda';
-import { ApiError, OrderStatusEnum, type OrderStatus } from '@afro90s/models';
+import { raiseApiError, OrderStatusEnum, type OrderStatus } from '@afro90s/models';
 import type { AdminApiContext } from '@afro90s/http';
 import { ok } from '@afro90s/http';
 import { buildPaginatedResponse, parseLimit } from '@afro90s/pagination';
@@ -16,7 +16,10 @@ export async function handleGetAdminOrders(
   if (query.status) {
     const parsed = OrderStatusEnum.safeParse(query.status);
     if (!parsed.success) {
-      throw new ApiError('INVALID_QUERY', 'Status inválido.');
+      raiseApiError('INVALID_QUERY', 'Status inválido.', {
+        param: 'status',
+        value: query.status ?? '',
+      });
     }
     status = parsed.data;
   }

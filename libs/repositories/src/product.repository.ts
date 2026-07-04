@@ -8,7 +8,7 @@ import {
 } from '@aws-sdk/lib-dynamodb';
 import { getDocClient, getProductsTableName } from '@afro90s/dynamodb';
 import {
-  ApiError,
+  raiseApiError,
   ProductSchema,
   normalizeNameLower,
   type Product,
@@ -165,7 +165,10 @@ export class ProductRepository {
       return ProductSchema.parse(result.Attributes);
     } catch (error) {
       if (error instanceof Error && error.name === 'ConditionalCheckFailedException') {
-        throw new ApiError('INSUFFICIENT_STOCK', 'Estoque insuficiente.');
+        raiseApiError('INSUFFICIENT_STOCK', 'Estoque insuficiente.', {
+          productId: id,
+          delta: String(delta),
+        });
       }
       throw error;
     }
@@ -178,7 +181,11 @@ export class ProductRepository {
   ): Record<string, string> {
     const decoded = decodeCursor(cursor, filters);
     if (decoded.index !== expectedIndex) {
-      throw new ApiError('INVALID_CURSOR', 'Cursor inválido.');
+      raiseApiError('INVALID_CURSOR', 'Cursor inválido.', {
+        reason: 'index_mismatch',
+        expectedIndex,
+        actualIndex: decoded.index,
+      });
     }
     return decoded.key;
   }

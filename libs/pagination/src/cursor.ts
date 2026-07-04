@@ -1,4 +1,4 @@
-import { ApiError } from '@afro90s/models';
+import { raiseApiError } from '@afro90s/models';
 import {
   CURSOR_VERSION,
   CursorPayloadSchema,
@@ -36,16 +36,19 @@ export function decodeCursor(cursor: string, expectedFilters: CursorFilters): Cu
     const json = Buffer.from(cursor, 'base64url').toString('utf8');
     parsed = JSON.parse(json);
   } catch {
-    throw new ApiError('INVALID_CURSOR', 'Cursor inválido.');
+    raiseApiError('INVALID_CURSOR', 'Cursor inválido.', { reason: 'malformed' });
   }
 
   const result = CursorPayloadSchema.safeParse(parsed);
   if (!result.success) {
-    throw new ApiError('INVALID_CURSOR', 'Cursor inválido.');
+    raiseApiError('INVALID_CURSOR', 'Cursor inválido.', { reason: 'invalid_schema' });
   }
 
   if (!filtersMatch(result.data.filters, expectedFilters)) {
-    throw new ApiError('INVALID_CURSOR', 'Cursor incompatível com os filtros atuais.');
+    raiseApiError('INVALID_CURSOR', 'Cursor incompatível com os filtros atuais.', {
+      reason: 'filter_mismatch',
+      filterKeys: Object.keys(normalizeCursorFilters(expectedFilters)).join(',') || 'none',
+    });
   }
 
   return result.data;

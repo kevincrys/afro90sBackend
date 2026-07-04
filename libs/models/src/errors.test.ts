@@ -12,7 +12,7 @@ describe('ApiError', () => {
     expect(statusForApiErrorCode('INTERNAL_ERROR')).toBe(500);
   });
 
-  it('carries code, status and details', () => {
+  it('carries code, status and internal log details', () => {
     const error = new ApiError('VALIDATION_ERROR', 'Dados inválidos.', { name: 'required' });
     expect(error.code).toBe('VALIDATION_ERROR');
     expect(error.statusCode).toBe(400);
