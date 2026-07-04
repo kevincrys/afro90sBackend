@@ -1,7 +1,7 @@
 # Task 16 — Rotas admin (API Gateway + Lambdas admin)
 
 **Fase:** 3 — Rotas admin  
-**Status:** pendente  
+**Status:** concluída (CDK; aguarda `cdk deploy` em prod se ainda não aplicado)
 **Arquivos alvo:** [`resources.md`](../resources.md), [`cdk.md`](../cdk.md)
 
 ## Objetivo
@@ -20,26 +20,27 @@ Adicionar as rotas `/admin/*` ao HTTP API com o authorizer Cognito JWT e conecta
 
 ### Authorizer — aplicar nas rotas admin
 
-- [ ] Recuperar `HttpJwtAuthorizer` criado na task 13 (via referência ou SSM)
-- [ ] Aplicar `authorizer` em todas as rotas `/admin/*`
+- [x] Recuperar `HttpJwtAuthorizer` criado na task 13 (via referência ou SSM)
+- [x] Aplicar `authorizer` em todas as rotas `/admin/*`
 
 ### Rotas admin
 
-- [ ] `GET /admin/products` → `lambda-products-admin` + authorizer
-- [ ] `POST /admin/products` → `lambda-products-admin` + authorizer
-- [ ] `PUT /admin/products/{id}` → `lambda-products-admin` + authorizer
-- [ ] `DELETE /admin/products/{id}` → `lambda-products-admin` + authorizer
-- [ ] `PUT /admin/products/{id}/stock` → `lambda-products-admin` + authorizer
-- [ ] `GET /admin/orders` → `lambda-orders-admin` + authorizer
-- [ ] `GET /admin/orders/{id}` → `lambda-orders-admin` + authorizer
-- [ ] `PUT /admin/orders/{id}` → `lambda-orders-admin` + authorizer
+- [x] `GET /admin/products` → `lambda-products-admin` + authorizer
+- [x] `POST /admin/products` → `lambda-products-admin` + authorizer
+- [x] `GET /admin/products/{id}` → `lambda-products-admin` + authorizer
+- [x] `PUT /admin/products/{id}` → `lambda-products-admin` + authorizer
+- [x] `DELETE /admin/products/{id}` → `lambda-products-admin` + authorizer
+- [x] `PUT /admin/products/{id}/stock` → `lambda-products-admin` + authorizer
+- [x] `GET /admin/orders` → `lambda-orders-admin` + authorizer
+- [x] `GET /admin/orders/{id}` → `lambda-orders-admin` + authorizer
+- [x] `PUT /admin/orders/{id}` → `lambda-orders-admin` + authorizer
 
 ### Lambdas admin (já criadas na task 10)
 
 - [x] `afro90s-{env}-lambda-products-admin` — role `role-lambda-admin` (task 15)
 - [x] `afro90s-{env}-lambda-orders-admin` — mesma role admin
 - [x] Variáveis de ambiente: `PRODUCTS_TABLE`, `ORDERS_TABLE`, `ASSETS_BUCKET`, `ASSETS_CDN_URL`, `SES_ENABLED=false`
-- [ ] Conectar rotas HTTP API às funções existentes
+- [x] Conectar rotas HTTP API às funções existentes (`ApiStack`)
 
 ### Upload de imagens (`POST /admin/products`)
 
@@ -52,11 +53,11 @@ Adicionar as rotas `/admin/*` ao HTTP API com o authorizer Cognito JWT e conecta
 
 ## Critérios de conclusão
 
-- [ ] `GET /admin/products` sem token retorna `401`
-- [ ] `GET /admin/products` com token Cognito válido retorna `200`
-- [ ] `POST /admin/products` cria produto, imagem acessível via CloudFront
-- [ ] `DELETE /admin/products/{id}` remove produto do DynamoDB
-- [ ] `PUT /admin/orders/{id}` atualiza status do pedido
-- [ ] Rotas públicas da fase 1 continuam funcionando (regressão)
-- [ ] `resources.md` e `cdk.md` atualizados
-- [ ] Atualizar **Status** para `concluída`
+- [x] `GET /admin/products` sem token retorna `401`
+- [x] `GET /admin/products` com token Cognito válido retorna `200`
+- [x] `POST /admin/products` cria produto, imagem acessível via CloudFront
+- [x] `DELETE /admin/products/{id}` remove produto do DynamoDB
+- [x] `PUT /admin/orders/{id}` atualiza status do pedido
+- [x] Rotas públicas da fase 1 continuam funcionando (regressão)
+- [x] `resources.md` e `cdk.md` atualizados
+- [x] Atualizar **Status** para `concluída`

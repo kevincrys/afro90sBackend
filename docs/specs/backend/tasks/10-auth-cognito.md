@@ -24,6 +24,7 @@ Implementar middleware de autenticação para rotas `/admin/*`. O authorizer JWT
 ### `libs/http/src/auth.ts`
 
 - [x] Extrair claims do `event.requestContext.authorizer.jwt.claims`
+- [x] `parseCognitoGroups`: suporta array, JSON string, lista separada por vírgula e notação `"[admins]"` do HTTP API authorizer
 - [x] Verificar presença de `cognito:groups` contendo `admins`
 - [x] Sem grupo `admins` → `401 UNAUTHORIZED`
 - [x] Exportar `adminUserId` (claim `sub`) via `createAdminHandler`

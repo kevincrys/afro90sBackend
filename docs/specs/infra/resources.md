@@ -129,7 +129,7 @@ Tags obrigatórias em todo recurso (via `TaggingAspect` em `bin/app.ts`): `proje
 |----------|-------|------------|
 | `lambda-products-public` | `GET /products`, `GET /products/{id}` | DynamoDB products read |
 | `lambda-orders-public` | `POST /orders` | DynamoDB orders write, products read, SES send |
-| `lambda-products-admin` | `/admin/products*` | DynamoDB products CRUD, S3 assets write |
+| `lambda-products-admin` | `GET/POST /admin/products`, `GET/PUT/DELETE /admin/products/{id}`, `PUT /admin/products/{id}/stock` | DynamoDB products CRUD, S3 assets write |
 | `lambda-orders-admin` | `GET /admin/orders`, `GET /admin/orders/{id}`, `PUT /admin/orders/{id}` | DynamoDB orders read/update |
 
 Runtime: **Node.js 20.x**. Bundling: **esbuild no afro90sBackend**; CDK cria função com placeholder ([ADR-007](../../foundation/adr/007-backend-lambda-s3-deploy.md)).
@@ -216,6 +216,17 @@ Billing: **on-demand** (`PAY_PER_REQUEST`) — alinhado ao [ADR-004](../../found
 | CloudWatch Logs | via CDK ao criar Lambda | *(task 10)* |
 
 Construct: `lib/constructs/lambda-products-public-role.ts`, `lambda-orders-public-role.ts`, `lambda-admin-role.ts` · Stack: `ApiStack`
+
+### Role `afro90s-{env}-role-lambda-admin` (task 15)
+
+| Permissão | Actions | Resource |
+|-----------|---------|----------|
+| DynamoDB products (CRUD) | `GetItem`, `PutItem`, `UpdateItem`, `DeleteItem`, `Query`, `Scan` | tabela + `index/*` |
+| DynamoDB orders (read/update) | `GetItem`, `Query`, `Scan`, `UpdateItem` | tabela + `index/*` |
+| S3 assets | `PutObject`, `DeleteObject` | `s3-assets/products/*` |
+| SSM | `GetParameter` | `/afro90s/{env}/*` |
+| CloudWatch Logs | via CDK ao criar Lambda | — |
+| SES | — | *(task 18)* |
 
 ## Referências
 

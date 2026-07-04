@@ -1,7 +1,7 @@
 # Backend — Overview
 
 **Status:** Aprovado  
-**Última atualização:** 2025-06-23
+**Última atualização:** 2026-07-04
 
 ## Objetivo
 
@@ -21,36 +21,25 @@ Guia de implementação do backend Afro90s no repositório **afro90sBackend**.
 | Bundling | esbuild (`npm run bundle`) |
 | Deploy | S3 artifact + `update-function-code` ([ADR-007](docs/foundation/adr/007-backend-lambda-s3-deploy.md)) |
 
-## Estrutura sugerida do repositório
+## Estrutura do repositório (monorepo Lerna)
+
+Ver [ADR-008](../../foundation/adr/008-backend-monorepo-lerna.md).
 
 ```
 afro90sBackend/
-├── src/
-│   ├── handlers/
-│   │   ├── products-public.ts
-│   │   ├── orders-public.ts
-│   │   ├── products-admin.ts
-│   │   └── orders-admin.ts
-│   ├── services/
-│   │   ├── product-service.ts
-│   │   ├── order-service.ts
-│   │   ├── image-service.ts      # base64, stream → S3
-│   │   └── email-service.ts
-│   ├── repositories/
-│   │   ├── product-repository.ts
-│   │   └── order-repository.ts
-│   ├── models/
-│   │   ├── product.ts
-│   │   ├── order.ts
-│   │   └── photo-input.ts
-│   └── lib/
-│       ├── response.ts           # helpers HTTP
-│       ├── errors.ts
-│       ├── pagination.ts
-│       └── multipart.ts
-├── tests/
+├── libs/
+│   ├── http/           # createHandler, createAdminHandler, auth, respostas HTTP
+│   ├── models/         # Zod schemas (@afro90s/models)
+│   ├── repositories/   # DynamoDB (@afro90s/repositories)
+│   └── storage/        # S3 / imagens (@afro90s/storage)
+├── resources/
+│   ├── products-public/
+│   ├── orders-public/
+│   ├── products-admin/
+│   └── orders-admin/   # uma Lambda por fluxo; handler + routes + services
+├── scripts/            # smoke tests, bundle, deploy
 ├── package.json
-└── tsconfig.json
+└── lerna.json
 ```
 
 ## Contrato da API

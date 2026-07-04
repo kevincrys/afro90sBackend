@@ -53,7 +53,7 @@ Requer token Cognito em `Authorization: Bearer <access_token>`.
 | Criar produto | `POST` | `/admin/products` |
 | Editar produto | `PUT` | `/admin/products/{id}` |
 | Excluir produto | `DELETE` | `/admin/products/{id}` |
-| Ajustar estoque | `PATCH` | `/admin/products/{id}/stock` |
+| Ajustar estoque | `PUT` | `/admin/products/{id}/stock` |
 | Listar pedidos | `GET` | `/admin/orders` |
 | Detalhe pedido | `GET` | `/admin/orders/{id}` |
 | Atualizar status | `PUT` | `/admin/orders/{id}` |

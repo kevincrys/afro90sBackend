@@ -18,8 +18,15 @@ Implementar repositórios DynamoDB para `products` e `orders` com queries nos GS
 ### `libs/repositories/`
 
 - [x] `ProductRepository` — get, list (Scan tabela / gsi-createdAt), create, update, delete, updateStock
-- [x] `OrderRepository` — create, get, list (gsi-status-createdAt), updateStatus + TTL terminal
+- [x] `OrderRepository` — create, get, list (gsi-status-createdAt ou Scan), updateStatus + TTL terminal
 - [x] Testes unitários com mock do client
+
+#### `updateStock` (products)
+
+- `UpdateExpression`: `quantity = quantity + :delta`
+- `delta < 0`: `ConditionExpression` inclui `quantity >= :minQuantity` (`:minQuantity = -delta`)
+- `delta > 0`: condição apenas `attribute_exists(id)`
+- Falha de condição → `409 INSUFFICIENT_STOCK` (via `@afro90s/models`)
 
 ## Critérios de conclusão
 

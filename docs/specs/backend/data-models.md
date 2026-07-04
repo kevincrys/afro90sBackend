@@ -207,6 +207,7 @@ Implementação: classe `ApiError` e tipo `ApiErrorCode` em `@afro90s/models`; h
 | Schema | Uso |
 |--------|-----|
 | `ProductSchema` / `CreateProductSchema` / `UpdateProductSchema` | Persistência e CRUD admin |
+| `UpdateStockSchema` (`{ delta: number }`, `delta !== 0`) | `PUT /admin/products/{id}/stock` |
 | `OrderSchema` / `CreateOrderSchema` | Pedido persistido e `POST /orders` |
 | `CustomerSchema` | Cliente no pedido |
 | `isValidOrderStatusTransition(from, to)` | `PUT /admin/orders/{id}` |

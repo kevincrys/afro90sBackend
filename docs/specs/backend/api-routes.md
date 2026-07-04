@@ -1,7 +1,7 @@
 # API Routes — Catálogo completo
 
 **Status:** Aprovado  
-**Última atualização:** 2025-06-23
+**Última atualização:** 2026-07-04
 
 > Documento editável — fonte da verdade para métodos, headers, payloads e respostas de cada rota.
 
@@ -69,7 +69,7 @@ Pacote compartilhado em `libs/http`, consumido por cada Lambda em `resources/{fl
 | `Content-Type` | `application/json; charset=utf-8` (omitido em `204`) |
 | `X-Request-Id` | ID da requisição (se enviado ou gerado) |
 | `Access-Control-Allow-Origin` | Origem permitida (via `baseHeaders`) |
-| `Access-Control-Allow-Methods` | `GET,POST,PUT,PATCH,DELETE,OPTIONS` |
+| `Access-Control-Allow-Methods` | `GET,POST,PUT,DELETE,OPTIONS` |
 | `Access-Control-Allow-Headers` | `Content-Type, Authorization` |
 
 ### Paginação (cursor opaco)
@@ -485,6 +485,8 @@ Token válido mas sem grupo `admins`: respondido pela **Lambda** (middleware tas
 }
 ```
 
+> **HTTP API JWT authorizer:** o claim `cognito:groups` pode chegar como string `"[admins]"` (notação entre colchetes, não JSON válido). O middleware em `libs/http/src/auth.ts` (`parseCognitoGroups`) normaliza array, JSON ou `"[grupo1, grupo2]"` antes de verificar o grupo `admins`.
+
 ---
 
 ### `GET /admin/products`
@@ -760,13 +762,19 @@ Sem body.
 
 ### `PUT /admin/products/{id}/stock`
 
-Ajusta estoque por delta (positivo aumenta, negativo reduz).
+Ajusta estoque por **delta** (positivo aumenta, negativo reduz). Rota dedicada — distinta do `PUT /admin/products/{id}` que atualiza campos do produto.
 
 | | |
 |---|---|
 | **Método** | `PUT` |
 | **Path** | `/admin/products/{id}/stock` |
 | **Auth** | Cognito JWT |
+
+#### Path parameters
+
+| Param | Tipo | Descrição |
+|-------|------|-----------|
+| `id` | string (UUID) | ID do produto |
 
 #### Request headers
 
@@ -800,9 +808,11 @@ Ajusta estoque por delta (positivo aumenta, negativo reduz).
 | Status | `code` | Quando |
 |--------|--------|--------|
 | `404` | `NOT_FOUND` | Produto não existe |
-| `409` | `INSUFFICIENT_STOCK` | Resultado < 0 |
-| `400` | `VALIDATION_ERROR` | `delta` = 0 ou ausente |
+| `409` | `INSUFFICIENT_STOCK` | Estoque resultante seria negativo (`delta` negativo sem saldo) |
+| `400` | `VALIDATION_ERROR` | `delta` = 0, body ausente ou ID inválido |
 | `401` | | Auth |
+
+**Implementação DynamoDB:** `UpdateExpression` usa `SET quantity = quantity + :delta`. Para `delta < 0`, `ConditionExpression` exige `quantity >= :minQuantity` com `:minQuantity = -delta` (DynamoDB não permite aritmética em condições).
 
 ---
 
