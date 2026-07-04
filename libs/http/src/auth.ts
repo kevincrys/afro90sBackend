@@ -41,7 +41,17 @@ export function parseCognitoGroups(claims: JwtClaims): string[] {
         return parsed.map(String);
       }
     } catch {
-      // fall through to split
+      // HTTP API JWT authorizer may pass "[admins]" (not valid JSON).
+      if (trimmed.endsWith(']')) {
+        const inner = trimmed.slice(1, -1).trim();
+        if (!inner) {
+          return [];
+        }
+        return inner
+          .split(',')
+          .map((group) => group.trim())
+          .filter(Boolean);
+      }
     }
   }
 

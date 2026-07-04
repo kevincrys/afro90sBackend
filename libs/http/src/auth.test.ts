@@ -58,6 +58,14 @@ describe('parseCognitoGroups', () => {
     ]);
   });
 
+  it('parses HTTP API bracket notation (non-JSON)', () => {
+    expect(parseCognitoGroups({ 'cognito:groups': '[admins]' })).toEqual(['admins']);
+    expect(parseCognitoGroups({ 'cognito:groups': '[admins, editors]' })).toEqual([
+      'admins',
+      'editors',
+    ]);
+  });
+
   it('coerces non-string groups claim to string array', () => {
     expect(parseCognitoGroups({ 'cognito:groups': 42 })).toEqual(['42']);
   });
@@ -71,6 +79,13 @@ describe('requireAdminAuth', () => {
   it('returns sub when user is in admins group', () => {
     const sub = requireAdminAuth(
       eventWithClaims({ sub: 'admin-uuid', 'cognito:groups': ADMIN_GROUP }),
+    );
+    expect(sub).toBe('admin-uuid');
+  });
+
+  it('returns sub when groups arrive as HTTP API bracket notation', () => {
+    const sub = requireAdminAuth(
+      eventWithClaims({ sub: 'admin-uuid', 'cognito:groups': '[admins]' }),
     );
     expect(sub).toBe('admin-uuid');
   });
