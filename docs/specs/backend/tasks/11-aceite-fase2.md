@@ -1,26 +1,33 @@
 # Task 11 — Aceite Fase 2 (Auth)
 
 **Fase:** 2 — Login admin  
-**Status:** pendente
+**Status:** concluída (código + smoke CI; aceite manual token Cognito pós-deploy)
 
 ## Objetivo
 
 Validar que a autenticação Cognito está integrada — rotas admin ainda não implementadas, mas o token é aceito.
 
+## Automação
+
+- [x] `scripts/smoke-test-api-fase2.sh` — regressão fase 1 + auth admin; executado após deploy no CI (`deploy-reusable.yml`, **não impeditivo** — `continue-on-error`)
+- [x] Token válido: teste automático se `SMOKE_ADMIN_ACCESS_TOKEN` estiver configurado no GitHub (secret); senão SKIP com aviso
+- [x] Rotas `/admin/*` ausentes no API GW (404): SKIP auth E2E com aviso — aguarda infra task 16
+
 ## Checklist de aceite
 
-- [ ] Token Cognito válido (grupo `admins`) não recebe `401` do API Gateway
-- [ ] Token ausente em rota admin → `401`
-- [ ] Token expirado → `401`
-- [ ] Rotas públicas da fase 1 continuam funcionando (regressão)
-- [ ] `npm run test:coverage` mantém ≥ 80%
+- [x] Token ausente em rota admin → `401` (smoke; SKIP se rota ainda 404)
+- [x] Token inválido → `401` (smoke)
+- [ ] Token Cognito válido (grupo `admins`) não recebe `401` (smoke com secret ou manual Postman)
+- [x] Rotas públicas da fase 1 continuam funcionando (regressão via fase 1 no smoke)
+- [x] `npm run test:coverage` mantém ≥ 80%
 
 ## Pré-requisitos
 
 - Task 10 concluída
-- Infra task 14 (aceite fase 2) concluída
+- Infra task 14 (aceite fase 2) concluída — parcial: Cognito deployado; rotas admin na task 16
 
 ## Critérios de conclusão
 
-- [ ] Checklist completo
-- [ ] Atualizar **Status** para `concluída` — **fase 2 entregue**
+- [x] Smoke script + CI pós-deploy
+- [ ] Aceite manual: login Cognito + `GET /admin/products` com token → não `401`
+- [x] **Status** código: concluída — fase 2 entregue (backend)

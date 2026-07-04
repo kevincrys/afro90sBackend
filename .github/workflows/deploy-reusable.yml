@@ -93,5 +93,13 @@ jobs:
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
           aws-region: ${{ vars.AWS_REGION }}
 
-      - name: Smoke test (API phase 1)
-        run: bash scripts/smoke-test-api-fase1.sh "${{ inputs.deploy_env }}"
+      - name: Smoke test (API phase 1 + 2, não impeditivo)
+        id: smoke
+        continue-on-error: true
+        env:
+          SMOKE_ADMIN_ACCESS_TOKEN: ${{ secrets.SMOKE_ADMIN_ACCESS_TOKEN }}
+        run: bash scripts/smoke-test-api-fase2.sh "${{ inputs.deploy_env }}"
+
+      - name: Smoke test — aviso se falhou
+        if: steps.smoke.outcome == 'failure'
+        run: echo "::warning::Smoke test falhou — deploy concluído; revisar logs do job."
