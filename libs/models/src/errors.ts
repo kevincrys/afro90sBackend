@@ -1,3 +1,5 @@
+import { getLogger } from '@afro90s/logger';
+
 export type ApiErrorCode =
   | 'VALIDATION_ERROR'
   | 'INVALID_OPTION'
@@ -62,11 +64,11 @@ export function logApiError(
   message: string,
   details?: Record<string, string>,
 ): void {
-  console.error('ApiError', {
+  getLogger().error('ApiError', {
     code,
     statusCode: statusForApiErrorCode(code),
     message,
-    ...(details ? { details } : {}),
+    ...details,
   });
 }
 

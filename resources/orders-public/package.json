@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@afro90s/http": "*",
+    "@afro90s/logger": "*",
     "@afro90s/models": "*",
     "@afro90s/repositories": "*"
   }

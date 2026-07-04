@@ -11,6 +11,7 @@
     "build": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
+    "@afro90s/logger": "*",
     "zod": "^3.25.76"
   }
 }

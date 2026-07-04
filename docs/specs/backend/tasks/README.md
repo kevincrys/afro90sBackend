@@ -72,6 +72,16 @@ Organizado em **4 fases** alinhadas com [`infra/tasks/`](../../infra/tasks/READM
 
 ---
 
+## Transversal — Observabilidade
+
+> **Ordem recomendada antes da Fase 4:** task 19 → 16 → 17 → 18.
+
+| # | Arquivo | O que entrega |
+|---|---------|---------------|
+| 19 | [19-logging-observabilidade.md](19-logging-observabilidade.md) | `@afro90s/logger`, `LOG_LEVEL`, `sessionId` |
+
+---
+
 ## Fase 4 — Email
 
 > **Entregável:** `POST /orders` passa a enviar e-mail SES. Cobertura de testes ≥ 80%.
@@ -94,7 +104,8 @@ Organizado em **4 fases** alinhadas com [`infra/tasks/`](../../infra/tasks/READM
 | 1 | tasks 05–12 | tasks 06–09 | tasks 05–10 |
 | 2 | tasks 13–14 | tasks 10–11 | tasks 11–12 |
 | 3 | tasks 15–17 | tasks 12–15 | tasks 13–15 |
-| 4 | tasks 18–20 | tasks 16–18 | tasks 16–17 |
+| Obs. | — | task 19 | — |
+| 4 | tasks 18–20 | tasks 16–18 (após 19) | tasks 16–17 |
 
 ## Referências
 

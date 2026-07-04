@@ -49,6 +49,7 @@ Implementar envio de e-mail via SES no `POST /orders`. Ativa quando `SES_ENABLED
 
 ## Pré-requisitos
 
+- Task 19 (logging) concluída
 - Fase 3 entregue
 - Infra task 18 (SES) deployada com identidade verificada
 

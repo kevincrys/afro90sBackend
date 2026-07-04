@@ -1,5 +1,6 @@
 import middy from '@middy/core';
 import { isApiError, logApiError } from '@afro90s/models';
+import { getLogger, runWithSession } from '@afro90s/logger';
 import { ZodError } from 'zod';
 import type {
   APIGatewayProxyEventV2,
@@ -40,22 +41,29 @@ export function createHandler(fn: ApiHandler) {
 
     const apiContext = Object.assign(context, { requestId }) as ApiContext;
 
-    try {
-      return await fn(event, apiContext);
-    } catch (error) {
-      if (isApiError(error)) {
-        return toErrorResponse(error, requestId);
-      }
+    return runWithSession(requestId, async () => {
+      try {
+        return await fn(event, apiContext);
+      } catch (error) {
+        if (isApiError(error)) {
+          return toErrorResponse(error, requestId);
+        }
 
-      if (error instanceof ZodError) {
-        const details = { ...zodErrorToDetails(error), ...requestLogContext(event) };
-        logApiError('VALIDATION_ERROR', 'Dados inválidos.', details);
-        return apiError(400, 'VALIDATION_ERROR', 'Dados inválidos.', requestId);
-      }
+        if (error instanceof ZodError) {
+          const details = { ...zodErrorToDetails(error), ...requestLogContext(event) };
+          logApiError('VALIDATION_ERROR', 'Dados inválidos.', details);
+          return apiError(400, 'VALIDATION_ERROR', 'Dados inválidos.', requestId);
+        }
 
-      console.error('Unhandled error', { requestId, error });
-      return internalError(requestId);
-    }
+        const err = error instanceof Error ? error : new Error(String(error));
+        getLogger().error('Unhandled error', {
+          requestId,
+          errorName: err.name,
+          errorMessage: err.message,
+        });
+        return internalError(requestId);
+      }
+    });
   });
 }
 
