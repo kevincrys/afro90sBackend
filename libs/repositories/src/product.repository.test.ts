@@ -109,4 +109,20 @@ describe('ProductRepository', () => {
     send.mockRejectedValueOnce(error);
     await expect(repository.updateStock(PRODUCT_ID, -10)).rejects.toThrow(ApiError);
   });
+
+  it('updateStock requires sufficient quantity when delta is negative', async () => {
+    send.mockResolvedValueOnce({ Attributes: { ...productItem, quantity: 2 } });
+    await repository.updateStock(PRODUCT_ID, -3);
+    const input = send.mock.calls[0][0].input;
+    expect(input.ConditionExpression).toBe('attribute_exists(id) AND quantity >= :minQuantity');
+    expect(input.ExpressionAttributeValues).toMatchObject({ ':minQuantity': 3, ':delta': -3 });
+  });
+
+  it('updateStock only checks existence when delta is positive', async () => {
+    send.mockResolvedValueOnce({ Attributes: { ...productItem, quantity: 8 } });
+    await repository.updateStock(PRODUCT_ID, 3);
+    const input = send.mock.calls[0][0].input;
+    expect(input.ConditionExpression).toBe('attribute_exists(id)');
+    expect(input.ExpressionAttributeValues).not.toHaveProperty(':minQuantity');
+  });
 });

@@ -142,18 +142,25 @@ export class ProductRepository {
   }
 
   async updateStock(id: string, delta: number): Promise<Product | null> {
+    const expressionAttributeValues: Record<string, unknown> = {
+      ':delta': delta,
+      ':updatedAt': new Date().toISOString(),
+    };
+
+    let conditionExpression = 'attribute_exists(id)';
+    if (delta < 0) {
+      expressionAttributeValues[':minQuantity'] = -delta;
+      conditionExpression += ' AND quantity >= :minQuantity';
+    }
+
     try {
       const result = await this.client.send(
         new UpdateCommand({
           TableName: this.tableName,
           Key: { id },
           UpdateExpression: 'SET quantity = quantity + :delta, updatedAt = :updatedAt',
-          ExpressionAttributeValues: {
-            ':delta': delta,
-            ':updatedAt': new Date().toISOString(),
-            ':zero': 0,
-          },
-          ConditionExpression: 'attribute_exists(id) AND quantity + :delta >= :zero',
+          ExpressionAttributeValues: expressionAttributeValues,
+          ConditionExpression: conditionExpression,
           ReturnValues: 'ALL_NEW',
         }),
       );
