@@ -1,16 +1,41 @@
-import { createAdminHandler, ok } from '@afro90s/http';
+import { ApiError } from '@afro90s/models';
+import { createAdminHandler } from '@afro90s/http';
+import {
+  isAdminProductById,
+  isAdminProductStock,
+  isAdminProductsCollection,
+} from './lib/request';
+import { handleDeleteAdminProduct } from './routes/delete-admin-product';
+import { handleGetAdminProductById } from './routes/get-admin-product-by-id';
+import { handleGetAdminProducts } from './routes/get-admin-products';
+import { handlePatchAdminProductStock } from './routes/patch-admin-product-stock';
+import { handlePostAdminProducts } from './routes/post-admin-products';
+import { handlePutAdminProduct } from './routes/put-admin-product';
 
-const FLOW = 'products-admin';
+export const handler = createAdminHandler(async (event, context) => {
+  if (isAdminProductsCollection(event)) {
+    if (event.requestContext.http.method === 'GET') {
+      return handleGetAdminProducts(event, context);
+    }
+    return handlePostAdminProducts(event, context);
+  }
 
-export const handler = createAdminHandler(async (event, { requestId, adminUserId }) => {
-  return ok(
-    {
-      ok: true,
-      flow: FLOW,
-      path: event.rawPath,
-      adminUserId,
-      message: 'afro90s API placeholder',
-    },
-    requestId,
-  );
+  if (isAdminProductStock(event)) {
+    return handlePatchAdminProductStock(event, context);
+  }
+
+  if (isAdminProductById(event)) {
+    switch (event.requestContext.http.method) {
+      case 'GET':
+        return handleGetAdminProductById(event, context);
+      case 'PUT':
+        return handlePutAdminProduct(event, context);
+      case 'DELETE':
+        return handleDeleteAdminProduct(event, context);
+      default:
+        break;
+    }
+  }
+
+  throw new ApiError('NOT_FOUND', 'Rota não encontrada.');
 });

@@ -1,8 +1,7 @@
 # Task 13 — Rotas admin de produtos
 
 **Fase:** 3 — Rotas admin  
-**Status:** pendente  
-**Arquivos alvo:** [`api-routes.md`](../api-routes.md)
+**Status:** concluída (código; aguarda revisão + deploy infra task 16)
 
 ## Objetivo
 
@@ -10,39 +9,44 @@ Implementar CRUD completo de produtos nas rotas `/admin/products*`.
 
 ## O que implementar
 
-### `src/routes/admin/products.ts`
+### `resources/products-admin/src/routes/*`
 
-- [ ] `GET /admin/products` — listagem com `name?`, `category?`, `cursor`, `limit`
-- [ ] `POST /admin/products` — criar produto + upload de imagens multipart
-- [ ] `GET /admin/products/{id}` — detalhe
-- [ ] `PUT /admin/products/{id}` — atualizar campos
-- [ ] `DELETE /admin/products/{id}` — remover produto e imagens do S3
-- [ ] `PUT /admin/products/{id}/stock` — atualizar apenas `quantity`
+- [x] `GET /admin/products` — listagem com `name?`, `category?`, `cursor`, `limit`
+- [x] `POST /admin/products` — criar produto + imagens (`PhotoInput`: url, base64, stream/multipart)
+- [x] `GET /admin/products/{id}` — detalhe
+- [x] `PUT /admin/products/{id}` — atualizar campos
+- [x] `DELETE /admin/products/{id}` — remover produto e imagens CDN do S3
+- [x] `PATCH /admin/products/{id}/stock` — ajuste por `delta` ([api-routes.md](../api-routes.md))
 
 Todas com middleware auth (task 10).
 
-### `src/services/product.service.ts` (expandir)
+### Serviços
 
-- [ ] `createProduct(input, images?)` — gera `id`, `nameLower`, timestamps, upload S3; persiste `description`, `options`
-- [ ] `updateProduct(id, fields)` — inclui `description` e `options` (admin only)
-- [ ] `deleteProduct(id)` — remove do DynamoDB + imagens S3
-- [ ] `updateStock(id, quantity)`
+- [x] `services/product.service.ts` — create, update, delete, updateStock
+- [x] `services/photo-input.service.ts` — resolve `PhotoInput[]` → URLs via `@afro90s/storage`
+- [x] `lib/parse-product-body.ts` — JSON + `multipart/form-data` (`@fastify/busboy`)
+
+### Modelos (`@afro90s/models`)
+
+- [x] `PhotoInput` (url | base64 | stream)
+- [x] `AdminCreateProductBodySchema`, `AdminUpdateProductBodySchema`, `UpdateStockSchema`
 
 ### Testes por rota
 
-- [ ] CRUD completo com token mock
-- [ ] Sem token → `401`
-- [ ] Produto inexistente → `404`
-- [ ] Validação de body → `400`
+- [x] CRUD com token mock
+- [x] Sem token → `401`
+- [x] Produto inexistente → `404`
+- [x] Validação de body → `400`
+- [x] Multipart + base64 cobertos em testes de serviço/lib
 
 ## Pré-requisitos
 
 - Tasks 10, 12 concluídas
-- Infra fase 3 (rotas admin) deployada
+- Infra fase 3 (rotas admin) deployada — task 16
 
 ## Critérios de conclusão
 
-- [ ] Todas as 6 rotas admin de produtos funcionais em dev
-- [ ] Upload de imagem retorna URL acessível via CloudFront
-- [ ] Cobertura de testes ≥ 80% nas rotas admin
-- [ ] Atualizar **Status** para `concluída`
+- [ ] Todas as 6 rotas admin de produtos funcionais em dev (pós-deploy infra)
+- [ ] Upload de imagem retorna URL acessível via CloudFront (E2E manual)
+- [x] Cobertura de testes ≥ 80%
+- [x] **Status** código: concluída — aguarda revisão

@@ -90,7 +90,10 @@ export class ProductRepository {
   }
 
   async update(id: string, fields: UpdateProductInput): Promise<Product | null> {
-    const entries = Object.entries(fields).filter(([, value]) => value !== undefined);
+    const entries = Object.entries({
+      ...fields,
+      updatedAt: new Date().toISOString(),
+    }).filter(([, value]) => value !== undefined);
     if (entries.length === 0) {
       return this.getById(id);
     }

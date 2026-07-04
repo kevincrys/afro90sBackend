@@ -14,11 +14,28 @@ export {
   ProductOptionsSchema,
   ProductSchema,
   UpdateProductSchema,
+  AdminCreateProductBodySchema,
+  AdminUpdateProductBodySchema,
+  UpdateStockSchema,
+  type AdminCreateProductBody,
+  type AdminUpdateProductBody,
   type Category,
   type CreateProductInput,
   type Product,
   type UpdateProductInput,
+  type UpdateStockInput,
 } from './product';
+export {
+  MAX_PHOTOS_PER_PRODUCT,
+  PhotoInputBase64Schema,
+  PhotoInputSchema,
+  PhotoInputStreamSchema,
+  PhotoInputUrlSchema,
+  type PhotoInput,
+  type PhotoInputBase64,
+  type PhotoInputStream,
+  type PhotoInputUrl,
+} from './photo-input';
 export {
   CreateOrderItemSchema,
   CreateOrderSchema,

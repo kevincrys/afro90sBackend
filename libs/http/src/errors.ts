@@ -67,7 +67,7 @@ export function throwFromZod(error: ZodError, message = 'Dados inválidos.'): ne
   throw new ApiError('VALIDATION_ERROR', message, zodErrorToDetails(error));
 }
 
-export function parseOrThrow<T>(schema: z.ZodType<T>, data: unknown): T {
+export function parseOrThrow<T extends z.ZodTypeAny>(schema: T, data: unknown): z.output<T> {
   try {
     return schema.parse(data);
   } catch (error) {

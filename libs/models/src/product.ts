@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { ProductOptionSchema, refineUniqueOptions } from './options';
+import { MAX_PHOTOS_PER_PRODUCT, PhotoInputSchema } from './photo-input';
 
 export const CategoryEnum = z.enum(['oculos', 'acessorios', 'maquiagem']);
 export type Category = z.infer<typeof CategoryEnum>;
@@ -46,3 +47,36 @@ export const UpdateProductSchema = CreateProductBaseSchema.partial().superRefine
   refineUniqueOptions(data.options, ctx),
 );
 export type UpdateProductInput = z.infer<typeof UpdateProductSchema>;
+
+const adminProductBodyFields = {
+  name: z.string().min(2).max(120),
+  description: descriptionSchema.default(''),
+  price: z.number().positive().multipleOf(0.01),
+  quantity: quantitySchema,
+  category: CategoryEnum,
+  options: ProductOptionsSchema.optional(),
+  photos: z.array(PhotoInputSchema).max(MAX_PHOTOS_PER_PRODUCT).default([]),
+};
+
+export const AdminCreateProductBodySchema = z
+  .object(adminProductBodyFields)
+  .superRefine((data, ctx) => refineUniqueOptions(data.options, ctx));
+export type AdminCreateProductBody = z.output<typeof AdminCreateProductBodySchema>;
+
+export const AdminUpdateProductBodySchema = z
+  .object({
+    name: adminProductBodyFields.name.optional(),
+    description: descriptionSchema.optional(),
+    price: adminProductBodyFields.price.optional(),
+    quantity: adminProductBodyFields.quantity.optional(),
+    category: adminProductBodyFields.category.optional(),
+    options: adminProductBodyFields.options,
+    photos: adminProductBodyFields.photos.optional(),
+  })
+  .superRefine((data, ctx) => refineUniqueOptions(data.options, ctx));
+export type AdminUpdateProductBody = z.output<typeof AdminUpdateProductBodySchema>;
+
+export const UpdateStockSchema = z.object({
+  delta: z.number().int().refine((value) => value !== 0, 'delta não pode ser zero.'),
+});
+export type UpdateStockInput = z.infer<typeof UpdateStockSchema>;

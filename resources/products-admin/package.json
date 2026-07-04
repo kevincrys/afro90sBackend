@@ -8,6 +8,11 @@
     "bundle": "node ../../scripts/bundle.mjs products-admin"
   },
   "dependencies": {
-    "@afro90s/http": "*"
+    "@afro90s/http": "*",
+    "@afro90s/models": "*",
+    "@afro90s/pagination": "*",
+    "@afro90s/repositories": "*",
+    "@afro90s/storage": "*",
+    "@fastify/busboy": "^3.2.0"
   }
 }
