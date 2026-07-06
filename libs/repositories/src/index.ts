@@ -1,4 +1,5 @@
 export { toPublicProduct, type PublicProduct } from './product.mapper';
+export { toPublicOrder, type PublicOrder } from './order.mapper';
 export {
   ProductRepository,
   getProductRepository,

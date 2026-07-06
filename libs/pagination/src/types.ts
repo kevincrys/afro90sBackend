@@ -13,6 +13,7 @@ export const CursorFiltersSchema = z.object({
   name: z.string().optional(),
   category: z.string().optional(),
   status: z.string().optional(),
+  q: z.string().optional(),
 });
 export type CursorFilters = z.infer<typeof CursorFiltersSchema>;
 

@@ -66,6 +66,7 @@ Organizado em **4 fases** alinhadas com [`infra/tasks/`](../../infra/tasks/READM
 | 12 | [12-upload-imagens.md](12-upload-imagens.md) | Serviço upload S3 multipart |
 | 13 | [13-rotas-admin-products.md](13-rotas-admin-products.md) | 6 rotas `/admin/products*` |
 | 14 | [14-rotas-admin-orders.md](14-rotas-admin-orders.md) | 3 rotas `/admin/orders*` |
+| 20 | [20-busca-admin-pedidos.md](20-busca-admin-pedidos.md) | Busca admin por ID/nome (`q`, `customerNameLower`) |
 | 15 | [15-aceite-fase3.md](15-aceite-fase3.md) | Checklist aceite fase 3 |
 
 **✓ Resultado:** admin gerencia produtos e pedidos via API.

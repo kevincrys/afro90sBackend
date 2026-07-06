@@ -83,6 +83,17 @@ describe('createOrder', () => {
     expect(create.mock.calls[0][0].fullPrice).toBe(269.7);
   });
 
+  it('persists customerNameLower on create', async () => {
+    getById.mockResolvedValueOnce({ ...baseProduct });
+
+    await createOrder({
+      customer,
+      items: [{ productId: PRODUCT_ID, quantity: 1 }],
+    });
+
+    expect(create.mock.calls[0][0].customerNameLower).toBe('maria silva');
+  });
+
   it('throws NOT_FOUND when product is missing', async () => {
     getById.mockResolvedValueOnce(null);
 

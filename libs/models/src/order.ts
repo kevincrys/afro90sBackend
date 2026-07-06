@@ -60,6 +60,7 @@ export const OrderSchema = z.object({
   items: z.array(OrderItemSchema).min(1).max(99),
   fullPrice: z.number().positive().multipleOf(0.01),
   customer: CustomerSchema,
+  customerNameLower: z.string().optional(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
   expiresAt: z.number().int().positive().optional(),

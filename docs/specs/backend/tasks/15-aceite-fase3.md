@@ -27,6 +27,8 @@ Validar CRUD de produtos, upload de imagens e gestão de pedidos com autenticaç
 
 - [x] `POST /orders` (público) cria pedido (smoke E2E)
 - [x] `GET /admin/orders` lista o pedido (smoke E2E)
+- [x] `GET /admin/orders?q=` busca por ID ou prefixo de nome (task 20)
+- [x] `POST /orders` grava `customerNameLower` (task 20)
 - [x] `PUT /admin/orders/{id}` atualiza status (smoke E2E)
 
 ### Auth e regressão

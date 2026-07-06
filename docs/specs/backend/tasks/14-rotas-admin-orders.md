@@ -52,3 +52,5 @@ Todas com middleware auth.
 - [x] 3 rotas admin de pedidos funcionais em dev
 - [x] Transições de status validadas
 - [x] Atualizar **Status** para `concluída`
+
+> **Extensão (task 20):** busca admin via `GET /admin/orders?q=` — ver [20-busca-admin-pedidos.md](20-busca-admin-pedidos.md).

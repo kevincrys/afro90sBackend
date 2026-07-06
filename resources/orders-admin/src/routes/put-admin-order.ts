@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { raiseApiError, UpdateOrderStatusSchema } from '@afro90s/models';
 import type { AdminApiContext } from '@afro90s/http';
 import { ok, parseOrThrow, throwValidationError } from '@afro90s/http';
+import { toPublicOrder } from '@afro90s/repositories';
 import { extractAdminOrderId } from '../lib/request';
 import { getAdminOrderService } from '../services/order.service';
 
@@ -35,5 +36,5 @@ export async function handlePutAdminOrder(
 
   const input = parseOrThrow(UpdateOrderStatusSchema, parseJsonBody(event));
   const order = await getAdminOrderService().updateOrderStatus(parsed.data, input.status);
-  return ok(order, context.requestId);
+  return ok(toPublicOrder(order), context.requestId);
 }

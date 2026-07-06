@@ -54,11 +54,39 @@ Requer token Cognito em `Authorization: Bearer <access_token>`.
 | Editar produto | `PUT` | `/admin/products/{id}` |
 | Excluir produto | `DELETE` | `/admin/products/{id}` |
 | Ajustar estoque | `PUT` | `/admin/products/{id}/stock` |
-| Listar pedidos | `GET` | `/admin/orders` |
+| Listar pedidos | `GET` | `/admin/orders` — query opcional `q` (busca por ID ou prefixo do nome do cliente) |
 | Detalhe pedido | `GET` | `/admin/orders/{id}` |
 | Atualizar status | `PUT` | `/admin/orders/{id}` |
 
 Detalhes de payload: [api-routes.md](../backend/api-routes.md).
+
+### Busca de pedidos (admin)
+
+Task 20 — barra de busca na tab Pedidos (`AdminOrdersTab`).
+
+| Camada | Arquivo | Responsabilidade |
+|--------|---------|------------------|
+| UI | `src/components/admin/AdminOrdersTab.tsx` | Input + debounce; passa `{ status, q }` ao hook |
+| Hook | `src/hooks/useAdminOrders.ts` | `useInfiniteQuery` com key `['admin', 'orders', filters]` |
+| Client | `src/api/admin/orders.ts` | `getAdminOrders({ status, q, limit, cursor })` |
+| API | `GET /admin/orders` | Filtra por `q` (ID ou prefixo de nome) + `status` opcional |
+
+**Regras de chamada:**
+
+- Sem busca: `GET /admin/orders?limit=20` (+ `status` se tab ≠ TODOS)
+- Com busca (≥ 2 chars): incluir `q` — ex.: `GET /admin/orders?limit=20&q=maria`
+- Paginação: repetir `status` e `q` + `cursor=nextCursor` da página anterior
+- Mínimo 2 caracteres em `q` (frontend não envia antes; backend retorna `400 INVALID_QUERY` se violado)
+
+```typescript
+// useAdminOrders → getAdminOrders (trecho)
+getAdminOrders({
+  status: filters.status,
+  q: filters.q,
+  limit: 20,
+  cursor: pageParam,
+});
+```
 
 ## Upload de imagens (admin)
 

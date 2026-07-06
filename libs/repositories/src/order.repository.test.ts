@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { ScanCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
+import { GetCommand, ScanCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
 import { OrderRepository } from './order.repository';
 import { ApiError } from '@afro90s/models';
 
@@ -12,11 +12,12 @@ const orderItem = {
   items: [{ productId: '550e8400-e29b-41d4-a716-446655440001', quantity: 1, unitPrice: 10 }],
   fullPrice: 10,
   customer: {
-    name: 'Maria',
+    name: 'Maria Silva',
     address: 'Rua A',
     postalCode: '01310100',
     tel: '11999999999',
   },
+  customerNameLower: 'maria silva',
   createdAt: '2025-01-01T00:00:00.000Z',
   updatedAt: '2025-01-01T00:00:00.000Z',
 };
@@ -87,5 +88,42 @@ describe('OrderRepository', () => {
     await expect(
       repository.list({ status: 'SOLICITADO', cursor, limit: 20 }),
     ).rejects.toThrow(ApiError);
+  });
+
+  it('list by full UUID uses GetItem', async () => {
+    send.mockResolvedValueOnce({ Item: orderItem });
+    const result = await repository.list({ q: ORDER_ID, limit: 20 });
+    expect(send.mock.calls[0][0]).toBeInstanceOf(GetCommand);
+    expect(result.items).toHaveLength(1);
+    expect(result.filters).toEqual({ q: ORDER_ID });
+  });
+
+  it('list by full UUID returns empty when status mismatches', async () => {
+    send.mockResolvedValueOnce({ Item: orderItem });
+    const result = await repository.list({ q: ORDER_ID, status: 'ENVIADO', limit: 20 });
+    expect(result.items).toHaveLength(0);
+  });
+
+  it('list by id prefix scans with begins_with on id', async () => {
+    send.mockResolvedValueOnce({ Items: [orderItem] });
+    await repository.list({ q: '550e8400', limit: 20 });
+    const command = send.mock.calls[0][0] as ScanCommand;
+    expect(command.input.FilterExpression).toBe('begins_with(#id, :q)');
+  });
+
+  it('list by customer name scans with begins_with on customerNameLower', async () => {
+    send.mockResolvedValueOnce({ Items: [orderItem] });
+    await repository.list({ q: 'maria', limit: 20 });
+    const command = send.mock.calls[0][0] as ScanCommand;
+    expect(command.input.FilterExpression).toBe('begins_with(#customerNameLower, :prefix)');
+    expect(command.input.ExpressionAttributeValues?.[':prefix']).toBe('maria');
+  });
+
+  it('list by customer name with status queries gsi with filter', async () => {
+    send.mockResolvedValueOnce({ Items: [orderItem] });
+    await repository.list({ q: 'maria', status: 'SOLICITADO', limit: 20 });
+    const command = send.mock.calls[0][0] as QueryCommand;
+    expect(command.input.IndexName).toBe('gsi-status-createdAt');
+    expect(command.input.FilterExpression).toBe('begins_with(#customerNameLower, :prefix)');
   });
 });

@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { raiseApiError } from '@afro90s/models';
 import type { AdminApiContext } from '@afro90s/http';
 import { ok } from '@afro90s/http';
+import { toPublicOrder } from '@afro90s/repositories';
 import { extractAdminOrderId } from '../lib/request';
 import { getAdminOrderService } from '../services/order.service';
 
@@ -22,5 +23,5 @@ export async function handleGetAdminOrderById(
   }
 
   const order = await getAdminOrderService().getOrder(parsed.data);
-  return ok(order, context.requestId);
+  return ok(toPublicOrder(order), context.requestId);
 }

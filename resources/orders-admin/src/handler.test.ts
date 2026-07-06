@@ -168,6 +168,25 @@ describe('orders-admin handler', () => {
     expect(result.statusCode).toBe(400);
   });
 
+  it('routes GET /admin/orders with q filter', async () => {
+    listOrders.mockResolvedValueOnce({ items: [order], index: 'primary', filters: { q: 'maria' } });
+    const result = await handler(
+      adminEvent({ queryStringParameters: { q: 'maria' } }),
+      {} as Context,
+    );
+    expect(result.statusCode).toBe(200);
+    expect(listOrders).toHaveBeenCalledWith(expect.objectContaining({ q: 'maria' }));
+    expect(JSON.parse(result.body as string).items[0]).not.toHaveProperty('customerNameLower');
+  });
+
+  it('returns 400 when q is too short', async () => {
+    const result = await handler(
+      adminEvent({ queryStringParameters: { q: 'a' } }),
+      {} as Context,
+    );
+    expect(result.statusCode).toBe(400);
+  });
+
   it('returns 400 for invalid PUT status body', async () => {
     const result = await handler(
       adminEvent({

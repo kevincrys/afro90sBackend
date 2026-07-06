@@ -833,6 +833,14 @@ Lista pedidos com filtros.
 | `limit` | integer | Não | `20` | Max 100 |
 | `cursor` | string | Não | — | Paginação |
 | `status` | OrderStatus | Não | — | Filtrar por status |
+| `q` | string | Não | — | Busca por **ID** (UUID completo ou prefixo ≥ 8 chars hex/hífen) ou **prefixo do nome do cliente** (case-insensitive, sem acentos). Mín. 2 caracteres. Ordenação default: `createdAt` desc |
+
+Ao paginar com busca, repetir `q` (e `status`, se usado) junto com `cursor`:
+
+```http
+GET /admin/orders?q=maria&limit=20
+GET /admin/orders?q=maria&limit=20&cursor=eyJ...
+```
 
 #### Response `200 OK`
 
@@ -865,8 +873,10 @@ Lista pedidos com filtros.
 
 | Status | `code` | Quando |
 |--------|--------|--------|
-| `400` | `INVALID_QUERY` | `status` inválido |
+| `400` | `INVALID_QUERY` | `status` inválido ou `q` com menos de 2 caracteres |
 | `401` | | Auth |
+
+> Campo interno `customerNameLower` é persistido no DynamoDB mas **não** retornado na resposta.
 
 ---
 

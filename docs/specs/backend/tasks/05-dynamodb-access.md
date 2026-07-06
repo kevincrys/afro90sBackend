@@ -19,6 +19,7 @@ Implementar repositórios DynamoDB para `products` e `orders` com queries nos GS
 
 - [x] `ProductRepository` — get, list (Scan tabela / gsi-createdAt), create, update, delete, updateStock
 - [x] `OrderRepository` — create, get, list (gsi-status-createdAt ou Scan), updateStatus + TTL terminal
+- [x] Busca admin (task 20): `list` com `q` — `Scan`/`Query` + `begins_with(customerNameLower, :prefix)` ou `begins_with(id, :q)`; campo `customerNameLower` gravado no `POST /orders`
 - [x] Testes unitários com mock do client
 
 #### `updateStock` (products)

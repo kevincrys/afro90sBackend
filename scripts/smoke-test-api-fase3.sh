@@ -115,6 +115,30 @@ if ! echo "${ORDERS}" | grep -q "${ORDER_ID}"; then
 fi
 echo "OK"
 
+echo -n "GET /admin/orders?q= (busca por nome)... "
+SEARCH_NAME=$(curl -s "${AUTH[@]}" "$(api_url "/admin/orders?q=smoke")")
+if ! echo "${SEARCH_NAME}" | grep -q "${ORDER_ID}"; then
+  echo "FAILED (pedido não encontrado por nome)" && exit 1
+fi
+if echo "${SEARCH_NAME}" | grep -q "customerNameLower"; then
+  echo "FAILED (customerNameLower exposto na resposta)" && exit 1
+fi
+echo "OK"
+
+echo -n "GET /admin/orders?q= (busca por ID)... "
+SEARCH_ID=$(curl -s "${AUTH[@]}" "$(api_url "/admin/orders?q=${ORDER_ID}")")
+if ! echo "${SEARCH_ID}" | grep -q "${ORDER_ID}"; then
+  echo "FAILED (pedido não encontrado por ID)" && exit 1
+fi
+echo "OK"
+
+echo -n "GET /admin/orders?q=a (query curta)... "
+SHORT_Q_HTTP=$(curl -s -o /dev/null -w "%{http_code}" "${AUTH[@]}" "$(api_url "/admin/orders?q=a")")
+if [ "${SHORT_Q_HTTP}" != "400" ]; then
+  echo "FAILED (HTTP ${SHORT_Q_HTTP}, esperado 400)" && exit 1
+fi
+echo "OK"
+
 echo -n "PUT /admin/orders/{id}... "
 STATUS_HTTP=$(curl -s -o /dev/null -w "%{http_code}" -X PUT "$(api_url "/admin/orders/${ORDER_ID}")" \
   "${AUTH[@]}" \

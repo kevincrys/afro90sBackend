@@ -143,12 +143,20 @@ interface Order {
   items: OrderItem[];
   fullPrice: number;
   customer: Customer;
+  customerNameLower?: string;  // interno (filtro de busca admin); não exposto em GET
   createdAt: string;
   updatedAt: string;
   /** Epoch segundos (TTL DynamoDB). Preenchido ao atingir status terminal. */
   expiresAt?: number;
 }
 ```
+
+### Regras — `Order`
+
+| Campo | Regra |
+|-------|-------|
+| `customerNameLower` | Gerado no servidor ao criar pedido: `normalizeNameLower(customer.name)` — lowercase + remoção de acentos (`NFD`). Optional no schema para pedidos legados sem o campo |
+| Leitura admin | `GET /admin/orders*` retorna `Order` **sem** `customerNameLower` (mapper `toPublicOrder`) |
 
 ### Valores monetários (`price`, `unitPrice`, `fullPrice`)
 
