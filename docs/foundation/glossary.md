@@ -9,6 +9,7 @@ Termos usados neste repositório e no ecossistema Afro90s.
 | **afro90sBackend** | Repositório da API (Lambda handlers, deploy S3). |
 | **afro90sFrontend** | Repositório da SPA React. |
 | **Product** | Item do catálogo: nome, descrição, preço, estoque, fotos, categoria, opções (variações). |
+| **productName** | Snapshot do nome do produto em `OrderItem`; gravado no `POST /orders` a partir de `Product.name`. |
 | **selectedOption** | Variação escolhida por item no pedido (ex.: cor); snapshot em `OrderItem`. |
 | **Order** | Pedido de compra criado pelo cliente no checkout. |
 | **OrderStatus** | Estado do pedido: `SOLICITADO`, `EM_ATENDIMENTO`, `AGUARDANDO_PAGAMENTO`, `EM_PREPARACAO`, `ENVIADO`, `CONCLUIDO`, `CANCELADO`. |

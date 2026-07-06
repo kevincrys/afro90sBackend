@@ -93,6 +93,7 @@ describe('buildOrderItem', () => {
       ),
     ).toEqual({
       productId: PRODUCT_ID,
+      productName: 'Óculos',
       quantity: 2,
       unitPrice: 89.9,
       selectedOption: 'Preto',

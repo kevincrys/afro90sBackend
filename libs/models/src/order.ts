@@ -33,6 +33,7 @@ export function isTerminalOrderStatus(status: OrderStatus): boolean {
 
 export const OrderItemSchema = z.object({
   productId: z.string().uuid(),
+  productName: z.string().min(2).max(120),
   quantity: z.number().int().min(1).max(99),
   unitPrice: z.number().positive().multipleOf(0.01),
   selectedOption: z.string().trim().min(1).max(40).optional(),

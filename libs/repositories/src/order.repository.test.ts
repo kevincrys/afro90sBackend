@@ -9,7 +9,7 @@ const ORDER_ID = '550e8400-e29b-41d4-a716-446655440000';
 const orderItem = {
   id: ORDER_ID,
   status: 'SOLICITADO',
-  items: [{ productId: '550e8400-e29b-41d4-a716-446655440001', quantity: 1, unitPrice: 10 }],
+  items: [{ productId: '550e8400-e29b-41d4-a716-446655440001', productName: 'Produto teste', quantity: 1, unitPrice: 10 }],
   fullPrice: 10,
   customer: {
     name: 'Maria Silva',

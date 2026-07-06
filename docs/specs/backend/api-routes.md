@@ -851,7 +851,7 @@ GET /admin/orders?q=maria&limit=20&cursor=eyJ...
       "id": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
       "status": "SOLICITADO",
       "items": [
-        { "productId": "550e8400-e29b-41d4-a716-446655440000", "quantity": 1, "unitPrice": 89.9, "selectedOption": "Preto" }
+        { "productId": "550e8400-e29b-41d4-a716-446655440000", "productName": "Óculos Vintage", "quantity": 1, "unitPrice": 89.9, "selectedOption": "Preto" }
       ],
       "fullPrice": 89.9,
       "customer": {

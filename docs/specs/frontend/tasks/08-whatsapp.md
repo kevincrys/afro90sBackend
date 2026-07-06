@@ -53,3 +53,5 @@ export function openWhatsAppOrder(order: { id: string; customerName: string; ful
 - [ ] Fallback funciona com popup bloqueado
 - [ ] `integration.md` fluxo documentado
 - [ ] Atualizar **Status** para `concluída`
+
+> **Extensão (task 21):** listar nomes dos produtos na mensagem WhatsApp — ver [21-nome-produto-no-pedido.md](21-nome-produto-no-pedido.md).

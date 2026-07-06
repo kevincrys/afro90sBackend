@@ -72,6 +72,7 @@ export function validateOrderItem(product: Product, item: CreateOrderItemInput):
 export function buildOrderItem(product: Product, item: CreateOrderItemInput): OrderItem {
   return {
     productId: item.productId,
+    productName: product.name,
     quantity: item.quantity,
     unitPrice: product.price,
     ...(item.selectedOption ? { selectedOption: item.selectedOption } : {}),

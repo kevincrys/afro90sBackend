@@ -58,3 +58,5 @@ const STATUS_LABELS = {
 - [ ] Mudança de status funciona com transições válidas
 - [ ] Drawer exibe dados completos do pedido
 - [ ] Atualizar **Status** para `concluída`
+
+> **Extensão (task 21):** exibir nome do produto nos itens do pedido — ver [21-nome-produto-no-pedido.md](21-nome-produto-no-pedido.md).

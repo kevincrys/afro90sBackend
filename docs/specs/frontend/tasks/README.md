@@ -66,6 +66,7 @@ Organizado em **4 fases** alinhadas com [`infra/tasks/`](../../infra/tasks/READM
 |---|---------|---------------|
 | 13 | [13-admin-produtos.md](13-admin-produtos.md) | Cards + modal CRUD + upload multipart |
 | 14 | [14-admin-pedidos.md](14-admin-pedidos.md) | Tabs status + drawer detalhe |
+| 21 | [21-nome-produto-no-pedido.md](21-nome-produto-no-pedido.md) | Nome do produto na admin + WhatsApp |
 | 15 | [15-aceite-fase3.md](15-aceite-fase3.md) | Checklist aceite fase 3 |
 
 **✓ Resultado:** admin gerencia produtos e pedidos.

@@ -14,6 +14,7 @@ Implementar criação de pedido. Na fase 1 grava no DynamoDB **sem enviar e-mail
 |---------|-------|
 | `fullPrice` | Calculado no servidor (soma em centavos inteiros; ver `data-models.md`) |
 | `unitPrice` | Snapshot de `Product.price` |
+| `productName` | Snapshot de `Product.name` — ver [task 21](21-nome-produto-no-pedido.md) |
 | Itens duplicados | Merge por `(productId, selectedOption)` |
 | `selectedOption` | Obrigatório se produto tem `options`; validar ∈ `product.options` |
 | Estoque `quantity=0` | `409 INSUFFICIENT_STOCK` |

@@ -6,7 +6,7 @@ describe('toPublicOrder', () => {
     const order = {
       id: '550e8400-e29b-41d4-a716-446655440000',
       status: 'SOLICITADO' as const,
-      items: [{ productId: '550e8400-e29b-41d4-a716-446655440001', quantity: 1, unitPrice: 10 }],
+      items: [{ productId: '550e8400-e29b-41d4-a716-446655440001', productName: 'Produto teste', quantity: 1, unitPrice: 10 }],
       fullPrice: 10,
       customer: {
         name: 'Maria',

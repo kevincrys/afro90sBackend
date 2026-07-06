@@ -138,18 +138,33 @@ await fetch(`${baseUrl}/admin/products`, {
 Após pedido criado com sucesso ([ADR-006](../../foundation/adr/006-whatsapp-integration.md)):
 
 ```typescript
+function formatWhatsAppItems(items: OrderItem[]): string {
+  if (!items?.length) return '';
+  return items
+    .map((item) => {
+      const name = item.productName ?? 'Produto';
+      const option = item.selectedOption ? ` (${item.selectedOption})` : '';
+      return `- ${name}${option} x${item.quantity}`;
+    })
+    .join('\n');
+}
+
 function openWhatsAppOrder(order: Order) {
   const phone = import.meta.env.VITE_WHATSAPP_NUMBER;
+  const itemsBlock = formatWhatsAppItems(order.items);
   const text = encodeURIComponent(
     `Olá! Novo pedido #${order.id}\n` +
     `Total: R$ ${order.fullPrice.toFixed(2)}\n` +
-    `Itens: ${order.items.length}\n` +
+    (itemsBlock ? `Itens:\n${itemsBlock}\n` : `Itens: ${order.items.length}\n`) +
     `Nome: ${order.customer.name}\n` +
     `Tel: ${order.customer.tel}`
   );
   window.open(`https://wa.me/${phone}?text=${text}`, '_blank');
 }
 ```
+
+- `productName` vem do snapshot da API (`OrderItem`) ou do carrinho local (`CartItem.name`) ao montar o pedido pós-checkout.
+- Pedidos/itens sem `productName`: usar fallback `'Produto'` na mensagem e `productId` truncado na admin (task 21).
 
 ## Autenticação admin (Cognito)
 

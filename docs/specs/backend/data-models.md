@@ -1,7 +1,7 @@
 # Modelos de dados — Backend
 
 **Status:** Aprovado  
-**Última atualização:** 2026-07-03
+**Última atualização:** 2026-07-06
 
 ## Objetivo
 
@@ -106,11 +106,21 @@ Limites sugeridos (editáveis):
 ```typescript
 interface OrderItem {
   productId: string;
+  productName: string;       // snapshot de Product.name
   quantity: number;          // inteiro >= 1
   unitPrice: number;         // preço no momento do pedido (snapshot)
   selectedOption?: string;   // variação escolhida (ex.: cor); snapshot; ver regras abaixo
 }
 ```
+
+### Regras — `OrderItem.productName`
+
+| Campo | Regra |
+|-------|-------|
+| Origem | Snapshot de `Product.name` no `POST /orders` |
+| Request | Não enviado pelo cliente (`CreateOrderItem` inalterado) |
+| Validação | 2–120 caracteres (igual `Product.name`) |
+| Legado | Sempre preenchido em pedidos novos |
 
 ### Regras — `OrderItem.selectedOption`
 
@@ -217,6 +227,7 @@ Implementação: classe `ApiError` e tipo `ApiErrorCode` em `@afro90s/models`; h
 | `ProductSchema` / `CreateProductSchema` / `UpdateProductSchema` | Persistência e CRUD admin |
 | `UpdateStockSchema` (`{ delta: number }`, `delta !== 0`) | `PUT /admin/products/{id}/stock` |
 | `OrderSchema` / `CreateOrderSchema` | Pedido persistido e `POST /orders` |
+| `OrderItemSchema` | Item persistido no pedido (`productName` snapshot — task 21) |
 | `CustomerSchema` | Cliente no pedido |
 | `isValidOrderStatusTransition(from, to)` | `PUT /admin/orders/{id}` |
 | `@afro90s/pagination` | `encodeCursor`, `decodeCursor`, `parseLimit`, `buildPaginatedResponse` |

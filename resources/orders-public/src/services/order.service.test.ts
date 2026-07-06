@@ -62,8 +62,14 @@ describe('createOrder', () => {
     expect(create).toHaveBeenCalledOnce();
     const savedOrder = create.mock.calls[0][0];
     expect(savedOrder.items).toEqual([
-      { productId: PRODUCT_ID, quantity: 2, unitPrice: 89.9, selectedOption: 'Preto' },
-      { productId: PRODUCT_ID_2, quantity: 1, unitPrice: 10 },
+      {
+        productId: PRODUCT_ID,
+        productName: 'Óculos',
+        quantity: 2,
+        unitPrice: 89.9,
+        selectedOption: 'Preto',
+      },
+      { productId: PRODUCT_ID_2, productName: 'Óculos', quantity: 1, unitPrice: 10 },
     ]);
   });
 
