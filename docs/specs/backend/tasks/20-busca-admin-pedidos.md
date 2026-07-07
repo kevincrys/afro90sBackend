@@ -17,7 +17,10 @@
 | 1 | `GET /admin/orders` | Lista paginada, `createdAt` desc |
 | 2 | `GET /admin/orders?q=maria` | Pedidos cujo `customerNameLower` começa com `maria` |
 | 3 | `GET /admin/orders?q={uuid}` | `GetItem` — 0 ou 1 pedido |
-| 4 | `GET /admin/orders?q=550e8400` | Prefixo de ID (≥ 8 hex/hífen) |
+| 4 | `GET /admin/orders?q=550e8400` | Prefixo de ID (`begins_with(id)`) |
+| 4b | `GET /admin/orders?q=55` | Prefixo curto de ID (sem mínimo de 8 chars) |
+| 4c | `GET /admin/orders?q=dead` | Busca combinada OR: ID **ou** nome |
+| 9 | `POST /orders` com `customer.name` contendo dígitos | `400` — nome sem números |
 | 5 | `GET /admin/orders?status=X&q=Y` | Combina filtros |
 | 6 | `GET /admin/orders?q=a` | `400 INVALID_QUERY` |
 | 7 | `POST /orders` | Grava `customerNameLower = normalizeNameLower(customer.name)` |
@@ -38,10 +41,9 @@
 
 | Arquivo | Alteração |
 |---------|-----------|
-| `libs/models/src/order.ts` | `customerNameLower?: string` no `OrderSchema` |
-| `resources/orders-public/src/services/order.service.ts` | Grava `customerNameLower` ao criar |
-| `libs/repositories/src/order.mapper.ts` | `toPublicOrder()` omite campo interno |
-| `libs/repositories/src/order.repository.ts` | `list({ q })` — UUID / prefixo ID / nome |
+| `libs/repositories/src/order.repository.ts` | `list({ q })` — heurística UUID / ID / nome / OR |
+| `libs/repositories/src/order-search.ts` | `classifyOrderSearchQuery`, `buildOrderSearchFilter` |
+| `libs/models/src/order.ts` | `customerNameLower`; validação `customer.name` sem dígitos |
 | `libs/pagination/src/types.ts` | `q` em `CursorFiltersSchema` |
 | `resources/orders-admin/src/routes/get-admin-orders.ts` | Parse `query.q`, map `toPublicOrder` |
 | `resources/orders-admin/src/routes/get-admin-order-by-id.ts` | `toPublicOrder` |
@@ -55,7 +57,8 @@
 ### `GET /admin/orders`
 
 - [x] Query param `q` (mín. 2 chars; `400 INVALID_QUERY` se curto)
-- [x] Detecção: UUID completo → `GetItem`; prefixo UUID (≥ 8 hex/hífen) → `begins_with(id)`; senão → busca por nome via `customerNameLower`
+- [x] Detecção automática de `q`: UUID completo → `GetItem`; dígito em `q` → ID; letras fora de hex → nome; hex puro sem dígitos → OR (`id` ou `customerNameLower`)
+- [x] `CustomerSchema.name`: regex sem dígitos (`^[\p{L}\s'-]+$`)
 - [x] Combina com `status` e paginação por cursor (`q` em `filters` do cursor)
 - [x] Ordenação: `createdAt` desc (inalterada)
 - [x] Resposta omita `customerNameLower` (`toPublicOrder`)
@@ -67,8 +70,8 @@
 
 ### Testes
 
-- [x] Unitários: `order.repository.test.ts`, `order.mapper.test.ts`, `order.service.test.ts`, `handler.test.ts`
-- [x] Smoke E2E: `scripts/smoke-test-api-fase3.sh` — busca por nome, por ID, `q` curto → 400
+- [x] Unitários: `order-search.test.ts`, `order.repository.test.ts`, `order.test.ts`, `order.mapper.test.ts`, `order.service.test.ts`, `handler.test.ts`
+- [x] Smoke E2E: busca por nome, por ID, `q` curto → 400, nome com dígitos → 400
 
 ## Fora de escopo
 

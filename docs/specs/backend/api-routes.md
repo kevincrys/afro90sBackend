@@ -411,7 +411,7 @@ Cria pedido com status inicial `SOLICITADO`. Valida estoque (sem decrementar na 
 | `items[].productId` | string (UUID) | Sim | Produto deve existir |
 | `items[].quantity` | integer | Sim | >= 1 |
 | `items[].selectedOption` | string | Condicional | Obrigatório se `product.options` não vazio; deve ∈ `product.options` |
-| `customer.name` | string | Sim | Min 2 caracteres |
+| `customer.name` | string | Sim | Min 2 caracteres; apenas letras (Unicode), espaços, apóstrofo e hífen — **sem dígitos** |
 | `customer.address` | string | Sim | Min 5 caracteres |
 | `customer.postalCode` | string | Sim | CEP |
 | `customer.tel` | string | Sim | Telefone com DDD |
@@ -833,7 +833,18 @@ Lista pedidos com filtros.
 | `limit` | integer | Não | `20` | Max 100 |
 | `cursor` | string | Não | — | Paginação |
 | `status` | OrderStatus | Não | — | Filtrar por status |
-| `q` | string | Não | — | Busca por **ID** (UUID completo ou prefixo ≥ 8 chars hex/hífen) ou **prefixo do nome do cliente** (case-insensitive, sem acentos). Mín. 2 caracteres. Ordenação default: `createdAt` desc |
+| `q` | string | Não | — | Busca unificada por **ID** ou **prefixo do nome do cliente** (case-insensitive, sem acentos). Mín. 2 caracteres. Ordenação default: `createdAt` desc. Detecção automática (ver tabela abaixo) |
+
+**Detecção de `q`**
+
+| Modo | Condição | DynamoDB |
+|------|----------|----------|
+| UUID completo | `q` é UUID válido | `GetItem` por `id` |
+| ID | `q` contém dígito `0-9` | `begins_with(id, q)` |
+| Nome | Letra fora de hex (`g-z`), acento, espaço, apóstrofo, etc. | `begins_with(customerNameLower, normalizeNameLower(q))` |
+| ID ou nome | Só hex `a-f` e hífen, sem dígitos (ex.: `dead`, `ace`) | `(begins_with(id, q) OR begins_with(customerNameLower, prefix))` |
+
+Exemplos: `550e8400` → ID; `55` → ID; `maria` → nome; `dead` → ID ou nome; `{uuid}` → GetItem.
 
 Ao paginar com busca, repetir `q` (e `status`, se usado) junto com `cursor`:
 

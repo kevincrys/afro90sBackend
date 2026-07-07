@@ -93,6 +93,15 @@ if [ "${STOCK_HTTP}" != "200" ]; then
 fi
 echo "OK"
 
+echo -n "POST /orders (nome com dígitos)... "
+INVALID_NAME_HTTP=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$(api_url /orders)" \
+  -H "Content-Type: application/json" \
+  -d "{\"customer\":{\"name\":\"Maria123\",\"address\":\"Rua Teste 1\",\"postalCode\":\"01310100\",\"tel\":\"11999999999\"},\"items\":[{\"productId\":\"${PRODUCT_ID}\",\"quantity\":1}]}")
+if [ "${INVALID_NAME_HTTP}" != "400" ]; then
+  echo "FAILED (HTTP ${INVALID_NAME_HTTP}, esperado 400)" && exit 1
+fi
+echo "OK"
+
 echo -n "POST /orders (público)... "
 ORDER_BODY=$(curl -s -w "\n%{http_code}" -X POST "$(api_url /orders)" \
   -H "Content-Type: application/json" \

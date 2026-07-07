@@ -16,12 +16,11 @@ import {
   type OrderStatus,
 } from '@afro90s/models';
 import { decodeCursor, type CursorFilters } from '@afro90s/pagination';
-import { z } from 'zod';
+import { buildOrderSearchFilter, classifyOrderSearchQuery } from './order-search';
 
 const GSI_STATUS_CREATED_AT = 'gsi-status-createdAt';
 const LIST_INDEX_PRIMARY = 'primary' as const;
 const TERMINAL_TTL_DAYS = 180;
-const UUID_LIKE_PATTERN = /^[0-9a-f-]{8,}$/i;
 
 export interface ListOrdersParams {
   status?: OrderStatus;
@@ -35,14 +34,6 @@ export interface ListOrdersResult {
   lastEvaluatedKey?: Record<string, string>;
   index: typeof LIST_INDEX_PRIMARY | typeof GSI_STATUS_CREATED_AT;
   filters: CursorFilters;
-}
-
-function isFullUuid(value: string): boolean {
-  return z.string().uuid().safeParse(value).success;
-}
-
-function isUuidLike(value: string): boolean {
-  return UUID_LIKE_PATTERN.test(value);
 }
 
 function buildSearchFilters(params: ListOrdersParams & { q: string }): CursorFilters {
@@ -94,13 +85,11 @@ export class OrderRepository {
   }
 
   private async listWithSearch(params: ListOrdersParams & { q: string }): Promise<ListOrdersResult> {
-    if (isFullUuid(params.q)) {
+    const mode = classifyOrderSearchQuery(params.q);
+    if (mode === 'fullUuid') {
       return this.listByFullId(params);
     }
-    if (isUuidLike(params.q)) {
-      return this.listByIdPrefix(params);
-    }
-    return this.listByCustomerName(params);
+    return this.listBySearchFilter(params, mode);
   }
 
   private async listByFullId(
@@ -124,70 +113,25 @@ export class OrderRepository {
     };
   }
 
-  private async listByIdPrefix(
+  private async listBySearchFilter(
     params: ListOrdersParams & { q: string },
+    mode: Exclude<ReturnType<typeof classifyOrderSearchQuery>, 'fullUuid'>,
   ): Promise<ListOrdersResult> {
-    const filters = buildSearchFilters(params);
-    const index = params.status !== undefined ? GSI_STATUS_CREATED_AT : LIST_INDEX_PRIMARY;
-    const exclusiveStartKey = params.cursor
-      ? this.resolveStartKey(params.cursor, filters, index)
-      : undefined;
-
-    const names: Record<string, string> = { '#id': 'id' };
-    const values: Record<string, string> = { ':q': params.q.toLowerCase() };
-    const filterParts = ['begins_with(#id, :q)'];
-
-    if (params.status !== undefined) {
-      return this.queryWithFilter({
-        status: params.status,
-        filterParts,
-        names,
-        values,
-        limit: params.limit,
-        exclusiveStartKey,
-        filters,
-      });
-    }
-
-    const result = await this.client.send(
-      new ScanCommand({
-        TableName: this.tableName,
-        FilterExpression: filterParts.join(' AND '),
-        ExpressionAttributeNames: names,
-        ExpressionAttributeValues: values,
-        Limit: params.limit,
-        ExclusiveStartKey: exclusiveStartKey,
-      }),
+    const { filterExpression, names, values } = buildOrderSearchFilter(
+      params.q,
+      mode,
+      normalizeNameLower,
     );
-
-    const items = this.sortByCreatedAtDesc(result.Items);
-
-    return {
-      items,
-      lastEvaluatedKey: result.LastEvaluatedKey as Record<string, string> | undefined,
-      index: LIST_INDEX_PRIMARY,
-      filters,
-    };
-  }
-
-  private async listByCustomerName(
-    params: ListOrdersParams & { q: string },
-  ): Promise<ListOrdersResult> {
-    const prefix = normalizeNameLower(params.q);
     const filters = buildSearchFilters(params);
     const index = params.status !== undefined ? GSI_STATUS_CREATED_AT : LIST_INDEX_PRIMARY;
     const exclusiveStartKey = params.cursor
       ? this.resolveStartKey(params.cursor, filters, index)
       : undefined;
 
-    const names: Record<string, string> = { '#customerNameLower': 'customerNameLower' };
-    const values: Record<string, string> = { ':prefix': prefix };
-    const filterParts = ['begins_with(#customerNameLower, :prefix)'];
-
     if (params.status !== undefined) {
       return this.queryWithFilter({
         status: params.status,
-        filterParts,
+        filterExpression,
         names,
         values,
         limit: params.limit,
@@ -199,7 +143,7 @@ export class OrderRepository {
     const result = await this.client.send(
       new ScanCommand({
         TableName: this.tableName,
-        FilterExpression: filterParts.join(' AND '),
+        FilterExpression: filterExpression,
         ExpressionAttributeNames: names,
         ExpressionAttributeValues: values,
         Limit: params.limit,
@@ -219,7 +163,7 @@ export class OrderRepository {
 
   private async queryWithFilter(params: {
     status: OrderStatus;
-    filterParts: string[];
+    filterExpression: string;
     names: Record<string, string>;
     values: Record<string, string>;
     limit: number;
@@ -231,7 +175,7 @@ export class OrderRepository {
         TableName: this.tableName,
         IndexName: GSI_STATUS_CREATED_AT,
         KeyConditionExpression: '#status = :status',
-        FilterExpression: params.filterParts.join(' AND '),
+        FilterExpression: params.filterExpression,
         ExpressionAttributeNames: { '#status': 'status', ...params.names },
         ExpressionAttributeValues: { ':status': params.status, ...params.values },
         Limit: params.limit,

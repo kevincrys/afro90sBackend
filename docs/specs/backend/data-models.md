@@ -137,12 +137,16 @@ Persistido no pedido como snapshot (mesmo que o catálogo mude depois).
 
 ```typescript
 interface Customer {
-  name: string;
+  name: string;              // letras (Unicode), espaços, apóstrofo, hífen — sem dígitos
   address: string;
   postalCode: string;        // 8 dígitos (CEP sem hífen)
   tel: string;               // 10–11 dígitos com DDD
 }
 ```
+
+| Campo | Regra |
+|-------|-------|
+| `name` | Min 2, max 200; regex `^[\p{L}\s'-]+$` (sem dígitos `0-9`) |
 
 ## Order (persistido e retornado pela API)
 

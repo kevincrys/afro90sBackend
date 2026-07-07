@@ -47,8 +47,14 @@ export const CreateOrderItemSchema = z.object({
 });
 export type CreateOrderItemInput = z.infer<typeof CreateOrderItemSchema>;
 
+const CUSTOMER_NAME_PATTERN = /^[\p{L}\s'-]+$/u;
+
 export const CustomerSchema = z.object({
-  name: z.string().min(2).max(200),
+  name: z
+    .string()
+    .min(2)
+    .max(200)
+    .regex(CUSTOMER_NAME_PATTERN, 'Nome não pode conter números'),
   address: z.string().min(2).max(200),
   postalCode: z.string().regex(/^\d{8}$/),
   tel: z.string().regex(/^\d{10,11}$/),

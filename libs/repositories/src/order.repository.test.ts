@@ -108,7 +108,27 @@ describe('OrderRepository', () => {
     send.mockResolvedValueOnce({ Items: [orderItem] });
     await repository.list({ q: '550e8400', limit: 20 });
     const command = send.mock.calls[0][0] as ScanCommand;
-    expect(command.input.FilterExpression).toBe('begins_with(#id, :q)');
+    expect(command.input.FilterExpression).toBe('begins_with(#id, :qLower)');
+    expect(command.input.ExpressionAttributeValues?.[':qLower']).toBe('550e8400');
+  });
+
+  it('list by short id prefix scans with begins_with on id', async () => {
+    send.mockResolvedValueOnce({ Items: [orderItem] });
+    await repository.list({ q: '55', limit: 20 });
+    const command = send.mock.calls[0][0] as ScanCommand;
+    expect(command.input.FilterExpression).toBe('begins_with(#id, :qLower)');
+    expect(command.input.ExpressionAttributeValues?.[':qLower']).toBe('55');
+  });
+
+  it('list by ambiguous hex-only query uses OR filter', async () => {
+    send.mockResolvedValueOnce({ Items: [orderItem] });
+    await repository.list({ q: 'dead', limit: 20 });
+    const command = send.mock.calls[0][0] as ScanCommand;
+    expect(command.input.FilterExpression).toBe(
+      '(begins_with(#id, :qLower) OR begins_with(#customerNameLower, :prefix))',
+    );
+    expect(command.input.ExpressionAttributeValues?.[':qLower']).toBe('dead');
+    expect(command.input.ExpressionAttributeValues?.[':prefix']).toBe('dead');
   });
 
   it('list by customer name scans with begins_with on customerNameLower', async () => {

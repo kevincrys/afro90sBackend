@@ -30,6 +30,22 @@ describe('CreateOrderSchema', () => {
     expect(result.success).toBe(false);
   });
 
+  it('rejects customer name with digits', () => {
+    const result = CreateOrderSchema.safeParse({
+      ...validOrder,
+      customer: { ...validOrder.customer, name: 'Maria123' },
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('accepts customer name with accents and apostrophe', () => {
+    const result = CreateOrderSchema.safeParse({
+      ...validOrder,
+      customer: { ...validOrder.customer, name: "José D'Avila" },
+    });
+    expect(result.success).toBe(true);
+  });
+
   it('rejects invalid phone', () => {
     const result = CreateOrderSchema.safeParse({
       ...validOrder,
