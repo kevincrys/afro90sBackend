@@ -1,7 +1,5 @@
 node_modules/
-**/dist/
+dist/
 .env
 coverage/
-**/lambda.zip
-*.js.map
 .lerna/*

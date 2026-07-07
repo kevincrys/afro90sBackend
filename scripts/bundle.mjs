@@ -13,7 +13,7 @@ for (const flow of flows) {
   }
 
   const entry = join('resources', flow, 'src', 'handler.ts');
-  const outFile = join('resources', flow, 'dist', 'handler.js');
+  const outFile = join('dist', flow, 'handler.js');
 
   await mkdir(dirname(outFile), { recursive: true });
 

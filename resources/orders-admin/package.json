@@ -2,7 +2,7 @@
   "name": "@afro90s/orders-admin",
   "version": "0.1.0",
   "private": true,
-  "main": "dist/handler.js",
+  "main": "../../dist/orders-admin/handler.js",
   "scripts": {
     "build": "tsc --noEmit -p tsconfig.json",
     "bundle": "node ../../scripts/bundle.mjs orders-admin"

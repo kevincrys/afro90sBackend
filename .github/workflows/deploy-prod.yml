@@ -10,7 +10,11 @@ permissions:
   contents: read
 
 jobs:
+  ci:
+    uses: ./.github/workflows/ci-reusable.yml
+
   deploy:
+    needs: ci
     uses: ./.github/workflows/deploy-reusable.yml
     with:
       github_environment: prod

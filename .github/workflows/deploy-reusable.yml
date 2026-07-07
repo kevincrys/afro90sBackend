@@ -41,7 +41,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: lambda-zips
-          path: resources/*/lambda.zip
+          path: dist/*.zip
 
   deploy:
     needs: build
@@ -64,7 +64,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: lambda-zips
-          path: resources
+          path: dist
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -77,7 +77,7 @@ jobs:
           ARTIFACT_BUCKET: ${{ vars.ARTIFACT_BUCKET }}
           FLOW: ${{ matrix.flow }}
           GITHUB_SHA: ${{ github.sha }}
-        run: bash scripts/deploy-flow.sh "${FLOW}" "${{ inputs.deploy_env }}" "resources/${FLOW}/lambda.zip"
+        run: bash scripts/deploy-flow.sh "${FLOW}" "${{ inputs.deploy_env }}" "dist/${FLOW}.zip"
 
   smoke-test:
     needs: deploy

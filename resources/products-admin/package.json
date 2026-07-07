@@ -2,7 +2,7 @@
   "name": "@afro90s/products-admin",
   "version": "0.1.0",
   "private": true,
-  "main": "dist/handler.js",
+  "main": "../../dist/products-admin/handler.js",
   "scripts": {
     "build": "tsc --noEmit -p tsconfig.json",
     "bundle": "node ../../scripts/bundle.mjs products-admin"

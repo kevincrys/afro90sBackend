@@ -5,8 +5,8 @@ import { ZipArchive } from 'archiver';
 import { FLOWS, isValidFlow } from './flows.mjs';
 
 async function packageFlow(flow) {
-  const distDir = join('resources', flow, 'dist');
-  const outPath = join('resources', flow, 'lambda.zip');
+  const distDir = join('dist', flow);
+  const outPath = join('dist', `${flow}.zip`);
 
   try {
     await stat(distDir);
