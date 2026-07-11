@@ -1,7 +1,7 @@
 # Backend — Overview
 
 **Status:** Aprovado  
-**Última atualização:** 2026-07-04
+**Última atualização:** 2026-07-10
 
 ## Objetivo
 
@@ -16,7 +16,7 @@ Guia de implementação do backend Afro90s no repositório **afro90sBackend**.
 | API | REST via API Gateway HTTP API |
 | Banco | DynamoDB |
 | Storage imagens | S3 |
-| E-mail | SES |
+| E-mail | SES (task 16 — **pendente**; `SES_ENABLED=false` até lá) |
 | Validação | Zod |
 | Bundling | esbuild (`npm run bundle`) |
 | Deploy | S3 artifact + `update-function-code` ([ADR-007](docs/foundation/adr/007-backend-lambda-s3-deploy.md)) |

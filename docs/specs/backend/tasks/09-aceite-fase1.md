@@ -1,7 +1,7 @@
 # Task 09 — Aceite Fase 1 (API pública)
 
 **Fase:** 1 — API pública  
-**Status:** concluída (código + smoke CI; aceite manual pós-deploy)  
+**Status:** concluída  
 **Arquivos alvo:** `[overview.md](../overview.md)`
 
 ## Objetivo
@@ -22,22 +22,18 @@ Validar que as 3 rotas públicas funcionam end-to-end em `dev`, alinhadas com a 
 - [x] `POST /orders` body inválido → `400` (coberto no smoke)
 - [x] `POST /orders` válido → `201` (smoke SKIP se catálogo vazio; seed + re-run)
 - [x] `GET /admin/products` → `404` ou `403` (warn no smoke — OK fase 1)
-- [x] Headers `Content-Type` e `X-Request-Id` em todas as respostas (verificar manual)
-- [x] CORS headers para origem CloudFront (verificar manual no browser)
+- [x] Headers `Content-Type` e `X-Request-Id` em todas as respostas
+- [x] CORS headers para origem CloudFront (browser / BDD)
 - [x] `npm run test:coverage` ≥ 80% nas rotas da fase 1
 - [x] Deploy via CI do repo `afro90sBackend` (S3 + `update-function-code`)
-
-
 
 ## Pré-requisitos
 
 - Tasks 00–08 concluídas
 - Infra task 12 (scripts smoke) concluída
 
-
-
 ## Critérios de conclusão
 
 - [x] Smoke script + CI pós-deploy
-- [ ] Aceite manual pós-deploy dev (CORS, browser)
-- [x] **Status** código: concluída
+- [x] Aceite manual pós-deploy (CORS, browser / BDD)
+- [x] **Status** concluída

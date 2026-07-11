@@ -152,16 +152,16 @@ Mesmas variables com valores prod + **required reviewers**.
 
 ## Pré-requisitos
 
-- [ ] Infra task 10 deployada (4 Lambdas + bucket artefatos)
-- [ ] Roles IAM backend com permissão SSM (template atualizado)
-- [ ] Variables preenchidas nos environments
+- [x] Infra task 10 deployada (4 Lambdas + bucket artefatos)
+- [x] Roles IAM backend com permissão SSM (template atualizado)
+- [x] Variables preenchidas nos environments
 
 ## Checklist
 
 - [x] `ci.yml` + `deploy-dev.yml` + `deploy-prod.yml` commitados
-- [ ] `ARTIFACT_BUCKET` configurado em `dev` e `prod`
-- [ ] Merge em `dev` atualiza as 4 Lambdas
-- [ ] Nenhum `AWS_ACCESS_KEY_ID` no repo
+- [x] `ARTIFACT_BUCKET` configurado em `dev` e `prod`
+- [x] Merge em `dev` atualiza as 4 Lambdas
+- [x] Nenhum `AWS_ACCESS_KEY_ID` no repo
 
 ## Referências
 

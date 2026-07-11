@@ -1,7 +1,7 @@
 # Task 13 — Rotas admin de produtos
 
 **Fase:** 3 — Rotas admin  
-**Status:** concluída (código; aguarda revisão + deploy infra task 16)
+**Status:** concluída (código; E2E validado em BDD / aceite fase 3)
 
 ## Objetivo
 
@@ -46,7 +46,7 @@ Todas com middleware auth (task 10).
 
 ## Critérios de conclusão
 
-- [ ] Todas as 6 rotas admin de produtos funcionais em dev (pós-deploy infra)
-- [ ] Upload de imagem retorna URL acessível via CloudFront (E2E manual)
+- [x] Todas as 6 rotas admin de produtos funcionais em dev/prod (pós-deploy infra)
+- [x] Upload de imagem retorna URL acessível via CloudFront (E2E / BDD)
 - [x] Cobertura de testes ≥ 80%
-- [x] **Status** código: concluída — aguarda revisão
+- [x] **Status** concluída

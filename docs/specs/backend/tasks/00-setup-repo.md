@@ -1,8 +1,8 @@
 # Task 00 — Setup do repositório afro90s-api
 
 **Fase:** 0 — Fundação  
-**Status:** pendente  
-**Repo:** `afro90s-api` (repositório separado)
+**Status:** concluída  
+**Repo:** `afro90sBackend`
 
 ## Objetivo
 

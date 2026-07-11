@@ -1,7 +1,7 @@
 # Task 11 — Aceite Fase 2 (Auth)
 
 **Fase:** 2 — Login admin  
-**Status:** concluída (código + smoke CI; aceite manual token Cognito pós-deploy)
+**Status:** concluída
 
 ## Objetivo
 
@@ -17,17 +17,17 @@ Validar que a autenticação Cognito está integrada — rotas admin ainda não 
 
 - [x] Token ausente em rota admin → `401` (smoke; SKIP se rota ainda 404)
 - [x] Token inválido → `401` (smoke)
-- [ ] Token Cognito válido (grupo `admins`) não recebe `401` (smoke com secret ou manual Postman)
+- [x] Token Cognito válido (grupo `admins`) não recebe `401` (smoke com secret ou aceite manual / BDD prod)
 - [x] Rotas públicas da fase 1 continuam funcionando (regressão via fase 1 no smoke)
 - [x] `npm run test:coverage` mantém ≥ 80%
 
 ## Pré-requisitos
 
 - Task 10 concluída
-- Infra task 14 (aceite fase 2) concluída — parcial: Cognito deployado; rotas admin na task 16
+- Infra task 14 (aceite fase 2) concluída
 
 ## Critérios de conclusão
 
 - [x] Smoke script + CI pós-deploy
-- [ ] Aceite manual: login Cognito + `GET /admin/products` com token → não `401`
-- [x] **Status** código: concluída — fase 2 entregue (backend)
+- [x] Aceite manual: login Cognito + `GET /admin/products` com token → não `401`
+- [x] **Status** concluída — fase 2 entregue (backend)

@@ -1,7 +1,7 @@
 # Task 00-deploy — CI/CD deploy da API (S3 + Lambda)
 
 **Fase:** 0 — Fundação  
-**Status:** pendente  
+**Status:** concluída  
 **Repo:** `afro90sBackend`  
 **ADR:** [007-backend-lambda-s3-deploy.md](../../../foundation/adr/007-backend-lambda-s3-deploy.md)
 
