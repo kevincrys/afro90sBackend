@@ -88,15 +88,15 @@ Organizado em **4 fases** alinhadas com [`infra/tasks/`](../../infra/tasks/READM
 ## Fase 4 — Email
 
 > **Entregável:** `POST /orders` passa a enviar e-mail SES. Cobertura de testes ≥ 80%.  
-> **Estado:** cobertura (17) OK; **SES (16) pendente**; aceite (18) parcial.
+> **Estado:** tasks 16–17 **concluídas**; aceite (18) parcial até e-mail live em sandbox.
 
 | # | Arquivo | O que entrega |
 |---|---------|---------------|
-| 16 | [16-email-ses.md](16-email-ses.md) | `email.service` com SES template — **pendente** |
+| 16 | [16-email-ses.md](16-email-ses.md) | `email.service` com SES template — **concluída** |
 | 17 | [17-testes-cobertura.md](17-testes-cobertura.md) | Vitest ≥ 80% — **concluída** |
-| 18 | [18-aceite-fase4.md](18-aceite-fase4.md) | Checklist aceite API v1 — **parcial (SES)** |
+| 18 | [18-aceite-fase4.md](18-aceite-fase4.md) | Checklist aceite API v1 — **parcial (e-mail live)** |
 
-**✓ Resultado (parcial):** API funcional + testes; e-mail SES em aberto.
+**✓ Resultado (parcial):** código SES pronto; ativar com secrets + verify + deploy.
 
 ---
 

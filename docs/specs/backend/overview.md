@@ -16,7 +16,7 @@ Guia de implementação do backend Afro90s no repositório **afro90sBackend**.
 | API | REST via API Gateway HTTP API |
 | Banco | DynamoDB |
 | Storage imagens | S3 |
-| E-mail | SES (task 16 — **pendente**; `SES_ENABLED=false` até lá) |
+| E-mail | SES (task 16 — **código pronto**; ativo com `SES_ENABLED=true` após secrets/verify) |
 | Validação | Zod |
 | Bundling | esbuild (`npm run bundle`) |
 | Deploy | S3 artifact + `update-function-code` ([ADR-007](docs/foundation/adr/007-backend-lambda-s3-deploy.md)) |

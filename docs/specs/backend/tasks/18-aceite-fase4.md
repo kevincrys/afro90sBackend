@@ -1,7 +1,7 @@
 # Task 18 — Aceite Fase 4 (API completa)
 
 **Fase:** 4 — Email  
-**Status:** parcial — API e qualidade OK; **SES pendente** (task 16)  
+**Status:** parcial — código SES OK; validação sandbox pós-deploy (secrets + verify)  
 **Arquivos alvo:** [`overview.md`](../overview.md)
 
 ## Objetivo
@@ -24,26 +24,26 @@ Validar API v1 completa: 3 rotas públicas + rotas admin + e-mail SES + cobertur
 
 ### Fase 4 — Email
 
-- [ ] `POST /orders` → `201` + e-mail recebido (sandbox) — **pendente task 16**
-- [ ] Falha SES simulada → ainda `201` — **pendente task 16**
+- [ ] `POST /orders` → `201` + e-mail recebido (sandbox) — **após** secrets GitHub + verify SES + deploy
+- [x] Falha SES simulada → ainda `201` (testes unitários task 16)
 
 ### Qualidade
 
 - [x] `npm run test:coverage` ≥ 80%
-- [x] Rotas documentadas em `api-routes.md` implementadas (exceto fluxo SES)
+- [x] Rotas documentadas em `api-routes.md` implementadas
 - [x] Logs estruturados JSON com `requestId` (task 19)
 
 ### Alinhamento infra
 
 - [x] Deploy via pipeline + CI repo
-- [x] Smoke / BDD manuais (exceto SES) executados
+- [x] Smoke / BDD manuais (exceto INT-01 SES live) executados
 
 ## Pré-requisitos
 
-- Tasks 00–15, 17, 19–22 concluídas
-- Task 16 (SES) + infra task 18/20 para fechar e-mail
+- Tasks 00–17, 19–22 concluídas
+- Infra task 18 + secrets + verificação SES para fechar INT-01
 
 ## Critérios de conclusão
 
-- [ ] Checklist completo (bloqueado em SES)
-- [ ] Atualizar **Status** para `concluída` — **API v1 completa** (após SES)
+- [ ] Checklist completo (bloqueado em e-mail live sandbox)
+- [ ] Atualizar **Status** para `concluída` — **API v1 completa** (após e-mail live)

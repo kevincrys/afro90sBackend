@@ -11,6 +11,7 @@
     "@afro90s/http": "*",
     "@afro90s/logger": "*",
     "@afro90s/models": "*",
-    "@afro90s/repositories": "*"
+    "@afro90s/repositories": "*",
+    "@aws-sdk/client-ses": "^3.888.0"
   }
 }
