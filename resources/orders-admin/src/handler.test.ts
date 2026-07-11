@@ -179,6 +179,16 @@ describe('orders-admin handler', () => {
     expect(JSON.parse(result.body as string).items[0]).not.toHaveProperty('customerNameLower');
   });
 
+  it('returns 400 when q exceeds 200 characters', async () => {
+    const result = await handler(
+      adminEvent({ queryStringParameters: { q: 'a'.repeat(201) } }),
+      {} as Context,
+    );
+    expect(result.statusCode).toBe(400);
+    expect(JSON.parse(result.body as string).code).toBe('INVALID_QUERY');
+    expect(listOrders).not.toHaveBeenCalled();
+  });
+
   it('returns 400 when q is too short', async () => {
     const result = await handler(
       adminEvent({ queryStringParameters: { q: 'a' } }),

@@ -48,4 +48,11 @@ describe('handleGetProducts', () => {
       ApiError,
     );
   });
+
+  it('rejects name longer than 120 characters', async () => {
+    await expect(handleGetProducts(event({ name: 'a'.repeat(121) }), context)).rejects.toMatchObject({
+      code: 'INVALID_QUERY',
+    });
+    expect(list).not.toHaveBeenCalled();
+  });
 });

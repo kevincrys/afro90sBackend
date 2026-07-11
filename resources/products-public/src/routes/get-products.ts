@@ -16,6 +16,12 @@ export async function handleGetProducts(event: APIGatewayProxyEventV2, context: 
     });
   }
 
+  if (query.name !== undefined && query.name.length > 120) {
+    raiseApiError('INVALID_QUERY', 'Busca por nome deve ter no máximo 120 caracteres.', {
+      param: 'name',
+    });
+  }
+
   const result = await getProductRepository().list({
     name: query.name,
     category: query.category,

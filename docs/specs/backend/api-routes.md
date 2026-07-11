@@ -285,7 +285,7 @@ Lista produtos com paginação e busca opcional por nome.
 |-------|------|-------------|---------|-----------|
 | `limit` | integer | Não | `20` | Itens por página (max 100) |
 | `cursor` | string | Não | — | Cursor de paginação |
-| `name` | string | Não | — | Busca parcial por nome (case-insensitive) |
+| `name` | string | Não | — | Busca parcial por nome (case-insensitive). Máx. **120** caracteres (igual a `product.name`) |
 | `category` | string | Não | — | Filtro: `oculos`, `acessorios`, `maquiagem` |
 
 #### Response `200 OK`
@@ -317,7 +317,7 @@ Lista produtos com paginação e busca opcional por nome.
 
 | Status | `code` | Quando |
 |--------|--------|--------|
-| `400` | `INVALID_QUERY` | `limit` inválido ou `category` desconhecida |
+| `400` | `INVALID_QUERY` | `limit` inválido, `category` desconhecida ou `name` com mais de 120 caracteres |
 
 ---
 
@@ -833,7 +833,7 @@ Lista pedidos com filtros.
 | `limit` | integer | Não | `20` | Max 100 |
 | `cursor` | string | Não | — | Paginação |
 | `status` | OrderStatus | Não | — | Filtrar por status |
-| `q` | string | Não | — | Busca unificada por **ID** ou **prefixo do nome do cliente** (case-insensitive, sem acentos). Mín. 2 caracteres. Ordenação default: `createdAt` desc. Detecção automática (ver tabela abaixo) |
+| `q` | string | Não | — | Busca unificada por **ID** ou **prefixo do nome do cliente** (case-insensitive, sem acentos). Mín. 2 e máx. **200** caracteres (igual a `customer.name`). Ordenação default: `createdAt` desc. Detecção automática (ver tabela abaixo) |
 
 **Detecção de `q`**
 
@@ -884,7 +884,7 @@ GET /admin/orders?q=maria&limit=20&cursor=eyJ...
 
 | Status | `code` | Quando |
 |--------|--------|--------|
-| `400` | `INVALID_QUERY` | `status` inválido ou `q` com menos de 2 caracteres |
+| `400` | `INVALID_QUERY` | `status` inválido, `q` com menos de 2 ou mais de 200 caracteres |
 | `401` | | Auth |
 
 > Campo interno `customerNameLower` é persistido no DynamoDB mas **não** retornado na resposta.

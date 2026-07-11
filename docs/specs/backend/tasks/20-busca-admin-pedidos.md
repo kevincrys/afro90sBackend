@@ -23,6 +23,7 @@
 | 9 | `POST /orders` com `customer.name` contendo dígitos | `400` — nome sem números |
 | 5 | `GET /admin/orders?status=X&q=Y` | Combina filtros |
 | 6 | `GET /admin/orders?q=a` | `400 INVALID_QUERY` |
+| 6b | `GET /admin/orders?q=` (201+ chars) | `400 INVALID_QUERY` |
 | 7 | `POST /orders` | Grava `customerNameLower = normalizeNameLower(customer.name)` |
 | 8 | `GET /admin/orders*` | Resposta **sem** campo `customerNameLower` |
 
@@ -56,7 +57,7 @@
 
 ### `GET /admin/orders`
 
-- [x] Query param `q` (mín. 2 chars; `400 INVALID_QUERY` se curto)
+- [x] Query param `q` (mín. 2 e máx. 200 chars — alinhado a `customer.name`; `400 INVALID_QUERY` se fora do intervalo)
 - [x] Detecção automática de `q`: UUID completo → `GetItem`; dígito em `q` → ID; letras fora de hex → nome; hex puro sem dígitos → OR (`id` ou `customerNameLower`)
 - [x] `CustomerSchema.name`: regex sem dígitos (`^[\p{L}\s'-]+$`)
 - [x] Combina com `status` e paginação por cursor (`q` em `filters` do cursor)

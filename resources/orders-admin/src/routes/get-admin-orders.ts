@@ -34,6 +34,11 @@ export async function handleGetAdminOrders(
         value: query.q,
       });
     }
+    if (trimmed.length > 200) {
+      raiseApiError('INVALID_QUERY', 'Busca deve ter no máximo 200 caracteres.', {
+        param: 'q',
+      });
+    }
     q = trimmed.length > 0 ? trimmed : undefined;
   }
 
