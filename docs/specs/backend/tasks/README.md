@@ -68,6 +68,7 @@ Organizado em **4 fases** alinhadas com [`infra/tasks/`](../../infra/tasks/READM
 | 14 | [14-rotas-admin-orders.md](14-rotas-admin-orders.md) | 3 rotas `/admin/orders*` |
 | 20 | [20-busca-admin-pedidos.md](20-busca-admin-pedidos.md) | Busca admin por ID/nome (`q`, `customerNameLower`) |
 | 21 | [21-nome-produto-no-pedido.md](21-nome-produto-no-pedido.md) | Snapshot `productName` em `OrderItem` |
+| 22 | [22-busca-admin-produtos.md](22-busca-admin-produtos.md) | Busca admin produtos por ID/nome (`q`, `nameLower`) |
 | 15 | [15-aceite-fase3.md](15-aceite-fase3.md) | Checklist aceite fase 3 |
 
 **✓ Resultado:** admin gerencia produtos e pedidos via API.

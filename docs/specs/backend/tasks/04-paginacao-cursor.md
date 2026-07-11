@@ -27,7 +27,7 @@ Implementar utilitário de cursor opaco Base64URL para listagens paginadas.
 - [x] `parseLimit` — default 20, rejeita fora de 1–100
 - [x] `buildPaginatedResponse` com `hasMore` e `nextCursor`
 
-Filtros em `filters` do cursor incluem, conforme a rota: `name`, `category`, `status`, **`q`** (busca admin de pedidos). Exemplo:
+Filtros em `filters` do cursor incluem, conforme a rota: `name`, `category`, `status`, **`q`** (busca admin de pedidos e produtos). Exemplo:
 
 ```json
 { "v": 1, "index": "primary", "key": { "id": "..." }, "filters": { "q": "maria" } }

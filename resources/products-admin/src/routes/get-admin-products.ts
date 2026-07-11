@@ -19,8 +19,27 @@ export async function handleGetAdminProducts(
     });
   }
 
+  let q: string | undefined;
+  if (query.q !== undefined) {
+    const trimmed = query.q.trim();
+    if (trimmed.length > 0 && trimmed.length < 2) {
+      raiseApiError('INVALID_QUERY', 'Busca deve ter ao menos 2 caracteres.', {
+        param: 'q',
+        value: query.q,
+      });
+    }
+    if (trimmed.length > 120) {
+      raiseApiError('INVALID_QUERY', 'Busca deve ter no máximo 120 caracteres.', {
+        param: 'q',
+      });
+    }
+    q = trimmed.length > 0 ? trimmed : undefined;
+  }
+
+  // Prefer unified `q`; keep `name` as legacy name-only alias when `q` is absent.
   const result = await getProductRepository().list({
-    name: query.name,
+    q,
+    name: q ? undefined : query.name,
     category: query.category,
     cursor: query.cursor,
     limit,

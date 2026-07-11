@@ -15,11 +15,13 @@ import {
   type UpdateProductInput,
 } from '@afro90s/models';
 import { decodeCursor, type CursorFilters } from '@afro90s/pagination';
+import { buildProductSearchFilter, classifyProductSearchQuery } from './product-search';
 
 const GSI_CREATED_AT = 'gsi-createdAt';
 const LIST_INDEX_PRIMARY = 'primary' as const;
 
 export interface ListProductsParams {
+  q?: string;
   name?: string;
   category?: string;
   cursor?: string;
@@ -31,6 +33,13 @@ export interface ListProductsResult {
   lastEvaluatedKey?: Record<string, string>;
   index: typeof LIST_INDEX_PRIMARY | typeof GSI_CREATED_AT;
   filters: CursorFilters;
+}
+
+function buildSearchFilters(params: ListProductsParams & { q: string }): CursorFilters {
+  return {
+    q: params.q,
+    ...(params.category ? { category: params.category } : {}),
+  };
 }
 
 export class ProductRepository {
@@ -55,6 +64,10 @@ export class ProductRepository {
   }
 
   async list(params: ListProductsParams): Promise<ListProductsResult> {
+    if (params.q !== undefined && params.q.length > 0) {
+      return this.listWithSearch({ ...params, q: params.q });
+    }
+
     const filters: CursorFilters = {
       ...(params.name ? { name: params.name } : {}),
       ...(params.category ? { category: params.category } : {}),
@@ -78,6 +91,73 @@ export class ProductRepository {
         });
 
     return { ...result, index, filters };
+  }
+
+  private async listWithSearch(params: ListProductsParams & { q: string }): Promise<ListProductsResult> {
+    const mode = classifyProductSearchQuery(params.q);
+    if (mode === 'fullUuid') {
+      return this.listByFullId(params);
+    }
+    return this.listBySearchFilter(params, mode);
+  }
+
+  private async listByFullId(
+    params: ListProductsParams & { q: string },
+  ): Promise<ListProductsResult> {
+    const filters = buildSearchFilters(params);
+    const product = await this.getById(params.q);
+
+    if (!product) {
+      return { items: [], index: LIST_INDEX_PRIMARY, filters };
+    }
+
+    if (params.category !== undefined && product.category !== params.category) {
+      return { items: [], index: LIST_INDEX_PRIMARY, filters };
+    }
+
+    return {
+      items: [product],
+      index: LIST_INDEX_PRIMARY,
+      filters,
+    };
+  }
+
+  private async listBySearchFilter(
+    params: ListProductsParams & { q: string },
+    mode: Exclude<ReturnType<typeof classifyProductSearchQuery>, 'fullUuid'>,
+  ): Promise<ListProductsResult> {
+    const base = buildProductSearchFilter(params.q, mode, normalizeNameLower);
+    const filters = buildSearchFilters(params);
+    const exclusiveStartKey = params.cursor
+      ? this.resolveStartKey(params.cursor, filters, LIST_INDEX_PRIMARY)
+      : undefined;
+
+    const names = { ...base.names };
+    const values = { ...base.values };
+    let filterExpression = base.filterExpression;
+
+    if (params.category) {
+      names['#category'] = 'category';
+      values[':category'] = params.category;
+      filterExpression = `(${filterExpression}) AND #category = :category`;
+    }
+
+    const result = await this.client.send(
+      new ScanCommand({
+        TableName: this.tableName,
+        FilterExpression: filterExpression,
+        ExpressionAttributeNames: names,
+        ExpressionAttributeValues: values,
+        Limit: params.limit,
+        ExclusiveStartKey: exclusiveStartKey,
+      }),
+    );
+
+    return {
+      ...this.mapListResult(result.Items, result.LastEvaluatedKey),
+      index: LIST_INDEX_PRIMARY,
+      filters,
+    };
   }
 
   async create(product: Product): Promise<void> {

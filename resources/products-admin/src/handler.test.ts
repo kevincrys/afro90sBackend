@@ -80,6 +80,36 @@ describe('products-admin handler', () => {
     expect(JSON.parse(result.body as string)).toMatchObject({ items: [{ id: PRODUCT_ID }] });
   });
 
+  it('routes GET /admin/products with q filter', async () => {
+    list.mockResolvedValueOnce({ items: [product], index: 'primary', filters: { q: 'oculos' } });
+    const result = await handler(
+      adminEvent({ queryStringParameters: { q: 'oculos' } }),
+      {} as Context,
+    );
+    expect(result.statusCode).toBe(200);
+    expect(list).toHaveBeenCalledWith(expect.objectContaining({ q: 'oculos', name: undefined }));
+  });
+
+  it('returns 400 when q is too short', async () => {
+    const result = await handler(
+      adminEvent({ queryStringParameters: { q: 'a' } }),
+      {} as Context,
+    );
+    expect(result.statusCode).toBe(400);
+    expect(JSON.parse(result.body as string).code).toBe('INVALID_QUERY');
+    expect(list).not.toHaveBeenCalled();
+  });
+
+  it('returns 400 when q exceeds 120 characters', async () => {
+    const result = await handler(
+      adminEvent({ queryStringParameters: { q: 'a'.repeat(121) } }),
+      {} as Context,
+    );
+    expect(result.statusCode).toBe(400);
+    expect(JSON.parse(result.body as string).code).toBe('INVALID_QUERY');
+    expect(list).not.toHaveBeenCalled();
+  });
+
   it('routes GET /admin/products/{id}', async () => {
     getById.mockResolvedValueOnce(product);
     const result = await handler(

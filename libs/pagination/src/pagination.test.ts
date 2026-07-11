@@ -32,6 +32,25 @@ describe('cursor', () => {
     expect(() => decodeCursor(cursor, { category: 'maquiagem' })).toThrow(ApiError);
   });
 
+  it('throws filter_mismatch when q differs', () => {
+    const withQ = encodeCursor({
+      ...payload,
+      filters: { q: 'maria' },
+    });
+    expect(() => decodeCursor(withQ, { q: 'joao' })).toThrow(ApiError);
+  });
+
+  it('round-trips cursor with q filter', () => {
+    const filters = { q: 'maria', category: 'oculos' };
+    const cursor = encodeCursor({
+      v: 1,
+      index: 'primary',
+      key: { id: '550e8400-e29b-41d4-a716-446655440000' },
+      filters,
+    });
+    expect(decodeCursor(cursor, filters).filters).toEqual(filters);
+  });
+
   it('throws filter_mismatch when expected filters are empty', () => {
     const cursor = encodeCursor(payload);
     expect(() => decodeCursor(cursor, {})).toThrow(ApiError);

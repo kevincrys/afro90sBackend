@@ -505,8 +505,22 @@ Lista todos os produtos (paginada).
 |-------|------|-------------|---------|-----------|
 | `limit` | integer | Não | `20` | Max 100 |
 | `cursor` | string | Não | — | Paginação |
-| `name` | string | Não | — | Busca por nome |
+| `q` | string | Não | — | Busca unificada por **ID** ou **prefixo do nome do produto** (case-insensitive, sem acentos). Mín. 2 e máx. **120** caracteres (igual a `product.name`). Detecção automática (ver tabela abaixo) |
+| `name` | string | Não | — | Legado: busca só por nome (ignorado se `q` estiver presente) |
 | `category` | string | Não | — | Filtro de categoria |
+
+**Detecção de `q` (admin produtos)**
+
+| Modo | Condição | DynamoDB |
+|------|----------|----------|
+| UUID completo | `q` é UUID válido | `GetItem` por `id` |
+| ID | Só hex/`-` **e** tem dígito | `begins_with(id, q)` |
+| Nome | Letras/acentos/espaços/números fora de hex puro | `begins_with(nameLower, normalizeNameLower(q))` |
+| ID ou nome | Só hex `a-f` e hífen, sem dígitos (ex.: `dead`) | `(begins_with(id) OR begins_with(nameLower))` |
+
+> Diferente de pedidos: nomes de produto **podem** conter dígitos; por isso dígito sozinho não força modo ID.
+
+Ao paginar com busca, repetir `q` (e `category`, se usado) junto com `cursor`.
 
 #### Response `200 OK`
 
@@ -517,6 +531,7 @@ Mesmo formato de `GET /products` (`PaginatedResponse<Product>`).
 | Status | `code` | Quando |
 |--------|--------|--------|
 | `401` | `UNAUTHORIZED` | Token ausente, expirado ou sem grupo `admins` |
+| `400` | `INVALID_QUERY` | `category` inválida, `q` com menos de 2 ou mais de 120 caracteres |
 
 ---
 

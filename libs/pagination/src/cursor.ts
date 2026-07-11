@@ -11,6 +11,7 @@ export function normalizeCursorFilters(filters: CursorFilters): CursorFilters {
   if (filters.name) normalized.name = filters.name;
   if (filters.category) normalized.category = filters.category;
   if (filters.status) normalized.status = filters.status;
+  if (filters.q) normalized.q = filters.q;
   return normalized;
 }
 

@@ -68,6 +68,36 @@ describe('ProductRepository', () => {
     expect(send.mock.calls[0][0].input.IndexName).toBe('gsi-createdAt');
   });
 
+  it('list with q nameOnly scans begins_with nameLower', async () => {
+    send.mockResolvedValueOnce({ Items: [] });
+    const result = await repository.list({ q: 'Óculos 90', limit: 20 });
+    const input = send.mock.calls[0][0].input;
+    expect(input.IndexName).toBeUndefined();
+    expect(input.FilterExpression).toBe('begins_with(#nameLower, :prefix)');
+    expect(result.index).toBe('primary');
+    expect(result.filters).toEqual({ q: 'Óculos 90' });
+  });
+
+  it('list with q fullUuid uses GetItem', async () => {
+    send.mockResolvedValueOnce({ Item: productItem });
+    const result = await repository.list({ q: PRODUCT_ID, limit: 20 });
+    expect(result.items).toHaveLength(1);
+    expect(result.filters).toEqual({ q: PRODUCT_ID });
+  });
+
+  it('list with q and category filters category on GetItem miss-match', async () => {
+    send.mockResolvedValueOnce({ Item: productItem });
+    const result = await repository.list({ q: PRODUCT_ID, category: 'maquiagem', limit: 20 });
+    expect(result.items).toHaveLength(0);
+  });
+
+  it('list with q idOnly uses begins_with id', async () => {
+    send.mockResolvedValueOnce({ Items: [] });
+    await repository.list({ q: '550e8400', limit: 20 });
+    const input = send.mock.calls[0][0].input;
+    expect(input.FilterExpression).toBe('begins_with(#id, :qLower)');
+  });
+
   it('list applies category filter', async () => {
     send.mockResolvedValueOnce({ Items: [] });
     await repository.list({ category: 'oculos', limit: 20 });
